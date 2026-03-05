@@ -1,10 +1,10 @@
-# 🎓 UniPortal — University Student Portal
+ UniVerse — One Platform endless connection
 
 A full-stack MERN web application that serves as a centralized hub for university student life — clubs, events, study groups, and more.
 
 ---
 
-## ✨ Features
+ Features
 
 - **🔐 Authentication** — JWT-based login/register with university email domain enforcement
 - **🏛️ Societies & Clubs** — Browse, join, and leave student clubs with real-time member counts
