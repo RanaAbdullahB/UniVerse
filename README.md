@@ -1,4 +1,4 @@
- UniVerse — One Platform endless connection
+UniVerse — One Platform endless connection
 
 A full-stack MERN web application that serves as a centralized hub for university student life — clubs, events, study groups, and more.
 
@@ -6,18 +6,18 @@ A full-stack MERN web application that serves as a centralized hub for universit
 
  Features
 
-- **🔐 Authentication** — JWT-based login/register with university email domain enforcement
-- **🏛️ Societies & Clubs** — Browse, join, and leave student clubs with real-time member counts
-- **📅 Upcoming Events** — Register for workshops, seminars, competitions, and social events
-- **📚 Study Groups** — Create and join peer study groups with scheduling
-- **👤 Student Profile** — Manage your profile, view memberships, change password
-- **📱 Responsive Design** — Works on mobile, tablet, and desktop
-- **🔔 Toast Notifications** — Real-time feedback on all user actions
-- **🛡️ Role-Based Access** — Admin and student roles with appropriate permissions
+- **Authentication** — JWT-based login/register with university email domain enforcement
+- **Societies & Clubs** — Browse, join, and leave student clubs with real-time member counts
+- **Upcoming Events** — Register for workshops, seminars, competitions, and social events
+- **Study Groups** — Create and join peer study groups with scheduling
+- **Student Profile** — Manage your profile, view memberships, change password
+- **Responsive Design** — Works on mobile, tablet, and desktop
+- **Toast Notifications** — Real-time feedback on all user actions
+- **Role-Based Access** — Admin and student roles with appropriate permissions
 
 ---
 
-## 🛠️ Tech Stack
+**Tech Stack**
 
 | Layer | Technology |
 |-------|-----------|
@@ -30,7 +30,7 @@ A full-stack MERN web application that serves as a centralized hub for universit
 
 ---
 
-## 📁 Project Structure
+**Project Structure**
 
 ```
 university-portal/
@@ -88,7 +88,7 @@ university-portal/
 
 ---
 
-## 🚀 Quick Start
+**Quick Start**
 
 ### Prerequisites
 
