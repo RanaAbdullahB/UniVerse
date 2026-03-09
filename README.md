@@ -138,7 +138,7 @@ PORT=5000
 CLIENT_URL=http://localhost:3000
 ```
 
-> ⚠️ Change `UNIVERSITY_EMAIL_DOMAIN` to match your actual university domain (e.g., `mit.edu`, `oxford.ac.uk`)
+>  Change `UNIVERSITY_EMAIL_DOMAIN` to match your actual university domain (e.g., `mit.edu`, `oxford.ac.uk`)
 
 ---
 
@@ -158,8 +158,8 @@ This creates:
 
 **Login credentials after seeding:**
 ```
-👨‍💼 Admin:   admin@university.edu    | password: password123
-👨‍🎓 Student: alex.johnson@university.edu | password: password123
+ Admin:   admin@university.edu    | password: password123
+ Student: alex.johnson@university.edu | password: password123
 ```
 
 ---
@@ -177,7 +177,7 @@ npm run dev:client   # Frontend on http://localhost:3000
 
 ---
 
-## 🔌 API Endpoints
+##  API Endpoints
 
 ### Authentication
 | Method | Endpoint | Access | Description |
@@ -221,7 +221,7 @@ npm run dev:client   # Frontend on http://localhost:3000
 
 ---
 
-## 🔒 Security
+## Security
 
 - All API routes (except `/auth/register` and `/auth/login`) require a valid JWT
 - University email domain enforced on register AND login
@@ -234,7 +234,7 @@ npm run dev:client   # Frontend on http://localhost:3000
 
 ---
 
-## 🎨 Design System
+## Design System
 
 The portal uses a **refined academic aesthetic** with:
 
@@ -245,7 +245,7 @@ The portal uses a **refined academic aesthetic** with:
 
 ---
 
-## 📝 Notes
+## Notes
 
 - The React app proxies `/api` requests to `localhost:5000` during development
 - For production, set `CLIENT_URL` in `.env` and configure CORS accordingly
