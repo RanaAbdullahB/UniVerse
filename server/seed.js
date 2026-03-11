@@ -28,7 +28,7 @@ const seedData = async () => {
     const hashedPassword = await bcrypt.hash('password123', 12);
 
     const adminUser = await User.create({
-      name: 'Dr. Admin Smith',
+      name: ' Admin Admin',
       universityEmail: `admin@${DOMAIN}`,
       password: 'password123',
       studentId: 'ADMIN001',
@@ -38,8 +38,8 @@ const seedData = async () => {
     });
 
     const studentUser = await User.create({
-      name: 'Alex Johnson',
-      universityEmail: `alex.johnson@${DOMAIN}`,
+      name: 'Abdullah',
+      universityEmail: `Abdullah@${DOMAIN}`,
       password: 'password123',
       studentId: 'STU2024001',
       department: 'Computer Science',
