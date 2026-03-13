@@ -6,6 +6,8 @@ import { PageLoader } from './components/LoadingSpinner';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
 import NotFound from './pages/NotFound';
 
 // Protected route wrapper
@@ -28,18 +30,11 @@ function AppRoutes() {
   return (
     <Routes>
       <Route path="/" element={<Navigate to="/dashboard" replace />} />
-      <Route
-        path="/login"
-        element={<PublicRoute><Login /></PublicRoute>}
-      />
-      <Route
-        path="/register"
-        element={<PublicRoute><Register /></PublicRoute>}
-      />
-      <Route
-        path="/dashboard"
-        element={<ProtectedRoute><Dashboard /></ProtectedRoute>}
-      />
+      <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
+      <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />
+      <Route path="/forgot-password" element={<PublicRoute><ForgotPassword /></PublicRoute>} />
+      <Route path="/reset-password/:token" element={<PublicRoute><ResetPassword /></PublicRoute>} />
+      <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   );
