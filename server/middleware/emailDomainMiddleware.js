@@ -9,7 +9,7 @@ const emailDomainMiddleware = (req, res, next) => {
     });
   }
 
-  const domain = process.env.UNIVERSITY_EMAIL_DOMAIN || '@cs.lgu.edu.pk';
+  const domain = process.env.UNIVERSITY_EMAIL_DOMAIN || 'cs.lgu.edu.pk';
   const emailLower = universityEmail.toLowerCase().trim();
 
   // Basic email format check

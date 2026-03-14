@@ -10,7 +10,7 @@ const Event = require('./models/Event');
 const StudyGroup = require('./models/StudyGroup');
 
 const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/university-portal';
-const DOMAIN = process.env.UNIVERSITY_EMAIL_DOMAIN || '@cs.lgu.edu.pk';
+const DOMAIN = process.env.UNIVERSITY_EMAIL_DOMAIN || 'cs.lgu.edu.pk';
 
 const seedData = async () => {
   try {
