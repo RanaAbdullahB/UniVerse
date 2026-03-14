@@ -41,25 +41,20 @@ export default function Sidebar({ activeTab, onTabChange, mobileOpen, onClose })
         className={`${!mobileOpen ? 'hidden md:flex' : 'flex'} flex-col`}
       >
         {/* Logo */}
-        <div style={{ padding: '28px 20px 20px', borderBottom: '1px solid rgba(201,168,76,0.12)' }}>
+        <div style={{ padding: '20px 20px 16px', borderBottom: '1px solid rgba(201,168,76,0.12)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <div
-              style={{
-                width: 38,
-                height: 38,
-                background: 'linear-gradient(135deg, #c9a84c, #8a6f30)',
-                borderRadius: 10,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: '1.1rem',
-              }}
-            >
-              🎓
+            <div style={{
+              width: 42, height: 42, borderRadius: '50%',
+              background: 'rgba(255,255,255,0.92)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              overflow: 'hidden', padding: 2, flexShrink: 0,
+              boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
+            }}>
+              <img src="/lgulogo.png" alt="LGU" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
             </div>
             <div>
               <h2 style={{ color: '#e8c97a', fontFamily: 'Playfair Display, serif', fontSize: '1rem', lineHeight: 1.2 }}>
-                UniPortal
+                UniVerse
               </h2>
               <p style={{ color: 'rgba(245,240,232,0.4)', fontSize: '0.7rem', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
                 Student Gateway

@@ -17,10 +17,7 @@ export default function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!form.universityEmail || !form.password) {
-      setError('Please fill in all fields');
-      return;
-    }
+    if (!form.universityEmail || !form.password) { setError('Please fill in all fields'); return; }
     setLoading(true);
     try {
       await login(form.universityEmail, form.password);
@@ -33,135 +30,213 @@ export default function Login() {
   };
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', background: '#f7f5f0' }}>
-      {/* Left panel */}
-      <div
-        style={{
-          flex: 1,
-          background: 'linear-gradient(160deg, #0f1b2d 0%, #1a2d4a 50%, #243d5e 100%)',
-          display: 'none',
-          flexDirection: 'column',
-          justifyContent: 'center',
-          padding: '60px 50px',
-          position: 'relative',
-          overflow: 'hidden',
-        }}
-        className="md:flex"
-      >
-        {/* Decorative circles */}
-        <div style={{ position: 'absolute', top: -80, right: -80, width: 300, height: 300, borderRadius: '50%', border: '1px solid rgba(201,168,76,0.1)' }} />
-        <div style={{ position: 'absolute', top: -40, right: -40, width: 200, height: 200, borderRadius: '50%', border: '1px solid rgba(201,168,76,0.08)' }} />
-        <div style={{ position: 'absolute', bottom: -100, left: -60, width: 350, height: 350, borderRadius: '50%', border: '1px solid rgba(201,168,76,0.06)' }} />
+    <div style={{
+      minHeight: '100vh',
+      position: 'relative',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: '24px 16px',
+      overflow: 'hidden',
+    }}>
 
-        <div style={{ position: 'relative', zIndex: 1 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 60 }}>
-            <div style={{ width: 48, height: 48, background: 'linear-gradient(135deg, #c9a84c, #8a6f30)', borderRadius: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.4rem' }}>
-              🎓
-            </div>
-            <div>
-              <h1 style={{ color: '#e8c97a', fontFamily: 'Playfair Display, serif', fontSize: '1.4rem' }}>UniPortal</h1>
-              <p style={{ color: 'rgba(245,240,232,0.4)', fontSize: '0.72rem', letterSpacing: '0.1em', textTransform: 'uppercase' }}>Student Gateway</p>
-            </div>
+      {/* ── Full-page campus background ── */}
+      <div style={{
+        position: 'fixed', inset: 0,
+        backgroundImage: 'url(/campus.jpeg)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+        zIndex: 0,
+      }} />
+
+      {/* ── Dark gradient overlay ── */}
+      <div style={{
+        position: 'fixed', inset: 0,
+        background: 'linear-gradient(135deg, rgba(1,8,24,0.72) 0%, rgba(29,47,111,0.58) 100%)',
+        zIndex: 1,
+      }} />
+
+      {/* ── Centered content wrapper ── */}
+      <div style={{
+        position: 'relative',
+        zIndex: 2,
+        width: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}>
+
+        {/* Top branding — above the card */}
+        <div style={{ textAlign: 'center', marginBottom: 28 }} className="animate-fade-in">
+          <div style={{
+            width: 72, height: 72,
+            background: 'rgba(255,255,255,0.92)',
+            backdropFilter: 'blur(10px)',
+            border: '2px solid rgba(255,255,255,0.5)',
+            borderRadius: '50%',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            margin: '0 auto 14px',
+            boxShadow: '0 4px 24px rgba(0,0,0,0.3)',
+            overflow: 'hidden',
+            padding: 4,
+          }}>
+            <img src="/lgulogo.png" alt="LGU Logo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
           </div>
-
-          <h2 style={{ color: '#f5f0e8', fontFamily: 'Playfair Display, serif', fontSize: '2.4rem', lineHeight: 1.25, marginBottom: 20 }}>
-            Your campus,<br />
-            <span style={{ color: '#c9a84c' }}>connected.</span>
-          </h2>
-          <p style={{ color: 'rgba(245,240,232,0.6)', fontSize: '0.95rem', lineHeight: 1.7, maxWidth: 360 }}>
-            Access clubs, events, study groups, and everything university life has to offer — all in one place.
+          <h1 style={{
+            color: '#fff',
+            fontFamily: 'Playfair Display, serif',
+            fontSize: '2rem',
+            textShadow: '0 2px 12px rgba(0,0,0,0.5)',
+            marginBottom: 4,
+          }}>
+            UniVerse
+          </h1>
+          <p style={{
+            color: 'rgba(255,255,255,0.55)',
+            fontSize: '0.72rem',
+            letterSpacing: '0.14em',
+            textTransform: 'uppercase',
+          }}>
+            Lahore Garrison University · Student Gateway
           </p>
-
-          <div style={{ marginTop: 50, display: 'flex', flexDirection: 'column', gap: 16 }}>
-            {['🏛️ 50+ Student Clubs & Societies', '📅 Live Event Registration', '📚 Peer Study Groups'].map((item) => (
-              <div key={item} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#c9a84c', flexShrink: 0 }} />
-                <span style={{ color: 'rgba(245,240,232,0.7)', fontSize: '0.875rem' }}>{item}</span>
-              </div>
-            ))}
-          </div>
         </div>
-      </div>
 
-      {/* Right panel — login form */}
-      <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px 24px' }}>
-        <div style={{ width: '100%', maxWidth: 400 }} className="animate-fade-in">
-          {/* Mobile logo */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 36 }} className="md:hidden">
-            <div style={{ width: 38, height: 38, background: 'linear-gradient(135deg, #c9a84c, #8a6f30)', borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.1rem' }}>🎓</div>
-            <h1 style={{ fontFamily: 'Playfair Display, serif', color: '#0f1b2d', fontSize: '1.2rem' }}>UniPortal</h1>
-          </div>
+        {/* ── Glassmorphism sign-in card ── */}
+        <div style={{ width: '100%', maxWidth: 420 }} className="animate-fade-in">
+          <div style={{
+            background: 'rgba(255,255,255,0.13)',
+            backdropFilter: 'blur(28px)',
+            WebkitBackdropFilter: 'blur(28px)',
+            border: '1px solid rgba(255,255,255,0.22)',
+            borderRadius: 20,
+            padding: '36px 36px',
+            boxShadow: '0 8px 40px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.15)',
+          }}>
 
-          <h2 style={{ fontFamily: 'Playfair Display, serif', fontSize: '1.8rem', color: '#0f1b2d', marginBottom: 6 }}>
-            Welcome back
-          </h2>
-          <p style={{ color: '#718096', fontSize: '0.875rem', marginBottom: 32 }}>
-            Sign in with your university credentials
-          </p>
-
-          {error && (
-            <div style={{ background: '#fef2f2', border: '1px solid #fca5a5', borderRadius: 8, padding: '11px 14px', marginBottom: 20, color: '#991b1b', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: 8 }}>
-              ⚠️ {error}
-            </div>
-          )}
-
-          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
-            <div>
-              <label className="input-label">University Email</label>
-              <input
-                type="email"
-                name="universityEmail"
-                value={form.universityEmail}
-                onChange={handleChange}
-                placeholder="yourname@university.edu"
-                className={`input-field ${error ? 'error' : ''}`}
-                autoComplete="email"
-              />
-            </div>
-
-            <div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 5 }}>
-                <label className="input-label" style={{ marginBottom: 0 }}>Password</label>
-                <Link
-                  to="/forgot-password"
-                  style={{ fontSize: '0.78rem', color: 'var(--blue-primary)', textDecoration: 'none', fontWeight: 500 }}
-                >
-                  Forgot password?
-                </Link>
-              </div>
-              <input
-                type="password"
-                name="password"
-                value={form.password}
-                onChange={handleChange}
-                placeholder="••••••••"
-                className="input-field"
-                autoComplete="current-password"
-              />
-            </div>
-
-            <button
-              type="submit"
-              className="btn-primary"
-              disabled={loading}
-              style={{ width: '100%', justifyContent: 'center', padding: '12px', marginTop: 4 }}
-            >
-              {loading ? <><Spinner size={16} color="#e8c97a" /> Signing in...</> : 'Sign In →'}
-            </button>
-          </form>
-
-          <p style={{ textAlign: 'center', marginTop: 24, color: '#718096', fontSize: '0.85rem' }}>
-            Don't have an account?{' '}
-            <Link to="/register" style={{ color: '#8a6f30', fontWeight: 600, textDecoration: 'none' }}>
-              Register here
-            </Link>
-          </p>
-
-          <div style={{ marginTop: 32, padding: '14px', background: 'rgba(201,168,76,0.06)', border: '1px solid rgba(201,168,76,0.2)', borderRadius: 8 }}>
-            <p style={{ fontSize: '0.75rem', color: '#8a6f30', textAlign: 'center', fontWeight: 500 }}>
-              🔒 Only university email addresses are accepted
+            <h2 style={{
+              fontFamily: 'Playfair Display, serif',
+              fontSize: '1.5rem',
+              color: '#fff',
+              marginBottom: 4,
+              textShadow: '0 1px 8px rgba(0,0,0,0.3)',
+              textAlign: 'center',
+            }}>
+              Welcome back
+            </h2>
+            <p style={{
+              color: 'rgba(255,255,255,0.55)',
+              fontSize: '0.83rem',
+              marginBottom: 24,
+              textAlign: 'center',
+            }}>
+              Sign in with your university credentials
             </p>
+
+            {/* Error */}
+            {error && (
+              <div style={{
+                background: 'rgba(220,53,69,0.18)',
+                border: '1px solid rgba(220,53,69,0.45)',
+                borderRadius: 8, padding: '11px 14px', marginBottom: 20,
+                color: '#ffb3b3', fontSize: '0.85rem',
+                display: 'flex', alignItems: 'center', gap: 8,
+              }}>
+                ⚠️ {error}
+              </div>
+            )}
+
+            {/* Form */}
+            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+
+              {/* Email */}
+              <div>
+                <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 500, color: 'rgba(255,255,255,0.8)', marginBottom: 6 }}>
+                  University Email
+                </label>
+                <input
+                  type="email" name="universityEmail"
+                  value={form.universityEmail} onChange={handleChange}
+                  placeholder="yourname@university.edu" autoComplete="email"
+                  style={{
+                    width: '100%', padding: '11px 14px',
+                    background: 'rgba(255,255,255,0.12)',
+                    border: `1.5px solid ${error ? 'rgba(220,53,69,0.6)' : 'rgba(255,255,255,0.25)'}`,
+                    borderRadius: 8, color: '#fff', fontSize: '0.9rem',
+                    outline: 'none', fontFamily: 'DM Sans, sans-serif',
+                    transition: 'border-color 0.2s, box-shadow 0.2s',
+                  }}
+                  onFocus={(e) => { e.target.style.borderColor = 'rgba(152,197,255,0.8)'; e.target.style.boxShadow = '0 0 0 3px rgba(152,197,255,0.15)'; }}
+                  onBlur={(e) => { e.target.style.borderColor = 'rgba(255,255,255,0.25)'; e.target.style.boxShadow = 'none'; }}
+                />
+              </div>
+
+              {/* Password */}
+              <div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                  <label style={{ fontSize: '0.82rem', fontWeight: 500, color: 'rgba(255,255,255,0.8)' }}>Password</label>
+                  <Link to="/forgot-password" style={{ fontSize: '0.78rem', color: 'rgb(152,197,255)', textDecoration: 'none', fontWeight: 500 }}>
+                    Forgot password?
+                  </Link>
+                </div>
+                <input
+                  type="password" name="password"
+                  value={form.password} onChange={handleChange}
+                  placeholder="••••••••" autoComplete="current-password"
+                  style={{
+                    width: '100%', padding: '11px 14px',
+                    background: 'rgba(255,255,255,0.12)',
+                    border: '1.5px solid rgba(255,255,255,0.25)',
+                    borderRadius: 8, color: '#fff', fontSize: '0.9rem',
+                    outline: 'none', fontFamily: 'DM Sans, sans-serif',
+                    transition: 'border-color 0.2s, box-shadow 0.2s',
+                  }}
+                  onFocus={(e) => { e.target.style.borderColor = 'rgba(152,197,255,0.8)'; e.target.style.boxShadow = '0 0 0 3px rgba(152,197,255,0.15)'; }}
+                  onBlur={(e) => { e.target.style.borderColor = 'rgba(255,255,255,0.25)'; e.target.style.boxShadow = 'none'; }}
+                />
+              </div>
+
+              {/* Submit */}
+              <button
+                type="submit" disabled={loading}
+                style={{
+                  width: '100%', padding: '12px', marginTop: 4,
+                  background: loading ? 'rgba(13,110,253,0.5)' : 'rgb(13,110,253)',
+                  color: '#fff', border: 'none', borderRadius: 8,
+                  fontFamily: 'DM Sans, sans-serif', fontWeight: 600, fontSize: '0.95rem',
+                  cursor: loading ? 'not-allowed' : 'pointer',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                  boxShadow: '0 4px 16px rgba(13,110,253,0.4)',
+                  transition: 'background 0.2s',
+                }}
+                onMouseEnter={(e) => { if (!loading) e.currentTarget.style.background = 'rgb(29,47,111)'; }}
+                onMouseLeave={(e) => { if (!loading) e.currentTarget.style.background = 'rgb(13,110,253)'; }}
+              >
+                {loading ? <><Spinner size={16} color="#fff" /> Signing in...</> : 'Sign In →'}
+              </button>
+            </form>
+
+            <div style={{ borderTop: '1px solid rgba(255,255,255,0.12)', margin: '22px 0' }} />
+
+            <p style={{ textAlign: 'center', color: 'rgba(255,255,255,0.6)', fontSize: '0.85rem' }}>
+              Don't have an account?{' '}
+              <Link to="/register" style={{ color: 'rgb(152,197,255)', fontWeight: 600, textDecoration: 'none' }}>
+                Register here
+              </Link>
+            </p>
+
+            <div style={{ marginTop: 14, padding: '9px 14px', background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8, textAlign: 'center' }}>
+              <p style={{ fontSize: '0.73rem', color: 'rgba(255,255,255,0.45)', fontWeight: 500 }}>
+                🔒 Only university email addresses are accepted
+              </p>
+            </div>
           </div>
+
+          {/* Footer */}
+          <p style={{ textAlign: 'center', marginTop: 18, color: 'rgba(255,255,255,0.3)', fontSize: '0.7rem' }}>
+            © 2025 Lahore Garrison University — UniVerse
+          </p>
         </div>
       </div>
     </div>

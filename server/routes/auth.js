@@ -29,13 +29,13 @@ const sendResetEmail = async (toEmail, resetURL, userName) => {
   });
 
   await transporter.sendMail({
-    from: `"UniPortal" <${process.env.EMAIL_USER}>`,
+    from: `"UniVerse" <${process.env.EMAIL_USER}>`,
     to: toEmail,
-    subject: 'Password Reset Request — UniPortal',
+    subject: 'Password Reset Request — UniVerse',
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 520px; margin: 0 auto; padding: 32px; background: #f8f9fa; border-radius: 12px;">
         <div style="text-align: center; margin-bottom: 28px;">
-          <h1 style="font-size: 1.6rem; color: #010818; margin: 0;">🎓 UniPortal</h1>
+          <h1 style="font-size: 1.6rem; color: #010818; margin: 0;">🎓 UniVerse</h1>
           <p style="color: #6c757d; margin: 4px 0 0;">Student Gateway</p>
         </div>
         <div style="background: #fff; border-radius: 10px; padding: 28px; border: 1px solid #dee2e6;">

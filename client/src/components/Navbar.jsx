@@ -38,6 +38,13 @@ export default function Navbar({ onMobileMenuToggle, activeTab }) {
         >
           ☰
         </button>
+        {/* Logo visible on mobile only */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }} className="md:hidden">
+          <div style={{ width: 28, height: 28, borderRadius: '50%', overflow: 'hidden', background: '#fff', border: '1px solid #e2e8f0' }}>
+            <img src="/lgulogo.png" alt="LGU" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+          </div>
+          <span style={{ fontFamily: 'Playfair Display, serif', fontSize: '0.95rem', color: '#0f1b2d', fontWeight: 600 }}>UniVerse</span>
+        </div>
         <h1
           style={{
             fontFamily: 'Playfair Display, serif',
@@ -45,6 +52,7 @@ export default function Navbar({ onMobileMenuToggle, activeTab }) {
             color: '#0f1b2d',
             fontWeight: 600,
           }}
+          className="hidden md:block"
         >
           {tabTitles[activeTab] || 'Dashboard'}
         </h1>

@@ -129,11 +129,9 @@ export default function ResetPassword() {
 
         {/* Logo */}
         <div style={{ textAlign: 'center', marginBottom: 32 }}>
-          <div style={{
-            width: 52, height: 52, background: 'linear-gradient(135deg, var(--blue-primary), var(--dark-accent))',
-            borderRadius: 14, display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: '1.5rem', margin: '0 auto 14px',
-          }}>🔑</div>
+          <div style={{ width: 60, height: 60, background: '#fff', borderRadius: '50%', overflow: 'hidden', border: '2px solid #e2e8f0', margin: '0 auto 14px', padding: 4, boxShadow: '0 2px 12px rgba(0,0,0,0.1)' }}>
+            <img src="/lgulogo.png" alt="LGU Logo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+          </div>
           <h1 style={{ fontFamily: 'Playfair Display, serif', fontSize: '1.8rem', color: 'var(--dark-primary)', marginBottom: 6 }}>
             Set New Password
           </h1>
