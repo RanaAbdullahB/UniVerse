@@ -10,7 +10,7 @@ const Event = require('./models/Event');
 const StudyGroup = require('./models/StudyGroup');
 
 const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/university-portal';
-const DOMAIN = process.env.UNIVERSITY_EMAIL_DOMAIN || 'university.edu';
+const DOMAIN = process.env.UNIVERSITY_EMAIL_DOMAIN || '@cs.lgu.edu.pk';
 
 const seedData = async () => {
   try {
@@ -28,7 +28,7 @@ const seedData = async () => {
     const hashedPassword = await bcrypt.hash('password123', 12);
 
     const adminUser = await User.create({
-      name: ' Admin Admin',
+      name: 'Dr. Admin Smith',
       universityEmail: `admin@${DOMAIN}`,
       password: 'password123',
       studentId: 'ADMIN001',
@@ -38,8 +38,8 @@ const seedData = async () => {
     });
 
     const studentUser = await User.create({
-      name: 'Abdullah',
-      universityEmail: `Abdullah@${DOMAIN}`,
+      name: 'Alex Johnson',
+      universityEmail: `alex.johnson@${DOMAIN}`,
       password: 'password123',
       studentId: 'STU2024001',
       department: 'Computer Science',

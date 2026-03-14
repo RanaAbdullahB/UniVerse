@@ -158,7 +158,7 @@ export default function Login() {
                 <input
                   type="email" name="universityEmail"
                   value={form.universityEmail} onChange={handleChange}
-                  placeholder="yourname@university.edu" autoComplete="email"
+                  placeholder="yourname@lgu.edu.pk" autoComplete="email"
                   style={{
                     width: '100%', padding: '11px 14px',
                     background: 'rgba(255,255,255,0.12)',
@@ -228,7 +228,7 @@ export default function Login() {
 
             <div style={{ marginTop: 14, padding: '9px 14px', background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8, textAlign: 'center' }}>
               <p style={{ fontSize: '0.73rem', color: 'rgba(255,255,255,0.45)', fontWeight: 500 }}>
-                🔒 Only university email addresses are accepted
+                🔒 Students: use your @lgu.edu.pk email
               </p>
             </div>
           </div>

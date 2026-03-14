@@ -108,7 +108,7 @@ export default function Register() {
               <Field label="Student ID" name="studentId" placeholder="STU2024001" />
             </div>
 
-            <Field label="University Email" name="universityEmail" type="email" placeholder="john.smith@university.edu" />
+            <Field label="University Email" name="universityEmail" type="email" placeholder="john.smith@lgu.edu.pk" />
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
               <Field label="Department" name="department">
@@ -144,7 +144,7 @@ export default function Register() {
             </div>
 
             <div style={{ background: 'rgba(201,168,76,0.06)', border: '1px solid rgba(201,168,76,0.2)', borderRadius: 8, padding: '10px 14px', fontSize: '0.78rem', color: '#8a6f30' }}>
-              🔒 Only university email addresses ending in <strong>@university.edu</strong> are accepted
+              🔒 Only LGU email addresses ending in @cs.lgu.edu.pk are accepted
             </div>
 
             <button

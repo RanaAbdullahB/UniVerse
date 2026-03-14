@@ -140,7 +140,8 @@ router.post('/register', emailDomainMiddleware, async (req, res, next) => {
 
 // @route   POST /api/auth/login
 // @access  Public
-router.post('/login', emailDomainMiddleware, async (req, res, next) => {
+// Rules: students must use @lgu.edu.pk — admins can use any email
+router.post('/login', async (req, res, next) => {
   try {
     const { universityEmail, password } = req.body;
 
@@ -151,7 +152,19 @@ router.post('/login', emailDomainMiddleware, async (req, res, next) => {
       });
     }
 
-    const user = await User.findOne({ universityEmail: universityEmail.toLowerCase() }).select('+password');
+    const emailLower = universityEmail.toLowerCase().trim();
+
+    // Basic email format check
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(emailLower)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid email format.',
+      });
+    }
+
+    // Find user first so we can check their role
+    const user = await User.findOne({ universityEmail: emailLower }).select('+password');
 
     if (!user) {
       return res.status(401).json({
@@ -159,6 +172,18 @@ router.post('/login', emailDomainMiddleware, async (req, res, next) => {
         message: 'Invalid email or password',
       });
     }
+
+    // If user is a student, enforce @lgu.edu.pk domain
+    if (user.role === 'student') {
+      const domain = process.env.UNIVERSITY_EMAIL_DOMAIN || '@cs.lgu.edu.pk';
+      if (!emailLower.endsWith(`@${domain}`)) {
+        return res.status(401).json({
+          success: false,
+          message: `Students must log in with their LGU email (@${domain})`,
+        });
+      }
+    }
+    // Admins can log in with any email — no domain restriction
 
     const isMatch = await user.comparePassword(password);
     if (!isMatch) {
