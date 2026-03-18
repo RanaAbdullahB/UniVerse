@@ -1,6 +1,6 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
-const crypto = require('crypto'); // built-in Node.js, no install needed
+const crypto = require('crypto');
 const nodemailer = require('nodemailer');
 const User = require('../models/User');
 const emailDomainMiddleware = require('../middleware/emailDomainMiddleware');
@@ -8,9 +8,31 @@ const { authMiddleware } = require('../middleware/authMiddleware');
 
 const router = express.Router();
 
-// ─── Email sender helper ───────────────────────────────────────────────────
+// Generate JWT token
+const generateToken = (id) => {
+  return jwt.sign({ id }, process.env.JWT_SECRET || 'fallback_secret', {
+    expiresIn: process.env.JWT_EXPIRE || '7d',
+  });
+};
+
+// Format user object for response (never include password)
+const formatUser = (user) => ({
+  _id: user._id,
+  name: user.name,
+  universityEmail: user.universityEmail,
+  studentId: user.studentId,
+  department: user.department,
+  year: user.year,
+  role: user.role,
+  profilePhoto: user.profilePhoto,
+  joinedClubs: user.joinedClubs,
+  joinedStudyGroups: user.joinedStudyGroups,
+  registeredEvents: user.registeredEvents,
+  createdAt: user.createdAt,
+});
+
+// ── Email helper for password reset ───────────────────────────────────────
 const sendResetEmail = async (toEmail, resetURL, userName) => {
-  // If no email config in .env, just log to console (great for development)
   if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
     console.log('\n─────────────────────────────────────────────');
     console.log('📧 PASSWORD RESET LINK (no email config found)');
@@ -19,58 +41,37 @@ const sendResetEmail = async (toEmail, resetURL, userName) => {
     console.log('─────────────────────────────────────────────\n');
     return;
   }
-
   const transporter = nodemailer.createTransport({
     service: process.env.EMAIL_SERVICE || 'gmail',
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS, // use an App Password for Gmail
-    },
+    auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS },
   });
-
   await transporter.sendMail({
     from: `"UniVerse" <${process.env.EMAIL_USER}>`,
     to: toEmail,
     subject: 'Password Reset Request — UniVerse',
     html: `
-      <div style="font-family: Arial, sans-serif; max-width: 520px; margin: 0 auto; padding: 32px; background: #f8f9fa; border-radius: 12px;">
-        <div style="text-align: center; margin-bottom: 28px;">
-          <h1 style="font-size: 1.6rem; color: #010818; margin: 0;">🎓 UniVerse</h1>
-          <p style="color: #6c757d; margin: 4px 0 0;">Student Gateway</p>
-        </div>
-        <div style="background: #fff; border-radius: 10px; padding: 28px; border: 1px solid #dee2e6;">
-          <h2 style="color: #010818; font-size: 1.2rem; margin: 0 0 12px;">Hi ${userName},</h2>
-          <p style="color: #333; line-height: 1.6; margin: 0 0 20px;">
-            We received a request to reset your password. Click the button below to choose a new password.
-          </p>
-          <div style="text-align: center; margin: 28px 0;">
-            <a href="${resetURL}" style="background: rgb(13,110,253); color: #fff; padding: 12px 32px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 0.95rem; display: inline-block;">
+      <div style="font-family:Arial,sans-serif;max-width:520px;margin:0 auto;padding:32px;background:#f8f9fa;border-radius:12px;">
+        <h1 style="color:#010818;font-size:1.4rem;">🎓 UniVerse</h1>
+        <div style="background:#fff;border-radius:10px;padding:28px;border:1px solid #dee2e6;margin-top:16px;">
+          <h2 style="color:#010818;font-size:1.1rem;">Hi ${userName},</h2>
+          <p style="color:#333;line-height:1.6;">We received a request to reset your password. Click the button below:</p>
+          <div style="text-align:center;margin:28px 0;">
+            <a href="${resetURL}" style="background:rgb(13,110,253);color:#fff;padding:12px 32px;border-radius:8px;text-decoration:none;font-weight:600;">
               Reset My Password
             </a>
           </div>
-          <p style="color: #6c757d; font-size: 0.82rem; margin: 0; border-top: 1px solid #dee2e6; padding-top: 16px;">
+          <p style="color:#6c757d;font-size:0.82rem;border-top:1px solid #dee2e6;padding-top:16px;">
             ⏱ This link expires in <strong>15 minutes</strong>.<br/>
-            If you did not request a password reset, please ignore this email.
+            If you did not request this, please ignore this email.
           </p>
         </div>
-        <p style="color: #adb5bd; font-size: 0.75rem; text-align: center; margin-top: 20px;">
-          If the button doesn't work, copy this link:<br/>
-          <span style="color: #0d6efd;">${resetURL}</span>
-        </p>
       </div>
     `,
   });
 };
 
-// Helper to generate JWT
-const generateToken = (id) => {
-  return jwt.sign({ id }, process.env.JWT_SECRET || 'fallback_secret', {
-    expiresIn: process.env.JWT_EXPIRE || '7d',
-  });
-};
-
-// @route   POST /api/auth/register
-// @access  Public
+// ── REGISTER ──────────────────────────────────────────────────────────────
+// emailDomainMiddleware enforces @lgu.edu.pk for all registrations
 router.post('/register', emailDomainMiddleware, async (req, res, next) => {
   try {
     const { name, universityEmail, password, studentId, department, year } = req.body;
@@ -78,24 +79,27 @@ router.post('/register', emailDomainMiddleware, async (req, res, next) => {
     if (!name || !universityEmail || !password || !studentId || !department) {
       return res.status(400).json({
         success: false,
-        message: 'Please provide all required fields: name, universityEmail, password, studentId, department',
+        message: 'Please provide all required fields',
       });
     }
 
     if (password.length < 6) {
       return res.status(400).json({
         success: false,
-        message: 'Password must be at least 6 characters long',
+        message: 'Password must be at least 6 characters',
       });
     }
 
-    // Check if user already exists
     const existingUser = await User.findOne({
-      $or: [{ universityEmail: universityEmail.toLowerCase() }, { studentId }],
+      $or: [
+        { universityEmail: universityEmail.toLowerCase() },
+        { studentId },
+      ],
     });
 
     if (existingUser) {
-      const field = existingUser.universityEmail === universityEmail.toLowerCase() ? 'email' : 'student ID';
+      const field = existingUser.universityEmail === universityEmail.toLowerCase()
+        ? 'email' : 'student ID';
       return res.status(400).json({
         success: false,
         message: `An account with this ${field} already exists`,
@@ -109,7 +113,7 @@ router.post('/register', emailDomainMiddleware, async (req, res, next) => {
       studentId,
       department,
       year: year || 1,
-      role: 'student',
+      role: 'student', // all self-registered users are students
     });
 
     const token = generateToken(user._id);
@@ -118,29 +122,16 @@ router.post('/register', emailDomainMiddleware, async (req, res, next) => {
       success: true,
       message: 'Account created successfully',
       token,
-      user: {
-        _id: user._id,
-        name: user.name,
-        universityEmail: user.universityEmail,
-        studentId: user.studentId,
-        department: user.department,
-        year: user.year,
-        role: user.role,
-        profilePhoto: user.profilePhoto,
-        joinedClubs: user.joinedClubs,
-        joinedStudyGroups: user.joinedStudyGroups,
-        registeredEvents: user.registeredEvents,
-        createdAt: user.createdAt,
-      },
+      user: formatUser(user),
     });
   } catch (error) {
     next(error);
   }
 });
 
-// @route   POST /api/auth/login
-// @access  Public
-// Rules: students must use @lgu.edu.pk — admins can use any email
+// ── LOGIN ─────────────────────────────────────────────────────────────────
+// Students: must use @lgu.edu.pk
+// Admins: can use any email — no domain restriction
 router.post('/login', async (req, res, next) => {
   try {
     const { universityEmail, password } = req.body;
@@ -154,16 +145,16 @@ router.post('/login', async (req, res, next) => {
 
     const emailLower = universityEmail.toLowerCase().trim();
 
-    // Basic email format check
+    // Basic format check
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(emailLower)) {
       return res.status(400).json({
         success: false,
-        message: 'Invalid email format.',
+        message: 'Invalid email format',
       });
     }
 
-    // Find user first so we can check their role
+    // Find user by email
     const user = await User.findOne({ universityEmail: emailLower }).select('+password');
 
     if (!user) {
@@ -173,18 +164,15 @@ router.post('/login', async (req, res, next) => {
       });
     }
 
-    // If user is a student, enforce @lgu.edu.pk domain
-    if (user.role === 'student') {
-      const domain = process.env.UNIVERSITY_EMAIL_DOMAIN || '@cs.lgu.edu.pk';
-      if (!emailLower.endsWith(`@${domain}`)) {
-        return res.status(401).json({
-          success: false,
-          message: `Students must log in with their LGU email (@${domain})`,
-        });
-      }
+    // Domain check — only for students, admins bypass this
+    if (user.role !== 'admin' && !emailLower.endsWith('@lgu.edu.pk')) {
+      return res.status(401).json({
+        success: false,
+        message: 'Students must log in with their LGU email (@lgu.edu.pk)',
+      });
     }
-    // Admins can log in with any email — no domain restriction
 
+    // Verify password
     const isMatch = await user.comparePassword(password);
     if (!isMatch) {
       return res.status(401).json({
@@ -199,64 +187,42 @@ router.post('/login', async (req, res, next) => {
       success: true,
       message: 'Login successful',
       token,
-      user: {
-        _id: user._id,
-        name: user.name,
-        universityEmail: user.universityEmail,
-        studentId: user.studentId,
-        department: user.department,
-        year: user.year,
-        role: user.role,
-        profilePhoto: user.profilePhoto,
-        joinedClubs: user.joinedClubs,
-        joinedStudyGroups: user.joinedStudyGroups,
-        registeredEvents: user.registeredEvents,
-        createdAt: user.createdAt,
-      },
+      user: formatUser(user),
     });
   } catch (error) {
     next(error);
   }
 });
 
-// @route   GET /api/auth/me
-// @access  Private
+// ── GET CURRENT USER ──────────────────────────────────────────────────────
 router.get('/me', authMiddleware, async (req, res, next) => {
   try {
     const user = await User.findById(req.user._id)
       .populate('joinedClubs', 'name category coverImage')
       .populate('joinedStudyGroups', 'name subject course')
       .populate('registeredEvents', 'title date venue');
-
-    res.json({
-      success: true,
-      user,
-    });
+    res.json({ success: true, user });
   } catch (error) {
     next(error);
   }
 });
 
-// @route   PUT /api/auth/update-profile
-// @access  Private
+// ── UPDATE PROFILE ────────────────────────────────────────────────────────
 router.put('/update-profile', authMiddleware, async (req, res, next) => {
   try {
     const { name, department, year, profilePhoto } = req.body;
-
     const user = await User.findByIdAndUpdate(
       req.user._id,
       { name, department, year, profilePhoto },
       { new: true, runValidators: true }
     );
-
     res.json({ success: true, message: 'Profile updated', user });
   } catch (error) {
     next(error);
   }
 });
 
-// @route   PUT /api/auth/change-password
-// @access  Private
+// ── CHANGE PASSWORD ───────────────────────────────────────────────────────
 router.put('/change-password', authMiddleware, async (req, res, next) => {
   try {
     const { currentPassword, newPassword } = req.body;
@@ -264,7 +230,6 @@ router.put('/change-password', authMiddleware, async (req, res, next) => {
     if (!currentPassword || !newPassword) {
       return res.status(400).json({ success: false, message: 'Please provide current and new password' });
     }
-
     if (newPassword.length < 6) {
       return res.status(400).json({ success: false, message: 'New password must be at least 6 characters' });
     }
@@ -285,54 +250,39 @@ router.put('/change-password', authMiddleware, async (req, res, next) => {
   }
 });
 
-// @route   POST /api/auth/forgot-password
-// @access  Public
+// ── FORGOT PASSWORD ───────────────────────────────────────────────────────
 router.post('/forgot-password', async (req, res, next) => {
   try {
     const { universityEmail } = req.body;
 
     if (!universityEmail) {
-      return res.status(400).json({ success: false, message: 'Please provide your university email' });
+      return res.status(400).json({ success: false, message: 'Please provide your email' });
     }
 
     const user = await User.findOne({ universityEmail: universityEmail.toLowerCase() });
 
-    // Always return success even if email not found (security best practice)
-    // This prevents attackers from knowing which emails are registered
+    // Always return same message for security
     if (!user) {
-      return res.json({
-        success: true,
-        message: 'If an account with that email exists, a reset link has been sent.',
-      });
+      return res.json({ success: true, message: 'If an account with that email exists, a reset link has been sent.' });
     }
 
-    // Generate a random reset token (plain version sent in email)
     const resetToken = crypto.randomBytes(32).toString('hex');
-
-    // Hash the token before storing in DB (so DB leak doesn't expose tokens)
     const hashedToken = crypto.createHash('sha256').update(resetToken).digest('hex');
 
-    // Save hashed token + expiry (15 minutes) to user
     user.resetPasswordToken = hashedToken;
-    user.resetPasswordExpire = Date.now() + 15 * 60 * 1000; // 15 minutes
+    user.resetPasswordExpire = Date.now() + 15 * 60 * 1000;
     await user.save({ validateBeforeSave: false });
 
-    // Build the reset URL pointing to the frontend
     const clientURL = process.env.CLIENT_URL || 'http://localhost:3000';
     const resetURL = `${clientURL}/reset-password/${resetToken}`;
 
     try {
       await sendResetEmail(user.universityEmail, resetURL, user.name);
-      res.json({
-        success: true,
-        message: 'If an account with that email exists, a reset link has been sent.',
-      });
+      res.json({ success: true, message: 'If an account with that email exists, a reset link has been sent.' });
     } catch (emailError) {
-      // If email fails, clear the token so user can try again
       user.resetPasswordToken = undefined;
       user.resetPasswordExpire = undefined;
       await user.save({ validateBeforeSave: false });
-      console.error('Email send error:', emailError);
       return res.status(500).json({ success: false, message: 'Failed to send reset email. Please try again.' });
     }
   } catch (error) {
@@ -340,8 +290,7 @@ router.post('/forgot-password', async (req, res, next) => {
   }
 });
 
-// @route   POST /api/auth/reset-password/:token
-// @access  Public
+// ── RESET PASSWORD ────────────────────────────────────────────────────────
 router.post('/reset-password/:token', async (req, res, next) => {
   try {
     const { newPassword, confirmPassword } = req.body;
@@ -349,58 +298,39 @@ router.post('/reset-password/:token', async (req, res, next) => {
     if (!newPassword || !confirmPassword) {
       return res.status(400).json({ success: false, message: 'Please provide new password and confirmation' });
     }
-
     if (newPassword !== confirmPassword) {
       return res.status(400).json({ success: false, message: 'Passwords do not match' });
     }
-
     if (newPassword.length < 6) {
       return res.status(400).json({ success: false, message: 'Password must be at least 6 characters' });
     }
 
-    // Hash the token from URL to compare with stored hash
-    const hashedToken = crypto
-      .createHash('sha256')
-      .update(req.params.token)
-      .digest('hex');
+    const hashedToken = crypto.createHash('sha256').update(req.params.token).digest('hex');
 
-    // Find user with matching token that hasn't expired
     const user = await User.findOne({
       resetPasswordToken: hashedToken,
-      resetPasswordExpire: { $gt: Date.now() }, // token must not be expired
+      resetPasswordExpire: { $gt: Date.now() },
     }).select('+resetPasswordToken +resetPasswordExpire +password');
 
     if (!user) {
-      return res.status(400).json({
-        success: false,
-        message: 'Reset link is invalid or has expired. Please request a new one.',
-      });
+      return res.status(400).json({ success: false, message: 'Reset link is invalid or has expired.' });
     }
 
-    // Set new password (pre-save hook will hash it automatically)
     user.password = newPassword;
-    user.resetPasswordToken = undefined; // clear the token
-    user.resetPasswordExpire = undefined; // clear the expiry
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpire = undefined;
     await user.save();
 
-    res.json({
-      success: true,
-      message: 'Password reset successfully! You can now log in with your new password.',
-    });
+    res.json({ success: true, message: 'Password reset successfully! You can now log in.' });
   } catch (error) {
     next(error);
   }
 });
 
-// @route   GET /api/auth/verify-reset-token/:token
-// @access  Public — lets frontend check if token is still valid before showing form
+// ── VERIFY RESET TOKEN ────────────────────────────────────────────────────
 router.get('/verify-reset-token/:token', async (req, res, next) => {
   try {
-    const hashedToken = crypto
-      .createHash('sha256')
-      .update(req.params.token)
-      .digest('hex');
-
+    const hashedToken = crypto.createHash('sha256').update(req.params.token).digest('hex');
     const user = await User.findOne({
       resetPasswordToken: hashedToken,
       resetPasswordExpire: { $gt: Date.now() },

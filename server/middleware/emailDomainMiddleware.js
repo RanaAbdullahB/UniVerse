@@ -1,4 +1,4 @@
-// Used on REGISTER only — enforces @lgu.edu.pk for all new accounts
+// Used on REGISTER only — enforces @lgu.edu.pk for all new student accounts
 const emailDomainMiddleware = (req, res, next) => {
   const { universityEmail } = req.body;
 
@@ -9,7 +9,6 @@ const emailDomainMiddleware = (req, res, next) => {
     });
   }
 
-  const domain = process.env.UNIVERSITY_EMAIL_DOMAIN || 'cs.lgu.edu.pk';
   const emailLower = universityEmail.toLowerCase().trim();
 
   // Basic email format check
@@ -21,10 +20,11 @@ const emailDomainMiddleware = (req, res, next) => {
     });
   }
 
-  if (!emailLower.endsWith(`@${domain}`)) {
+  // Enforce LGU domain
+  if (!emailLower.endsWith('@lgu.edu.pk')) {
     return res.status(400).json({
       success: false,
-      message: `Only LGU email addresses are permitted. Your email must end with @${domain}`,
+      message: 'Only LGU email addresses are permitted. Your email must end with @lgu.edu.pk',
     });
   }
 
