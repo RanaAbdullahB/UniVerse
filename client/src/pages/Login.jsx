@@ -99,7 +99,8 @@ export default function Login() {
             letterSpacing: '0.14em',
             textTransform: 'uppercase',
           }}>
-            Lahore Garrison University · Student Gateway
+            One Platform Endless Connections!
+           
           </p>
         </div>
 
@@ -228,7 +229,7 @@ export default function Login() {
 
             <div style={{ marginTop: 14, padding: '9px 14px', background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8, textAlign: 'center' }}>
               <p style={{ fontSize: '0.73rem', color: 'rgba(255,255,255,0.45)', fontWeight: 500 }}>
-                🔒 Students: use your @lgu.edu.pk email
+               Students: use your @lgu.edu.pk email
               </p>
             </div>
           </div>
