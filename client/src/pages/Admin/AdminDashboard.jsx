@@ -19,11 +19,11 @@ export default function AdminDashboard() {
 
   const renderContent = () => {
     switch (activeTab) {
-      case 'overview': return <AdminOverview />;
-      case 'users': return <AdminUsers />;
-      case 'clubs': return <AdminClubs />;
-      case 'events': return <AdminEvents />;
-      default: return <AdminOverview />;
+      case 'overview': return <AdminOverview onTabChange={setActiveTab} />;
+      case 'users':    return <AdminUsers />;
+      case 'clubs':    return <AdminClubs />;
+      case 'events':   return <AdminEvents />;
+      default:         return <AdminOverview onTabChange={setActiveTab} />;
     }
   };
 
