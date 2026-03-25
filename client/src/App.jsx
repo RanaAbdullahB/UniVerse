@@ -1,51 +1,52 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider, useAuth } from './context/AuthContext';
+import { AuthProvider } from './context/AuthContext';
 import { ToastProvider } from './context/ToastContext';
-import { PageLoader } from './components/LoadingSpinner';
+import { AdminRoute, StudentRoute, PublicRoute } from './components/RouteGuards';
+
+// Public pages
 import Login from './pages/Login';
 import Register from './pages/Register';
-import Dashboard from './pages/Dashboard';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
 import NotFound from './pages/NotFound';
 
-// Protected route wrapper
-function ProtectedRoute({ children }) {
-  const { user, loading } = useAuth();
-  if (loading) return <PageLoader />;
-  if (!user) return <Navigate to="/login" replace />;
-  return children;
-}
+// Student pages
+import Dashboard from './pages/Dashboard';
 
-// Public route (redirect if logged in)
-function PublicRoute({ children }) {
-  const { user, loading } = useAuth();
-  if (loading) return <PageLoader />;
-  if (user) return <Navigate to="/dashboard" replace />;
-  return children;
-}
-
-function AppRoutes() {
-  return (
-    <Routes>
-      <Route path="/" element={<Navigate to="/dashboard" replace />} />
-      <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
-      <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />
-      <Route path="/forgot-password" element={<PublicRoute><ForgotPassword /></PublicRoute>} />
-      <Route path="/reset-password/:token" element={<PublicRoute><ResetPassword /></PublicRoute>} />
-      <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-      <Route path="*" element={<NotFound />} />
-    </Routes>
-  );
-}
+// Admin pages
+import AdminDashboard from './pages/admin/AdminDashboard';
 
 export default function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
         <ToastProvider>
-          <AppRoutes />
+          <Routes>
+            {/* Root — redirect based on role handled by PublicRoute/guards */}
+            <Route path="/" element={<Navigate to="/login" replace />} />
+
+            {/* Public routes — redirect if already logged in */}
+            <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
+            <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />
+            <Route path="/forgot-password" element={<PublicRoute><ForgotPassword /></PublicRoute>} />
+            <Route path="/reset-password/:token" element={<PublicRoute><ResetPassword /></PublicRoute>} />
+
+            {/* Student dashboard — blocks admins, redirects them to /admin */}
+            <Route
+              path="/dashboard"
+              element={<StudentRoute><Dashboard /></StudentRoute>}
+            />
+
+            {/* Admin dashboard — blocks students, redirects them to /dashboard */}
+            <Route
+              path="/admin"
+              element={<AdminRoute><AdminDashboard /></AdminRoute>}
+            />
+
+            {/* 404 */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
         </ToastProvider>
       </AuthProvider>
     </BrowserRouter>
