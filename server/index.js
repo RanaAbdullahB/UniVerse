@@ -8,7 +8,6 @@ dotenv.config();
 
 const app = express();
 
-// Middleware
 app.use(cors({
   origin: process.env.CLIENT_URL || 'http://localhost:3000',
   credentials: true,
@@ -21,21 +20,18 @@ app.use('/api/auth', require('./routes/auth'));
 app.use('/api/clubs', require('./routes/clubs'));
 app.use('/api/events', require('./routes/events'));
 app.use('/api/study-groups', require('./routes/studyGroups'));
+app.use('/api/admin', require('./routes/admin')); // Admin-only routes
 
-// Health check
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'OK', message: 'University Portal API is running' });
+  res.json({ status: 'OK', message: 'UniVerse API is running' });
 });
 
-// 404 handler
 app.use((req, res) => {
   res.status(404).json({ success: false, message: 'Route not found' });
 });
 
-// Error handler
 app.use(errorHandler);
 
-// Connect to MongoDB
 const PORT = process.env.PORT || 5000;
 
 mongoose
@@ -43,7 +39,7 @@ mongoose
   .then(() => {
     console.log('✅ MongoDB connected successfully');
     app.listen(PORT, () => {
-      console.log(`🚀 Server running on port ${PORT}`);
+      console.log(`🚀 UniVerse API running on port ${PORT}`);
     });
   })
   .catch((err) => {
