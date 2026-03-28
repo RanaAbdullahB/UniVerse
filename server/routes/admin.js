@@ -185,5 +185,156 @@ router.delete('/events/:id', async (req, res, next) => {
     next(error);
   }
 });
+// ============================================================
+// ADD THESE ROUTES TO: server/routes/admin.js
+// Place them after your existing admin routes (before module.exports)
+// Also add these requires at the top of admin.js if not already there:
+//   const StudyGroup = require('../models/StudyGroup');
+//   const Event = require('../models/Event');
+//   const User = require('../models/User');
+//   const Club = require('../models/Club');
+// ============================================================
 
+// ─── GET /api/admin/study-groups ────────────────────────────
+// Returns all study groups with creator + members populated
+router.get('/study-groups', protect, adminMiddleware, async (req, res, next) => {
+  try {
+    const groups = await StudyGroup.find()
+      .populate('creator', 'name universityEmail department')
+      .populate('members', 'name universityEmail department year')
+      .sort('-createdAt');
+
+    res.json({ success: true, count: groups.length, data: groups });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// ─── DELETE /api/admin/study-groups/:id ─────────────────────
+// Deletes a study group and removes it from all users' joinedStudyGroups
+router.delete('/study-groups/:id', protect, adminMiddleware, async (req, res, next) => {
+  try {
+    const group = await StudyGroup.findById(req.params.id);
+    if (!group) {
+      return res.status(404).json({ success: false, message: 'Study group not found' });
+    }
+
+    await StudyGroup.findByIdAndDelete(req.params.id);
+
+    // Clean up users' joinedStudyGroups references
+    await User.updateMany(
+      { joinedStudyGroups: req.params.id },
+      { $pull: { joinedStudyGroups: req.params.id } }
+    );
+
+    res.json({ success: true, message: 'Study group deleted successfully' });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// ─── GET /api/admin/events/:id/registrations ────────────────
+// Returns the list of students registered for a specific event
+router.get('/events/:id/registrations', protect, adminMiddleware, async (req, res, next) => {
+  try {
+    const event = await Event.findById(req.params.id).populate(
+      'registeredStudents',
+      'name universityEmail department year studentId'
+    );
+
+    if (!event) {
+      return res.status(404).json({ success: false, message: 'Event not found' });
+    }
+
+    res.json({
+      success: true,
+      data: {
+        eventTitle: event.title,
+        eventDate: event.date,
+        eventType: event.eventType,
+        registrations: event.registeredStudents,
+      },
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// ─── GET /api/admin/analytics ───────────────────────────────
+// Returns aggregated analytics data for charts in AdminOverview
+router.get('/analytics', protect, adminMiddleware, async (req, res, next) => {
+  try {
+    // 1. Students per department
+    const deptDistribution = await User.aggregate([
+      { $match: { role: 'student' } },
+      { $group: { _id: '$department', count: { $sum: 1 } } },
+      { $sort: { count: -1 } },
+      { $limit: 10 },
+    ]);
+
+    // 2. Monthly new student registrations — last 6 months
+    const sixMonthsAgo = new Date();
+    sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 5);
+    sixMonthsAgo.setDate(1);
+    sixMonthsAgo.setHours(0, 0, 0, 0);
+
+    const monthlyRegistrations = await User.aggregate([
+      { $match: { createdAt: { $gte: sixMonthsAgo }, role: 'student' } },
+      {
+        $group: {
+          _id: {
+            year: { $year: '$createdAt' },
+            month: { $month: '$createdAt' },
+          },
+          count: { $sum: 1 },
+        },
+      },
+      { $sort: { '_id.year': 1, '_id.month': 1 } },
+    ]);
+
+    // 3. Club membership totals by category
+    const clubsByCategory = await Club.aggregate([
+      {
+        $group: {
+          _id: '$category',
+          totalMembers: { $sum: { $size: '$members' } },
+          clubCount: { $sum: 1 },
+        },
+      },
+      { $sort: { totalMembers: -1 } },
+    ]);
+
+    // 4. Event registrations by event type
+    const eventsByType = await Event.aggregate([
+      {
+        $group: {
+          _id: '$eventType',
+          totalRegistrations: { $sum: { $size: '$registeredStudents' } },
+          eventCount: { $sum: 1 },
+        },
+      },
+      { $sort: { totalRegistrations: -1 } },
+    ]);
+
+    // 5. Student year distribution (Year 1–5)
+    const yearDistribution = await User.aggregate([
+      { $match: { role: 'student', year: { $exists: true, $ne: null } } },
+      { $group: { _id: '$year', count: { $sum: 1 } } },
+      { $sort: { _id: 1 } },
+    ]);
+
+    res.json({
+      success: true,
+      data: {
+        deptDistribution,
+        monthlyRegistrations,
+        clubsByCategory,
+        eventsByType,
+        yearDistribution,
+      },
+    });
+  } catch (err) {
+    next(err);
+  }
+});
 module.exports = router;
