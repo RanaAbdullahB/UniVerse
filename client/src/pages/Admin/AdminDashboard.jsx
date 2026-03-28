@@ -1,170 +1,168 @@
-import React, { useState } from 'react';
+// client/src/pages/admin/AdminDashboard.jsx
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import AdminOverview from './AdminOverview';
 import AdminUsers from './AdminUsers';
 import AdminClubs from './AdminClubs';
 import AdminEvents from './AdminEvents';
+import AdminStudyGroups from './AdminStudyGroups';
 
-const navItems = [
-  { key: 'overview', label: 'Overview', icon: '📊' },
-  { key: 'users', label: 'Manage Users', icon: '👥' },
-  { key: 'clubs', label: 'Manage Clubs', icon: '🏛️' },
-  { key: 'events', label: 'Manage Events', icon: '📅' },
+const TABS = [
+  { id: 'overview',     label: 'Overview',      icon: '📊' },
+  { id: 'users',        label: 'Users',          icon: '👥' },
+  { id: 'clubs',        label: 'Clubs',          icon: '🏛️' },
+  { id: 'events',       label: 'Events',         icon: '📅' },
+  { id: 'studyGroups',  label: 'Study Groups',   icon: '📚' },
 ];
 
 export default function AdminDashboard() {
-  const { user, logout } = useAuth();
   const [activeTab, setActiveTab] = useState('overview');
-  const [mobileOpen, setMobileOpen] = useState(false);
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
 
   const renderContent = () => {
     switch (activeTab) {
-      case 'overview': return <AdminOverview onTabChange={setActiveTab} />;
-      case 'users':    return <AdminUsers />;
-      case 'clubs':    return <AdminClubs />;
-      case 'events':   return <AdminEvents />;
-      default:         return <AdminOverview onTabChange={setActiveTab} />;
+      case 'overview':    return <AdminOverview onTabChange={setActiveTab} />;
+      case 'users':       return <AdminUsers />;
+      case 'clubs':       return <AdminClubs />;
+      case 'events':      return <AdminEvents />;
+      case 'studyGroups': return <AdminStudyGroups />;
+      default:            return <AdminOverview onTabChange={setActiveTab} />;
     }
   };
 
-  const tabTitles = {
-    overview: 'Admin Overview',
-    users: 'Manage Users',
-    clubs: 'Manage Clubs',
-    events: 'Manage Events',
-  };
+  const currentTab = TABS.find(t => t.id === activeTab);
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', background: 'rgb(248,249,250)' }}>
+    <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--bg-page)' }}>
 
-      {/* Mobile overlay */}
-      {mobileOpen && (
-        <div
-          style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 40 }}
-          onClick={() => setMobileOpen(false)}
-        />
-      )}
-
-      {/* ── Admin Sidebar ── */}
+      {/* ── Sidebar ── */}
       <aside style={{
         width: 240,
-        background: 'linear-gradient(180deg, rgb(1,8,24) 0%, rgb(25,24,27) 100%)',
-        display: 'flex', flexDirection: 'column',
-        height: '100vh', position: 'fixed', left: 0, top: 0,
-        zIndex: 50, borderRight: '1px solid rgba(131,144,250,0.2)',
-        transition: 'transform 0.3s ease',
-        transform: mobileOpen ? 'translateX(0)' : undefined,
-      }}
-        className={`${!mobileOpen ? 'hidden md:flex' : 'flex'} flex-col`}
-      >
+        background: 'linear-gradient(180deg, var(--dark-primary) 0%, rgb(18,30,80) 100%)',
+        display: 'flex',
+        flexDirection: 'column',
+        position: 'fixed',
+        left: 0, top: 0, bottom: 0,
+        zIndex: 100,
+        boxShadow: '4px 0 20px rgba(1,8,24,0.2)',
+      }}>
+
         {/* Logo */}
-        <div style={{ padding: '20px', borderBottom: '1px solid rgba(131,144,250,0.15)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <div style={{ width: 42, height: 42, borderRadius: '50%', background: 'rgba(255,255,255,0.9)', overflow: 'hidden', padding: 2, flexShrink: 0, boxShadow: '0 2px 8px rgba(0,0,0,0.3)' }}>
-              <img src="/lgulogo.png" alt="LGU" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
-            </div>
+        <div style={{ padding: '1.5rem 1.25rem', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+            <img src="/lgulogo.png" alt="LGU Logo"
+              style={{ width: 38, height: 38, borderRadius: '50%', objectFit: 'cover', border: '2px solid rgba(255,255,255,0.2)', flexShrink: 0 }} />
             <div>
-              <h2 style={{ color: 'rgb(131,144,250)', fontFamily: 'Playfair Display, serif', fontSize: '1rem', lineHeight: 1.2 }}>
+              <div style={{ fontFamily: 'Playfair Display, serif', color: '#fff', fontWeight: 700, fontSize: '1.05rem', lineHeight: 1.2 }}>
                 UniVerse
-              </h2>
-              <p style={{ color: 'rgba(255,255,255,0.35)', fontSize: '0.65rem', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
-                Admin Panel
-              </p>
+              </div>
+              <div style={{ color: 'rgba(152,197,255,0.7)', fontSize: '0.65rem', letterSpacing: '0.1em', textTransform: 'uppercase', marginTop: '0.1rem' }}>
+                Admin Portal
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Admin badge */}
-        <div style={{ padding: '14px 20px', borderBottom: '1px solid rgba(131,144,250,0.1)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <div style={{ width: 34, height: 34, borderRadius: '50%', background: 'linear-gradient(135deg, rgb(131,144,250), rgb(29,47,111))', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 700, fontSize: '0.85rem', flexShrink: 0 }}>
-              {user?.name?.charAt(0)?.toUpperCase()}
-            </div>
-            <div style={{ minWidth: 0 }}>
-              <p style={{ color: '#fff', fontSize: '0.82rem', fontWeight: 500, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                {user?.name}
-              </p>
-              <span style={{ background: 'rgba(131,144,250,0.2)', color: 'rgb(131,144,250)', fontSize: '0.65rem', fontWeight: 700, padding: '1px 8px', borderRadius: 20, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
-                👑 Admin
-              </span>
-            </div>
-          </div>
-        </div>
-
-        {/* Nav */}
-        <nav style={{ flex: 1, padding: '12px' }}>
-          <p style={{ color: 'rgba(255,255,255,0.25)', fontSize: '0.62rem', letterSpacing: '0.1em', textTransform: 'uppercase', padding: '8px 4px', marginBottom: 4 }}>
-            Admin Controls
-          </p>
-          {navItems.map((item) => (
-            <button
-              key={item.key}
-              onClick={() => { setActiveTab(item.key); setMobileOpen(false); }}
-              style={{
-                display: 'flex', alignItems: 'center', gap: 12,
-                padding: '11px 14px', borderRadius: 8, width: '100%',
-                border: 'none', background: activeTab === item.key
-                  ? 'rgba(13,110,253,0.2)' : 'transparent',
-                color: activeTab === item.key ? '#fff' : 'rgb(136,152,170)',
-                fontWeight: activeTab === item.key ? 600 : 400,
-                fontSize: '0.875rem', cursor: 'pointer',
-                borderLeft: activeTab === item.key ? '3px solid rgb(13,110,253)' : '3px solid transparent',
-                marginBottom: 2, transition: 'all 0.15s',
-                fontFamily: 'DM Sans, sans-serif',
-                textAlign: 'left',
-              }}
-            >
-              <span style={{ fontSize: '1rem' }}>{item.icon}</span>
-              {item.label}
-            </button>
-          ))}
+        {/* Nav items */}
+        <nav style={{ flex: 1, padding: '0.875rem 0.75rem', display: 'flex', flexDirection: 'column', gap: '0.2rem', overflowY: 'auto' }}>
+          {TABS.map(tab => {
+            const isActive = activeTab === tab.id;
+            return (
+              <button key={tab.id} onClick={() => setActiveTab(tab.id)}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: '0.75rem',
+                  padding: '0.7rem 0.875rem', borderRadius: '10px', border: 'none',
+                  cursor: 'pointer', textAlign: 'left', width: '100%',
+                  transition: 'all 0.15s ease',
+                  background: isActive ? 'rgba(13,110,253,0.2)' : 'transparent',
+                  color: isActive ? '#fff' : 'rgba(255,255,255,0.55)',
+                  fontWeight: isActive ? 600 : 400,
+                  fontSize: '0.875rem',
+                  fontFamily: 'DM Sans, sans-serif',
+                  position: 'relative',
+                  outline: 'none',
+                }}
+                onMouseEnter={e => {
+                  if (!isActive) {
+                    e.currentTarget.style.background = 'rgba(255,255,255,0.07)';
+                    e.currentTarget.style.color = '#fff';
+                  }
+                }}
+                onMouseLeave={e => {
+                  if (!isActive) {
+                    e.currentTarget.style.background = 'transparent';
+                    e.currentTarget.style.color = 'rgba(255,255,255,0.55)';
+                  }
+                }}>
+                {/* Active indicator bar */}
+                {isActive && (
+                  <div style={{ position: 'absolute', left: 0, top: '20%', bottom: '20%', width: 3, borderRadius: '0 2px 2px 0', background: 'var(--blue-primary)' }} />
+                )}
+                <span style={{ fontSize: '1rem', lineHeight: 1, flexShrink: 0 }}>{tab.icon}</span>
+                <span>{tab.label}</span>
+              </button>
+            );
+          })}
         </nav>
 
-        {/* Logout */}
-        <div style={{ padding: '12px', borderTop: '1px solid rgba(131,144,250,0.1)' }}>
-          <button
-            onClick={logout}
-            style={{ width: '100%', padding: '10px', background: 'rgba(220,53,69,0.1)', border: '1px solid rgba(220,53,69,0.3)', borderRadius: 8, color: '#ff8080', fontSize: '0.85rem', fontWeight: 500, cursor: 'pointer', fontFamily: 'DM Sans, sans-serif', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
-          >
-            🚪 Sign Out
+        {/* Admin user + logout */}
+        <div style={{ padding: '0.875rem 0.75rem', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', marginBottom: '0.75rem', padding: '0.625rem 0.5rem', borderRadius: '10px', background: 'rgba(255,255,255,0.05)' }}>
+            <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'linear-gradient(135deg, var(--blue-primary), var(--blue-light))', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 700, fontSize: '0.875rem', flexShrink: 0 }}>
+              {user?.name?.charAt(0).toUpperCase() || 'A'}
+            </div>
+            <div style={{ minWidth: 0, flex: 1 }}>
+              <div style={{ color: '#fff', fontWeight: 600, fontSize: '0.82rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                {user?.name || 'Admin'}
+              </div>
+              <div style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.68rem' }}>Administrator</div>
+            </div>
+          </div>
+
+          <button onClick={handleLogout}
+            style={{
+              width: '100%', padding: '0.55rem', borderRadius: '8px',
+              border: '1px solid rgba(220,53,69,0.3)',
+              background: 'rgba(220,53,69,0.12)',
+              color: 'rgba(255,190,190,0.9)',
+              cursor: 'pointer', fontSize: '0.8rem', fontWeight: 500,
+              transition: 'all 0.15s', fontFamily: 'DM Sans, sans-serif',
+            }}
+            onMouseEnter={e => { e.currentTarget.style.background = 'rgba(220,53,69,0.3)'; e.currentTarget.style.color = '#fff'; }}
+            onMouseLeave={e => { e.currentTarget.style.background = 'rgba(220,53,69,0.12)'; e.currentTarget.style.color = 'rgba(255,190,190,0.9)'; }}>
+            Sign Out
           </button>
         </div>
       </aside>
 
-      {/* ── Main content ── */}
-      <div style={{ flex: 1, marginLeft: 240, display: 'flex', flexDirection: 'column', minHeight: '100vh' }} className="admin-main">
+      {/* ── Main Content ── */}
+      <main style={{ marginLeft: 240, flex: 1, minWidth: 0, padding: '2rem' }}>
 
         {/* Top bar */}
-        <header style={{ height: 60, background: '#fff', borderBottom: '1px solid rgb(222,226,230)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 24px', position: 'sticky', top: 0, zIndex: 30, boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-            <button
-              onClick={() => setMobileOpen(!mobileOpen)}
-              style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.2rem', color: '#4a5568' }}
-              className="md:hidden"
-            >
-              ☰
-            </button>
-            <h1 style={{ fontFamily: 'Playfair Display, serif', fontSize: '1.1rem', color: 'rgb(1,8,24)', fontWeight: 600 }}>
-              {tabTitles[activeTab]}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.75rem', flexWrap: 'wrap', gap: '0.75rem' }}>
+          <div>
+            <h1 style={{ fontFamily: 'Playfair Display, serif', fontSize: '1.75rem', fontWeight: 700, color: 'var(--dark-primary)', margin: 0, lineHeight: 1.2 }}>
+              {currentTab?.icon} {currentTab?.label}
             </h1>
+            <p style={{ color: 'var(--text-muted)', margin: '0.3rem 0 0', fontSize: '0.82rem' }}>
+              Lahore Garrison University — Admin Portal
+            </p>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <span style={{ background: 'rgb(231,237,254)', color: 'rgb(29,47,111)', fontSize: '0.72rem', fontWeight: 700, padding: '4px 10px', borderRadius: 20, letterSpacing: '0.05em' }}>
-              👑 ADMIN
-            </span>
-            <span style={{ fontSize: '0.82rem', color: 'rgb(88,85,94)' }}>{user?.name}</span>
+          <div style={{ background: '#fff', borderRadius: '8px', padding: '0.5rem 0.875rem', border: '1px solid var(--border)', fontSize: '0.78rem', color: 'var(--text-muted)', alignSelf: 'flex-end' }}>
+            {new Date().toLocaleDateString('en-US', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' })}
           </div>
-        </header>
+        </div>
 
-        {/* Page content */}
-        <main style={{ flex: 1, overflowY: 'auto' }}>
-          {renderContent()}
-        </main>
-      </div>
-
-      <style>{`
-        @media (max-width: 768px) { .admin-main { margin-left: 0 !important; } }
-      `}</style>
+        {/* Active tab content */}
+        {renderContent()}
+      </main>
     </div>
   );
 }
