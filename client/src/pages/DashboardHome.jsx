@@ -2,8 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import api from '../utils/api';
 import { InlineLoader } from '../components/LoadingSpinner';
-import { InlineLoader } from '../components/LoadingSpinner';
-import AnnouncementBanner from '../components/AnnouncementBanner'; // ← ADD THIS
+import AnnouncementBanner from '../components/AnnouncementBanner'; 
 
 const categoryColors = {
   Technical: '#dbeafe', Sports: '#dcfce7', Arts: '#fce7f3',
@@ -64,6 +63,7 @@ export default function DashboardHome({ onTabChange }) {
 
   return (
     <div className="animate-fade-in" style={{ padding: '28px 24px', maxWidth: 1100 }}>
+       <AnnouncementBanner userDepartment={user?.department} />
       {/* Welcome */}
       <div style={{ marginBottom: 28 }}>
         <p style={{ color: '#8a6f30', fontSize: '0.82rem', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 4 }}>
