@@ -20,7 +20,8 @@ app.use('/api/auth', require('./routes/auth'));
 app.use('/api/clubs', require('./routes/clubs'));
 app.use('/api/events', require('./routes/events'));
 app.use('/api/study-groups', require('./routes/studyGroups'));
-app.use('/api/admin', require('./routes/admin')); // Admin-only routes
+app.use('/api/admin', require('./routes/admin')); 
+app.use('/api/announcements', require('./routes/announcements'));// Admin-only routes
 
 app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', message: 'UniVerse API is running' });
