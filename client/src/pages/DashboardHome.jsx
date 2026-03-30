@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import api from '../utils/api';
 import { InlineLoader } from '../components/LoadingSpinner';
+import { InlineLoader } from '../components/LoadingSpinner';
+import AnnouncementBanner from '../components/AnnouncementBanner'; // ← ADD THIS
 
 const categoryColors = {
   Technical: '#dbeafe', Sports: '#dcfce7', Arts: '#fce7f3',
