@@ -30,7 +30,7 @@ export default function AdminUsers() {
     try {
       setLoading(true);
       const res = await api.get('/admin/users');
-      setUsers(res.data.data || res.data);
+      setUsers(res.data.data || res.data.users || res.data || []);
     } catch {
       showToast('Failed to load users', 'error');
     } finally {
