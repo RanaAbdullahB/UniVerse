@@ -158,6 +158,64 @@ router.delete('/clubs/:id', async (req, res, next) => {
 router.post('/events', async (req, res, next) => {
   try {
     const event = await Event.create(req.body);
+
+    // ── Email all students about the new event ──────────────
+    if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
+      try {
+        const transporter = nodemailer.createTransport({
+          service: process.env.EMAIL_SERVICE || 'gmail',
+          auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS },
+        });
+
+        const students = await User.find({ role: 'student' }).select('universityEmail').lean();
+        const emailList = students.map(s => s.universityEmail).filter(Boolean);
+
+        const eventDate = new Date(event.date).toLocaleDateString('en-US', {
+          weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
+        });
+
+        const html = `
+          <div style="font-family: DM Sans, Arial, sans-serif; max-width: 580px; margin: 0 auto; background: #f8f9fa; padding: 20px;">
+            <div style="background: linear-gradient(135deg, #010818, #1d2f6f); padding: 30px; border-radius: 12px 12px 0 0; text-align: center;">
+              <h1 style="color: #fff; font-size: 1.3rem; margin: 0;">📅 New Event on UniVerse</h1>
+            </div>
+            <div style="background: #fff; padding: 28px; border-radius: 0 0 12px 12px; border: 1px solid #dee2e6; border-top: none;">
+              <span style="background: rgba(13,110,253,0.1); color: #0d6efd; padding: 3px 12px; border-radius: 20px; font-size: 0.78rem; font-weight: 700;">${event.eventType}</span>
+              <h2 style="color: #010818; font-size: 1.3rem; margin: 12px 0 8px;">${event.title}</h2>
+              <p style="color: #58555e; line-height: 1.7; margin: 0 0 16px;">${event.description || ''}</p>
+              <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+                <tr><td style="padding: 6px 0; color: #7e7e7e; font-size: 0.85rem; width: 110px;">📅 Date</td><td style="padding: 6px 0; font-weight: 600; font-size: 0.85rem;">${eventDate}</td></tr>
+                ${event.time ? `<tr><td style="padding: 6px 0; color: #7e7e7e; font-size: 0.85rem;">⏰ Time</td><td style="padding: 6px 0; font-weight: 600; font-size: 0.85rem;">${event.time}</td></tr>` : ''}
+                <tr><td style="padding: 6px 0; color: #7e7e7e; font-size: 0.85rem;">📍 Venue</td><td style="padding: 6px 0; font-weight: 600; font-size: 0.85rem;">${event.venue}</td></tr>
+                ${event.organizerName ? `<tr><td style="padding: 6px 0; color: #7e7e7e; font-size: 0.85rem;">🏛️ Organizer</td><td style="padding: 6px 0; font-weight: 600; font-size: 0.85rem;">${event.organizerName}</td></tr>` : ''}
+                ${event.maxCapacity ? `<tr><td style="padding: 6px 0; color: #7e7e7e; font-size: 0.85rem;">🎟️ Capacity</td><td style="padding: 6px 0; font-weight: 600; font-size: 0.85rem;">${event.maxCapacity} seats</td></tr>` : ''}
+              </table>
+              <a href="${process.env.CLIENT_URL || 'http://localhost:3000'}" style="display: inline-block; background: #0d6efd; color: #fff; padding: 10px 24px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 0.875rem;">
+                Register on UniVerse →
+              </a>
+              <hr style="border: none; border-top: 1px solid #dee2e6; margin: 20px 0;" />
+              <p style="color: #7e7e7e; font-size: 0.78rem; margin: 0; text-align: center;">Lahore Garrison University · UniVerse Student Portal</p>
+            </div>
+          </div>`;
+
+        // Send in batches of 50
+        const chunkSize = 50;
+        for (let i = 0; i < emailList.length; i += chunkSize) {
+          const chunk = emailList.slice(i, i + chunkSize);
+          await transporter.sendMail({
+            from: `"UniVerse LGU" <${process.env.EMAIL_USER}>`,
+            bcc: chunk,
+            subject: `📅 New Event: ${event.title} — ${eventDate}`,
+            html,
+          });
+        }
+        console.log(`📧 Event email sent to ${emailList.length} students`);
+      } catch (emailErr) {
+        // Don't fail the request if email fails
+        console.error('Event email error:', emailErr.message);
+      }
+    }
+
     res.status(201).json({ success: true, message: 'Event created successfully', event });
   } catch (error) {
     next(error);
@@ -188,15 +246,7 @@ router.delete('/events/:id', async (req, res, next) => {
     next(error);
   }
 });
-// ============================================================
-// ADD THESE ROUTES TO: server/routes/admin.js
-// Place them after your existing admin routes (before module.exports)
-// Also add these requires at the top of admin.js if not already there:
-//   const StudyGroup = require('../models/StudyGroup');
-//   const Event = require('../models/Event');
-//   const User = require('../models/User');
-//   const Club = require('../models/Club');
-// ============================================================
+
 
 // ─── GET /api/admin/study-groups ────────────────────────────
 router.get('/study-groups', authMiddleware, adminMiddleware, async (req, res, next) => {
@@ -294,16 +344,7 @@ router.get('/analytics', authMiddleware, adminMiddleware, async (req, res, next)
     next(err);
   }
 });
-// ================================================================
-// FILE 1: ADD THESE ROUTES TO server/routes/admin.js
-// ----------------------------------------------------------------
-// ADD these requires at the top of admin.js (after existing ones):
-//
-//   const Announcement = require('../models/Announcement');
-//   const ActivityLog  = require('../models/ActivityLog');
-//   const nodemailer   = require('nodemailer');
-//
-// ================================================================
+
 
 // ── Helper: log an admin action ──────────────────────────────
 async function logActivity(req, action, targetType, targetId, targetName, details = null) {

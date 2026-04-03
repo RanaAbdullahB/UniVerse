@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
+import GlobalSearch from './GlobalSearch';
 
 export default function Navbar({ onMobileMenuToggle, activeTab }) {
+  const [searchOpen, setSearchOpen] = useState(false);
   const { user, logout } = useAuth();
   const [showDropdown, setShowDropdown] = useState(false);
 
@@ -38,6 +40,25 @@ export default function Navbar({ onMobileMenuToggle, activeTab }) {
         >
           ☰
         </button>
+        <button
+  onClick={() => setSearchOpen(true)}
+  style={{
+    display: 'flex', alignItems: 'center', gap: '0.5rem',
+    padding: '0.45rem 0.875rem',
+    border: '1.5px solid var(--border)',
+    borderRadius: 8,
+    background: 'var(--bg-page)',
+    cursor: 'pointer',
+    fontSize: '0.8rem',
+    color: 'var(--text-muted)',
+    fontFamily: 'DM Sans, sans-serif',
+    transition: 'all 0.15s',
+  }}
+  onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--blue-primary)'; e.currentTarget.style.color = 'var(--blue-primary)'; }}
+  onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--text-muted)'; }}>
+  🔍 <span>Search</span>
+  <span style={{ background: 'var(--border)', borderRadius: 4, padding: '1px 5px', fontSize: '0.65rem', marginLeft: 2 }}>Ctrl+K</span>
+</button>
         {/* Logo visible on mobile only */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }} className="md:hidden">
           <div style={{ width: 28, height: 28, borderRadius: '50%', overflow: 'hidden', background: '#fff', border: '1px solid #e2e8f0' }}>
@@ -184,6 +205,13 @@ export default function Navbar({ onMobileMenuToggle, activeTab }) {
           onClick={() => setShowDropdown(false)}
         />
       )}
+      {searchOpen && (
+  <GlobalSearch
+    onClose={() => setSearchOpen(false)}
+    onTabChange={onTabChange || (() => {})}
+  />
+)}
     </header>
   );
+  
 }
