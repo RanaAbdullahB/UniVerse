@@ -1,149 +1,173 @@
-// server/socket.js
-// Real-time chat via Socket.io
-//
-// HOW TO INTEGRATE INTO server/index.js:
-// ─────────────────────────────────────────
-// 1. Replace:
-//      const app = express();
-//      ...
-//      app.listen(PORT, ...)
-//
-//    With:
-//      const app    = express();
-//      const http   = require('http');
-//      const server = http.createServer(app);
-//      const initSocket = require('./socket');
-//      initSocket(server);
-//      ...
-//      server.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
-// ─────────────────────────────────────────
+/**
+ * socket.js — UniVerse real-time server
+ * Handles: Study Group Chat + Direct Messages (DMs)
+ */
 
-const { Server }   = require('socket.io');
-const jwt          = require('jsonwebtoken');
-const Message      = require('./models/Message');
-const StudyGroup   = require('./models/StudyGroup');
-const User         = require('./models/User');
+const jwt = require('jsonwebtoken');
+const User          = require('./models/User');
+const Message       = require('./models/Message');
+const DirectMessage = require('./models/DirectMessage');
+const Conversation  = require('./models/Conversation');
 
-module.exports = function initSocket(httpServer) {
-  const io = new Server(httpServer, {
+module.exports = function initSocket(server) {
+  const { Server } = require('socket.io');
+
+  const io = new Server(server, {
     cors: {
-      origin: process.env.CLIENT_URL || 'http://localhost:3000',
-      methods: ['GET', 'POST'],
-      credentials: true,
-    },
-  });
-
-  // ── Auth middleware ───────────────────────────────────────
-  io.use(async (socket, next) => {
-    try {
-      const token = socket.handshake.auth?.token ||
-                    socket.handshake.headers?.authorization?.replace('Bearer ', '');
-
-      if (!token) return next(new Error('No token provided'));
-
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      const user    = await User.findById(decoded.id).select('-password');
-      if (!user) return next(new Error('User not found'));
-
-      socket.user = user;
-      next();
-    } catch {
-      next(new Error('Invalid token'));
+      origin:  process.env.CLIENT_URL || 'http://localhost:3000',
+      methods: ['GET', 'POST']
     }
   });
 
-  // ── Connection ────────────────────────────────────────────
+  // ─── Auth middleware for every socket connection ───────────────────────────
+  io.use(async (socket, next) => {
+    try {
+      const token = socket.handshake.auth.token;
+      if (!token) return next(new Error('Authentication error: no token'));
+
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      const user    = await User.findById(decoded.id).select('-password');
+      if (!user)    return next(new Error('Authentication error: user not found'));
+
+      socket.user = user;
+      next();
+    } catch (err) {
+      next(new Error('Authentication error: invalid token'));
+    }
+  });
+
+  // ─── Connection handler ────────────────────────────────────────────────────
   io.on('connection', (socket) => {
-    const userId = socket.user._id.toString();
-    console.log(`💬 Socket connected: ${socket.user.name} (${socket.id})`);
+    const uid = socket.user._id.toString();
 
-    // ── Join a study group chat room ──────────────────────
-    socket.on('join_group', async ({ groupId }) => {
-      try {
-        const group = await StudyGroup.findById(groupId);
-        if (!group) return socket.emit('error', { message: 'Group not found' });
+    // Each user automatically joins their personal room for DM delivery
+    socket.join(`user_${uid}`);
 
-        const isMember = group.members.some(m => m.toString() === userId);
-        const isCreator = group.creator.toString() === userId;
-        if (!isMember && !isCreator) {
-          return socket.emit('error', { message: 'Not a member of this group' });
-        }
+    // ════════════════════════════════════════════════
+    // GROUP CHAT EVENTS
+    // ════════════════════════════════════════════════
 
-        socket.join(`group_${groupId}`);
-        socket.emit('joined_group', { groupId, groupName: group.name });
-        console.log(`  → ${socket.user.name} joined group_${groupId}`);
-      } catch (err) {
-        socket.emit('error', { message: 'Failed to join group' });
-      }
+    socket.on('join_group', ({ groupId }) => {
+      socket.join(`group_${groupId}`);
+      socket.emit('joined_group', { groupId, groupName: '' });
     });
 
-    // ── Leave a study group chat room ─────────────────────
     socket.on('leave_group', ({ groupId }) => {
       socket.leave(`group_${groupId}`);
-      console.log(`  → ${socket.user.name} left group_${groupId}`);
     });
 
-    // ── Send a message ────────────────────────────────────
     socket.on('send_message', async ({ groupId, content }) => {
       try {
         if (!content?.trim()) return;
-        if (content.length > 1000) return socket.emit('error', { message: 'Message too long (max 1000 chars)' });
 
-        // Verify membership again
-        const group = await StudyGroup.findById(groupId);
-        if (!group) return socket.emit('error', { message: 'Group not found' });
-
-        const isMember = group.members.some(m => m.toString() === userId);
-        const isCreator = group.creator.toString() === userId;
-        if (!isMember && !isCreator) {
-          return socket.emit('error', { message: 'Not a member of this group' });
-        }
-
-        // Save to DB
-        const message = await Message.create({
-          studyGroup: groupId,
-          sender: socket.user._id,
-          senderName: socket.user.name,
-          senderDepartment: socket.user.department || null,
-          senderYear: socket.user.year || null,
-          senderPhoto: socket.user.profilePhoto || null,
-          content: content.trim(),
-          readBy: [socket.user._id],
+        const msg = await Message.create({
+          studyGroup:       groupId,
+          sender:           socket.user._id,
+          senderName:       socket.user.name,
+          senderDepartment: socket.user.department,
+          senderYear:       socket.user.year,
+          senderPhoto:      socket.user.profilePhoto || '',
+          content:          content.trim()
         });
 
-        // Broadcast to everyone in the room (including sender)
-        io.to(`group_${groupId}`).emit('receive_message', {
-          _id: message._id,
-          studyGroup: groupId,
-          sender: socket.user._id,
-          senderName: socket.user.name,
-          senderDepartment: socket.user.department || null,
-          senderYear: socket.user.year || null,
-          senderPhoto: socket.user.profilePhoto || null,
-          content: message.content,
-          createdAt: message.createdAt,
-        });
-      } catch (err) {
-        console.error('send_message error:', err.message);
-        socket.emit('error', { message: 'Failed to send message' });
+        io.to(`group_${groupId}`).emit('receive_message', msg);
+      } catch {
+        socket.emit('error', { message: 'Failed to send group message' });
       }
     });
 
-    // ── Typing indicator ──────────────────────────────────
     socket.on('typing_start', ({ groupId }) => {
       socket.to(`group_${groupId}`).emit('user_typing', {
-        userId,
-        userName: socket.user.name,
+        userId:   socket.user._id,
+        userName: socket.user.name
       });
     });
 
     socket.on('typing_stop', ({ groupId }) => {
-      socket.to(`group_${groupId}`).emit('user_stopped_typing', { userId });
+      socket.to(`group_${groupId}`).emit('user_stopped_typing', {
+        userId: socket.user._id
+      });
     });
 
-    // ── Disconnect ────────────────────────────────────────
+    // ════════════════════════════════════════════════
+    // DIRECT MESSAGE EVENTS
+    // ════════════════════════════════════════════════
+
+    /**
+     * send_dm
+     * Payload: { conversationId, recipientId, content }
+     * - Saves the message to MongoDB
+     * - Updates conversation.lastMessage + unread count
+     * - Emits receive_dm to sender + recipient personal rooms
+     * - Emits dm_notification to recipient (for badge / toast)
+     */
+    socket.on('send_dm', async ({ conversationId, recipientId, content }) => {
+      try {
+        if (!content?.trim()) return;
+
+        // Verify this user is actually in the conversation
+        const convo = await Conversation.findOne({
+          _id:          conversationId,
+          participants: socket.user._id
+        });
+        if (!convo) return socket.emit('error', { message: 'Conversation not found' });
+
+        const message = await DirectMessage.create({
+          conversation: conversationId,
+          sender:       socket.user._id,
+          senderName:   socket.user.name,
+          senderPhoto:  socket.user.profilePhoto || '',
+          content:      content.trim()
+        });
+
+        // Update conversation metadata
+        convo.lastMessage = {
+          content: content.trim(),
+          sender:  socket.user._id,
+          sentAt:  new Date()
+        };
+        const prev = convo.unreadCount.get(recipientId) || 0;
+        convo.unreadCount.set(recipientId, prev + 1);
+        await convo.save();
+
+        // Deliver to both sides
+        socket.emit('receive_dm', message);
+        io.to(`user_${recipientId}`).emit('receive_dm', message);
+
+        // Lightweight notification for the recipient (shows badge / toast)
+        io.to(`user_${recipientId}`).emit('dm_notification', {
+          conversationId,
+          senderId:   uid,
+          senderName: socket.user.name,
+          preview:    content.trim().slice(0, 60)
+        });
+      } catch {
+        socket.emit('error', { message: 'Failed to send DM' });
+      }
+    });
+
+    /**
+     * dm_typing_start / dm_typing_stop
+     * Payload: { conversationId, recipientId }
+     */
+    socket.on('dm_typing_start', ({ conversationId, recipientId }) => {
+      io.to(`user_${recipientId}`).emit('dm_user_typing', {
+        userId:         uid,
+        userName:       socket.user.name,
+        conversationId
+      });
+    });
+
+    socket.on('dm_typing_stop', ({ conversationId, recipientId }) => {
+      io.to(`user_${recipientId}`).emit('dm_user_stopped_typing', {
+        userId:         uid,
+        conversationId
+      });
+    });
+
+    // ─── Cleanup ──────────────────────────────────────────────────────────────
     socket.on('disconnect', () => {
-      console.log(`💬 Socket disconnected: ${socket.user.name}`);
+      // Personal room is auto-cleaned by socket.io
     });
   });
 

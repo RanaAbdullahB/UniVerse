@@ -10,9 +10,10 @@ import Register from './pages/Register';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
 import NotFound from './pages/NotFound';
-
+import Messages from './pages/Messages';
 // Student pages
 import Dashboard from './pages/Dashboard';
+
 
 // Admin pages
 import AdminDashboard from './pages/admin/AdminDashboard';

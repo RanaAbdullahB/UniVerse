@@ -31,6 +31,7 @@ app.use('/api/messages',      require('./routes/messages'));
 app.use('/api/search',        require('./routes/search'));
 app.use('/api/upload',        require('./routes/upload'));
 app.use('/uploads',           express.static(path.join(__dirname, 'uploads')));
+app.use('/api/conversations', require('./routes/conversations'));
 
 // ── Health check ──────────────────────────────────────────────
 app.get('/api/health', (req, res) => {

@@ -205,10 +205,9 @@ export default function Navbar({ onMobileMenuToggle, activeTab }) {
           onClick={() => setShowDropdown(false)}
         />
       )}
-      {searchOpen && (
+     {searchOpen && (
   <GlobalSearch
     onClose={() => setSearchOpen(false)}
-    onTabChange={onTabChange || (() => {})}
   />
 )}
     </header>
