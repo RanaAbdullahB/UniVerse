@@ -12,15 +12,16 @@ export default function Dashboard() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const renderContent = () => {
-    switch (activeTab) {
-      case 'home': return <DashboardHome onTabChange={setActiveTab} />;
-      case 'clubs': return <Clubs />;
-      case 'events': return <Events />;
-      case 'studygroups': return <StudyGroups />;
-      case 'profile': return <Profile />;
-      default: return <DashboardHome onTabChange={setActiveTab} />;
-    }
-  };
+  switch (activeTab) {
+    case 'home': return <DashboardHome onTabChange={setActiveTab} />;
+    case 'clubs': return <Clubs />;
+    case 'events': return <Events />;
+    case 'studygroups': return <StudyGroups />;
+    case 'profile': return <Profile />;
+    case 'messages': return <Messages />;
+    default: return <DashboardHome onTabChange={setActiveTab} />;
+  }
+};
 
   return (
     <div style={{ display: 'flex', minHeight: '100vh', background: '#f7f5f0' }}>

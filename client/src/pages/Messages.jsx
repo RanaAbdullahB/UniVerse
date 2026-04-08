@@ -1,7 +1,7 @@
-import { useState, useEffect, useRef, useCallback, useContext } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { io } from 'socket.io-client';
 import api from '../utils/api';
-import { AuthContext } from '../context/AuthContext';
+import { useAuth } from '../context/AuthContext';
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -71,7 +71,7 @@ function Avatar({ name = '', photo, size = 40 }) {
 // ─── Main Component ───────────────────────────────────────────────────────────
 
 export default function Messages() {
-  const { user } = useContext(AuthContext);
+  const { user } = useAuth();
 
   // Conversations list
   const [conversations,    setConversations]    = useState([]);
@@ -113,7 +113,7 @@ export default function Messages() {
   // ─── Socket setup ────────────────────────────────────────────────────────
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('uni_token');
     const socket = io('/', { auth: { token }, transports: ['websocket'] });
     socketRef.current = socket;
 

@@ -34,10 +34,9 @@ export default function App() {
             <Route path="/reset-password/:token" element={<PublicRoute><ResetPassword /></PublicRoute>} />
 
             {/* Student dashboard — blocks admins, redirects them to /admin */}
-            <Route
-              path="/dashboard"
-              element={<StudentRoute><Dashboard /></StudentRoute>}
-            />
+<Route path="/dashboard" element={<StudentRoute><Dashboard /></StudentRoute>}>
+  <Route path="messages" element={<Messages />} />
+</Route>
 
             {/* Admin dashboard — blocks students, redirects them to /dashboard */}
             <Route
