@@ -7,6 +7,7 @@ const navItems = [
   { key: 'clubs', label: 'Societies & Clubs', icon: '🏛️' },
   { key: 'events', label: 'Upcoming Events', icon: '📅' },
   { key: 'studygroups', label: 'Study Groups', icon: '📚' },
+  { key: 'messages', label: 'Messages', icon: '💬' }, // ✅ Added here
   { key: 'profile', label: 'My Profile', icon: '👤' },
 ];
 
@@ -96,7 +97,6 @@ export default function Sidebar({ activeTab, onTabChange, mobileOpen, onClose })
         </div>
 
         {/* Nav items */}
-        <NavLink to="messages">💬 Messages</NavLink>
         <nav style={{ flex: 1, padding: '12px 12px', overflowY: 'auto' }}>
           <p style={{ color: 'rgba(245,240,232,0.3)', fontSize: '0.65rem', letterSpacing: '0.1em', textTransform: 'uppercase', padding: '8px 4px', marginBottom: 4 }}>
             Navigation
