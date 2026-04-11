@@ -6,6 +6,7 @@ import Clubs from './Clubs';
 import Events from './Events';
 import StudyGroups from './StudyGroups';
 import Profile from './Profile';
+import Messages from './Messages';
 
 export default function Dashboard() {
   const [activeTab, setActiveTab] = useState('home');
