@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import GlobalSearch from './GlobalSearch';
+import DarkModeToggle from './DarkModeToggle'; // ✅ IMPORT ADDED
 
 export default function Navbar({ onMobileMenuToggle, activeTab }) {
   const [searchOpen, setSearchOpen] = useState(false);
@@ -31,7 +32,7 @@ export default function Navbar({ onMobileMenuToggle, activeTab }) {
         boxShadow: '0 1px 4px rgba(15,27,45,0.06)',
       }}
     >
-      {/* Left: mobile menu + title */}
+      {/* Left */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
         <button
           onClick={onMobileMenuToggle}
@@ -40,32 +41,35 @@ export default function Navbar({ onMobileMenuToggle, activeTab }) {
         >
           ☰
         </button>
+
         <button
-  onClick={() => setSearchOpen(true)}
-  style={{
-    display: 'flex', alignItems: 'center', gap: '0.5rem',
-    padding: '0.45rem 0.875rem',
-    border: '1.5px solid var(--border)',
-    borderRadius: 8,
-    background: 'var(--bg-page)',
-    cursor: 'pointer',
-    fontSize: '0.8rem',
-    color: 'var(--text-muted)',
-    fontFamily: 'DM Sans, sans-serif',
-    transition: 'all 0.15s',
-  }}
-  onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--blue-primary)'; e.currentTarget.style.color = 'var(--blue-primary)'; }}
-  onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--text-muted)'; }}>
-  🔍 <span>Search</span>
-  <span style={{ background: 'var(--border)', borderRadius: 4, padding: '1px 5px', fontSize: '0.65rem', marginLeft: 2 }}>Ctrl+K</span>
-</button>
-        {/* Logo visible on mobile only */}
+          onClick={() => setSearchOpen(true)}
+          style={{
+            display: 'flex', alignItems: 'center', gap: '0.5rem',
+            padding: '0.45rem 0.875rem',
+            border: '1.5px solid var(--border)',
+            borderRadius: 8,
+            background: 'var(--bg-page)',
+            cursor: 'pointer',
+            fontSize: '0.8rem',
+            color: 'var(--text-muted)',
+            fontFamily: 'DM Sans, sans-serif',
+            transition: 'all 0.15s',
+          }}
+          onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--blue-primary)'; e.currentTarget.style.color = 'var(--blue-primary)'; }}
+          onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--text-muted)'; }}
+        >
+          🔍 <span>Search</span>
+          <span style={{ background: 'var(--border)', borderRadius: 4, padding: '1px 5px', fontSize: '0.65rem', marginLeft: 2 }}>Ctrl+K</span>
+        </button>
+
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }} className="md:hidden">
           <div style={{ width: 28, height: 28, borderRadius: '50%', overflow: 'hidden', background: '#fff', border: '1px solid #e2e8f0' }}>
             <img src="/lgulogo.png" alt="LGU" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
           </div>
           <span style={{ fontFamily: 'Playfair Display, serif', fontSize: '0.95rem', color: '#0f1b2d', fontWeight: 600 }}>UniVerse</span>
         </div>
+
         <h1
           style={{
             fontFamily: 'Playfair Display, serif',
@@ -79,9 +83,13 @@ export default function Navbar({ onMobileMenuToggle, activeTab }) {
         </h1>
       </div>
 
-      {/* Right: notifications + user */}
+      {/* Right */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-        {/* Notification bell */}
+
+        {/* ✅ DARK MODE TOGGLE ADDED HERE */}
+        <DarkModeToggle />
+
+        {/* Notification */}
         <button
           style={{
             background: 'none',
@@ -187,8 +195,6 @@ export default function Navbar({ onMobileMenuToggle, activeTab }) {
                     alignItems: 'center',
                     gap: 8,
                   }}
-                  onMouseEnter={(e) => (e.target.style.background = '#fef2f2')}
-                  onMouseLeave={(e) => (e.target.style.background = 'none')}
                 >
                   🚪 Sign Out
                 </button>
@@ -198,19 +204,17 @@ export default function Navbar({ onMobileMenuToggle, activeTab }) {
         </div>
       </div>
 
-      {/* Close dropdown on outside click */}
+      {/* Overlay */}
       {showDropdown && (
         <div
           style={{ position: 'fixed', inset: 0, zIndex: 99 }}
           onClick={() => setShowDropdown(false)}
         />
       )}
-     {searchOpen && (
-  <GlobalSearch
-    onClose={() => setSearchOpen(false)}
-  />
-)}
+
+      {searchOpen && (
+        <GlobalSearch onClose={() => setSearchOpen(false)} />
+      )}
     </header>
   );
-  
 }

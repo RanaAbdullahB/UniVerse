@@ -50,6 +50,9 @@
   /* Shadows */
   --shadow-sm:      rgba(0, 0, 0, 0.176);
   --bg-glass:       rgba(246, 249, 252, 0.3);
+
+  /*Dark Theme*/
+  --surface:        rgb(255,255,255);
 }
 
 * {
@@ -405,4 +408,122 @@ h1, h2, h3 {
 @keyframes typingBounce {
   0%, 80%, 100% { transform: translateY(0);    opacity: 0.4; }
   40%            { transform: translateY(-6px); opacity: 1;   }
+}
+/* ═══════════════════════════════════════════════════════════════
+   DARK MODE — append this entire block to client/src/index.css
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── Dark theme variable overrides ────────────────────────────── */
+[data-theme="dark"] {
+  /* Backgrounds */
+  --bg-page:        rgb(10, 14, 28);
+  --white:          rgb(18, 24, 48);        /* cards / panels */
+  --surface:        rgb(24, 32, 60);        /* elevated surfaces */
+
+  /* Brand blues — slightly brighter for dark bg */
+  --dark-primary:   rgb(230, 235, 255);     /* used for headings on dark */
+  --dark-accent:    rgb(40, 60, 130);
+  --blue-primary:   rgb(79, 140, 255);
+  --blue-light:     rgb(131, 144, 250);
+  --blue-pale:      rgb(100, 140, 220);
+  --blue-wash:      rgb(30, 45, 100);
+  --blue-tint:      rgb(20, 30, 70);
+
+  /* Text */
+  --text-primary:   rgb(225, 230, 245);
+  --text-body:      rgb(170, 178, 210);
+  --text-muted:     rgb(110, 120, 160);
+
+  /* Borders */
+  --border:         rgb(38, 48, 90);
+
+  /* Status colours — slightly desaturated for dark bg */
+  --success:        rgb(40, 167, 100);
+  --error:          rgb(230, 80, 90);
+}
+
+/* ── Smooth transition on theme switch ────────────────────────── */
+*,
+*::before,
+*::after {
+  transition:
+    background-color 0.25s ease,
+    border-color     0.25s ease,
+    color            0.15s ease,
+    box-shadow       0.25s ease;
+}
+
+/* ── Prevent transition flash on page load ────────────────────── */
+/* Add class="no-transition" to <html> during initial render if needed */
+html.no-transition *,
+html.no-transition *::before,
+html.no-transition *::after {
+  transition: none !important;
+}
+
+/* ── Scrollbar (dark) ─────────────────────────────────────────── */
+[data-theme="dark"] ::-webkit-scrollbar {
+  width:  8px;
+  height: 8px;
+}
+[data-theme="dark"] ::-webkit-scrollbar-track {
+  background: var(--bg-page);
+}
+[data-theme="dark"] ::-webkit-scrollbar-thumb {
+  background:    var(--dark-accent);
+  border-radius: 4px;
+}
+[data-theme="dark"] ::-webkit-scrollbar-thumb:hover {
+  background: var(--blue-primary);
+}
+
+/* ── Input / textarea overrides ───────────────────────────────── */
+[data-theme="dark"] input,
+[data-theme="dark"] textarea,
+[data-theme="dark"] select {
+  background:   var(--white);
+  color:        var(--text-primary);
+  border-color: var(--border);
+}
+
+[data-theme="dark"] input::placeholder,
+[data-theme="dark"] textarea::placeholder {
+  color: var(--text-muted);
+}
+
+/* ── Modal / dropdown overlays ────────────────────────────────── */
+[data-theme="dark"] .modal-overlay,
+[data-theme="dark"] [class*="overlay"] {
+  background: rgba(0, 0, 10, 0.75);
+}
+
+/* ── Chart.js canvas — force white tick labels in dark mode ────── */
+[data-theme="dark"] canvas {
+  filter: none; /* Charts handle color via JS — no filter needed */
+}
+
+/* ── Campus login page background — keep readable in dark ──────── */
+[data-theme="dark"] .login-page {
+  background-color: rgb(5, 8, 20);
+}
+
+/* ── AnnouncementBanner type colours in dark mode ─────────────── */
+[data-theme="dark"] .banner-info    { background: rgb(20, 35, 80);  border-color: var(--blue-primary); }
+[data-theme="dark"] .banner-warning { background: rgb(60, 45, 10);  border-color: rgb(200, 150, 30);  }
+[data-theme="dark"] .banner-urgent  { background: rgb(70, 15, 20);  border-color: var(--error);        }
+[data-theme="dark"] .banner-success { background: rgb(10, 55, 30);  border-color: var(--success);      }
+
+/* ── Toast notifications in dark mode ────────────────────────── */
+[data-theme="dark"] .toast {
+  background: var(--surface);
+  color:      var(--text-primary);
+  border:     1px solid var(--border);
+}
+
+/* ── Table rows in dark mode ──────────────────────────────────── */
+[data-theme="dark"] tr:nth-child(even) {
+  background: rgba(255, 255, 255, 0.03);
+}
+[data-theme="dark"] tr:hover {
+  background: rgba(79, 140, 255, 0.08);
 }
