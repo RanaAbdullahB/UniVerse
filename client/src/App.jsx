@@ -3,7 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { ToastProvider } from './context/ToastContext';
 import { AdminRoute, StudentRoute, PublicRoute } from './components/RouteGuards';
-import { ThemeProvider } from 'styled-components';
+import { ThemeProvider } from './context/ThemeContext';
 
 // Public pages
 import Login from './pages/Login';
@@ -30,7 +30,7 @@ const theme = {
 
 export default function App() {
   return (
-    <ThemeProvider theme={theme}> {/* ✅ WRAPPED HERE */}
+    <ThemeProvider > {/* ✅ WRAPPED HERE */}
       <BrowserRouter>
         <AuthProvider>
           <ToastProvider>
