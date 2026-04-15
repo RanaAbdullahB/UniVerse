@@ -12,6 +12,7 @@ import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
 import NotFound from './pages/NotFound';
 import Messages from './pages/Messages';
+import CheckIn from './pages/CheckIn';
 
 // Student pages
 import Dashboard from './pages/Dashboard';
@@ -43,6 +44,7 @@ export default function App() {
               <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />
               <Route path="/forgot-password" element={<PublicRoute><ForgotPassword /></PublicRoute>} />
               <Route path="/reset-password/:token" element={<PublicRoute><ResetPassword /></PublicRoute>} />
+              <Route path="/checkin/:eventId/:token" element={<CheckIn />} />
 
               {/* Student dashboard */}
               <Route path="/dashboard" element={<StudentRoute><Dashboard /></StudentRoute>}>

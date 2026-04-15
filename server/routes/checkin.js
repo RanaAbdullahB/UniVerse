@@ -35,3 +35,10 @@ const checkInSchema = new mongoose.Schema(
 checkInSchema.index({ event: 1, student: 1 }, { unique: true });
 
 module.exports = mongoose.model('CheckIn', checkInSchema);
+function generateCheckInToken(eventId) {
+  return crypto
+    .createHmac('sha256', process.env.JWT_SECRET)
+    .update(eventId.toString())
+    .digest('hex')
+    .slice(0, 32);
+}

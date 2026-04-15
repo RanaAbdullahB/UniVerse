@@ -43,6 +43,8 @@ app.use((req, res) => {
   res.status(404).json({ success: false, message: 'Route not found' });
 });
 app.use(errorHandler);
+//QR routes 
+app.use('/api/checkin', require('./routes/checkin'));
 
 // ── Start server ──────────────────────────────────────────────
 const PORT = process.env.PORT || 5000;

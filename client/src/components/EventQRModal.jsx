@@ -11,7 +11,7 @@
  */
 
 import { useState, useEffect, useRef } from 'react';
-import QRCode from 'qrcode.react';
+import { QRCodeCanvas } from 'qrcode.react';
 import api from '../utils/api';
 
 export default function EventQRModal({ event, onClose }) {
@@ -130,18 +130,18 @@ export default function EventQRModal({ event, onClose }) {
 
                 {/* QR Code */}
                 <div ref={qrRef} style={styles.qrWrap}>
-                  <QRCode
-                    value={tokenData.checkInUrl}
-                    size={220}
-                    level="H"
-                    includeMargin={true}
-                    imageSettings={{
-                      src:    '/lgulogo.png',
-                      height: 36,
-                      width:  36,
-                      excavate: true
-                    }}
-                  />
+                  <QRCodeCanvas
+  value={tokenData.checkInUrl}
+  size={220}
+  level="H"
+  includeMargin={true}
+  imageSettings={{
+    src: '/lgulogo.png',
+    height: 36,
+    width: 36,
+    excavate: true
+  }}
+/>
                 </div>
 
                 {/* URL display */}

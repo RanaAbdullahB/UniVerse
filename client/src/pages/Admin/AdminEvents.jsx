@@ -1,8 +1,10 @@
 // client/src/pages/admin/AdminEvents.jsx
+import React from 'react';
 import { useState, useEffect, useCallback } from 'react';
 import api from '../../utils/api';
 import { useToast } from '../../context/ToastContext';
 import { PageLoader, InlineLoader } from '../../components/LoadingSpinner';
+import EventQRModal from '../../components/EventQRModal';
 
 const EVENT_TYPES = ['Workshop', 'Seminar', 'Competition', 'Social', 'Sports', 'Cultural'];
 
@@ -23,6 +25,7 @@ const EMPTY_FORM = {
 export default function AdminEvents() {
   const { showToast } = useToast();
 
+  const [qrEvent, setQrEvent] = useState(null);           // ← QR modal state
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -40,17 +43,18 @@ export default function AdminEvents() {
   const [deleting, setDeleting] = useState(false);
 
   // Registrations modal
-  const [regModal, setRegModal] = useState(null);       // { eventId, eventTitle }
-  const [regData, setRegData] = useState(null);         // { registrations: [], eventTitle, eventDate }
+  const [regModal, setRegModal] = useState(null);
+  const [regData, setRegData] = useState(null);
   const [regLoading, setRegLoading] = useState(false);
   const [regSearch, setRegSearch] = useState('');
 
-  // ── Fetch all events ──
+  // ── Fetch all events — FIX: handle all response shapes ──
   const fetchEvents = useCallback(async () => {
     try {
       setLoading(true);
       const res = await api.get('/events');
-      setEvents(res.data.data || res.data);
+      const list = res.data.events || res.data.data || res.data;
+      setEvents(Array.isArray(list) ? list : []);
     } catch {
       showToast('Failed to load events', 'error');
     } finally {
@@ -101,7 +105,7 @@ export default function AdminEvents() {
     setModalOpen(true);
   };
 
-  // ── Save (create / edit) ──
+  // ── Save (create / edit) — FIX: removed misplaced QR modal JSX ──
   const handleSave = async () => {
     if (!form.title.trim() || !form.date || !form.venue.trim()) {
       showToast('Title, date, and venue are required', 'error');
@@ -115,7 +119,8 @@ export default function AdminEvents() {
         showToast('Event updated successfully', 'success');
       } else {
         const res = await api.post('/admin/events', form);
-        setEvents(prev => [res.data.data || res.data, ...prev]);
+        const newEvent = res.data.event || res.data.data || res.data;
+        setEvents(prev => [newEvent, ...prev]);
         showToast('Event created successfully', 'success');
       }
       setModalOpen(false);
@@ -282,12 +287,28 @@ export default function AdminEvents() {
                       onMouseLeave={e => { e.currentTarget.style.background = 'rgba(220,53,69,0.06)'; e.currentTarget.style.color = 'var(--error)'; }}>
                       Delete
                     </button>
+                    {/* ── QR Button ── */}
+                    <button
+                      onClick={() => setQrEvent(event)}
+                      style={{ padding: '0.5rem 0.75rem', borderRadius: '7px', border: '1.5px solid var(--blue-primary)', background: 'var(--blue-tint)', color: 'var(--blue-primary)', cursor: 'pointer', fontSize: '0.78rem', fontWeight: 600, transition: 'all 0.15s' }}
+                      onMouseEnter={e => { e.currentTarget.style.background = 'var(--blue-primary)'; e.currentTarget.style.color = '#fff'; }}
+                      onMouseLeave={e => { e.currentTarget.style.background = 'var(--blue-tint)'; e.currentTarget.style.color = 'var(--blue-primary)'; }}>
+                      📲 QR
+                    </button>
                   </div>
                 </div>
               </div>
             );
           })}
         </div>
+      )}
+
+      {/* ── QR Modal — FIX: moved here from inside handleSave ── */}
+      {qrEvent && (
+        <EventQRModal
+          event={qrEvent}
+          onClose={() => setQrEvent(null)}
+        />
       )}
 
       {/* ── Registrations Modal ── */}
