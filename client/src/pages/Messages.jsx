@@ -39,6 +39,12 @@ function groupMessagesByDate(messages) {
   return groups;
 }
 
+// ─── FIX #7: Reliable ID normalizer used everywhere ──────────────────────────
+function normalizeId(id) {
+  if (!id) return '';
+  return id?._id?.toString() ?? id?.toString();
+}
+
 function Avatar({ name = '', photo, size = 40 }) {
   const initials = name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
   if (photo) {
@@ -101,30 +107,52 @@ export default function Messages() {
   // Notification badge (total unread)
   const [totalUnread,      setTotalUnread]      = useState(0);
 
-  const socketRef       = useRef(null);
-  const messagesEndRef  = useRef(null);
-  const typingTimerRef  = useRef(null);
-  const searchTimerRef  = useRef(null);
-  const draftRef        = useRef(draft);
-  const activeConvoRef  = useRef(activeConvo);
-  draftRef.current      = draft;
-  activeConvoRef.current = activeConvo;
+  const socketRef          = useRef(null);
+  const messagesEndRef     = useRef(null);
+  // FIX #8: Separate timer refs so they never clobber each other
+  const theyTypingTimerRef = useRef(null);
+  const myTypingTimerRef   = useRef(null);
+  const searchTimerRef     = useRef(null);
+  const activeConvoRef     = useRef(activeConvo);
+  activeConvoRef.current   = activeConvo;
 
   // ─── Socket setup ────────────────────────────────────────────────────────
 
   useEffect(() => {
+    if (!user?._id) return;
+
     const token = localStorage.getItem('uni_token');
     const socket = io('/', { auth: { token }, transports: ['websocket'] });
     socketRef.current = socket;
 
-    socket.on('receive_dm', (msg) => {
-      const convoId = msg.conversation;
+    // FIX #1 & #5: Join personal room immediately on connect so the server
+    // knows which socket belongs to this user and can route receive_dm to us.
+    socket.on('connect', () => {
+      socket.emit('join', { userId: user._id.toString() });
+    });
 
-      // If this DM belongs to the active chat, append it
-      if (activeConvoRef.current?._id === convoId) {
+    socket.on('receive_dm', (msg) => {
+      const convoId = msg.conversation?.toString?.() ?? msg.conversation;
+
+      // If this DM belongs to the active chat, append or replace optimistic msg
+      if (normalizeId(activeConvoRef.current?._id) === convoId) {
         setMessages(prev => {
-          // Avoid duplicates (optimistic update may have already added it)
-          if (prev.find(m => m._id === msg._id)) return prev;
+          // FIX #4: Replace any optimistic placeholder that matches content+sender,
+          // or skip if a real message with same _id already exists.
+          const realId = msg._id?.toString();
+          if (prev.find(m => m._id?.toString() === realId)) return prev;
+
+          // Try to replace a pending optimistic message (same content from me)
+          const optimisticIdx = prev.findIndex(
+            m => m._id?.toString?.().startsWith('opt-') &&
+                 m.content === msg.content &&
+                 normalizeId(m.sender) === normalizeId(msg.sender)
+          );
+          if (optimisticIdx !== -1) {
+            const next = [...prev];
+            next[optimisticIdx] = msg;
+            return next;
+          }
           return [...prev, msg];
         });
         setTheyTyping(false);
@@ -133,42 +161,72 @@ export default function Messages() {
 
       // Update conversation list: bump to top + update last message
       setConversations(prev => {
-        const updated = prev.map(c => {
-          if (c._id !== convoId) return c;
-          const isActive = activeConvoRef.current?._id === convoId;
-          return {
-            ...c,
-            lastMessage: { content: msg.content, sender: msg.sender, sentAt: msg.createdAt },
-            myUnread:    isActive ? 0 : (c.myUnread || 0) + 1,
-            updatedAt:   msg.createdAt
-          };
-        });
-        // Sort: most recent first
+        const exists = prev.find(c => c._id?.toString() === convoId);
+        let updated;
+        if (exists) {
+          updated = prev.map(c => {
+            if (c._id?.toString() !== convoId) return c;
+            const isActive = normalizeId(activeConvoRef.current?._id) === convoId;
+            return {
+              ...c,
+              lastMessage: { content: msg.content, sender: msg.sender, sentAt: msg.createdAt },
+              myUnread:    isActive ? 0 : (c.myUnread || 0) + 1,
+              updatedAt:   msg.createdAt
+            };
+          });
+        } else {
+          updated = prev;
+        }
         return [...updated].sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
       });
     });
 
+    // FIX #3: Server acks the saved message back to sender — replace optimistic
+    socket.on('dm_sent', (msg) => {
+      setMessages(prev => {
+        const realId = msg._id?.toString();
+        if (prev.find(m => m._id?.toString() === realId)) return prev;
+        const optimisticIdx = prev.findIndex(
+          m => m._id?.toString?.().startsWith('opt-') &&
+               m.content === msg.content &&
+               normalizeId(m.sender) === normalizeId(user._id)
+        );
+        if (optimisticIdx !== -1) {
+          const next = [...prev];
+          next[optimisticIdx] = msg;
+          return next;
+        }
+        return prev;
+      });
+    });
+
     socket.on('dm_user_typing', ({ conversationId }) => {
-      if (activeConvoRef.current?._id === conversationId) {
+      if (normalizeId(activeConvoRef.current?._id) === conversationId?.toString()) {
         setTheyTyping(true);
-        clearTimeout(typingTimerRef.current);
-        typingTimerRef.current = setTimeout(() => setTheyTyping(false), 3000);
+        // FIX #8: Use dedicated they-typing timer ref
+        clearTimeout(theyTypingTimerRef.current);
+        theyTypingTimerRef.current = setTimeout(() => setTheyTyping(false), 3000);
       }
     });
 
     socket.on('dm_user_stopped_typing', ({ conversationId }) => {
-      if (activeConvoRef.current?._id === conversationId) setTheyTyping(false);
+      if (normalizeId(activeConvoRef.current?._id) === conversationId?.toString()) {
+        setTheyTyping(false);
+      }
     });
 
-    socket.on('dm_notification', ({ conversationId, senderName, preview }) => {
-      // If it's not the currently open convo, increment global unread badge
-      if (activeConvoRef.current?._id !== conversationId) {
+    socket.on('dm_notification', ({ conversationId }) => {
+      if (normalizeId(activeConvoRef.current?._id) !== conversationId?.toString()) {
         setTotalUnread(n => n + 1);
       }
     });
 
-    return () => socket.disconnect();
-  }, []);
+    return () => {
+      clearTimeout(theyTypingTimerRef.current);
+      clearTimeout(myTypingTimerRef.current);
+      socket.disconnect();
+    };
+  }, [user?._id]);
 
   // ─── Load conversations ───────────────────────────────────────────────────
 
@@ -176,7 +234,7 @@ export default function Messages() {
     (async () => {
       try {
         setLoadingConvos(true);
-        const { data } = await api.get('/api/conversations');
+        const { data } = await api.get('/conversations');
         if (data.success) {
           setConversations(data.conversations);
           const unread = data.conversations.reduce((s, c) => s + (c.myUnread || 0), 0);
@@ -192,26 +250,26 @@ export default function Messages() {
 
   // ─── Open conversation ────────────────────────────────────────────────────
 
+  // FIX #6: Use activeConvoRef for the guard so callback is stable (no activeConvo dep)
   const openConversation = useCallback(async (convo) => {
-    if (activeConvo?._id === convo._id) return;
+    if (normalizeId(activeConvoRef.current?._id) === normalizeId(convo._id)) return;
+
     setActiveConvo(convo);
     setMessages([]);
-    setPage(1);
     setHasMore(false);
     setTheyTyping(false);
     setDraft('');
 
     // Reset unread badge locally
     setConversations(prev =>
-      prev.map(c => c._id === convo._id ? { ...c, myUnread: 0 } : c)
+      prev.map(c => normalizeId(c._id) === normalizeId(convo._id) ? { ...c, myUnread: 0 } : c)
     );
-    setTotalUnread(prev =>
-      Math.max(0, prev - (convo.myUnread || 0))
-    );
+    setTotalUnread(prev => Math.max(0, prev - (convo.myUnread || 0)));
 
     setLoadingMessages(true);
+    // FIX #10: Set page after fetch to avoid double-set race
     try {
-      const { data } = await api.get(`/api/conversations/${convo._id}/messages?page=1`);
+      const { data } = await api.get(`/conversations/${convo._id}/messages?page=1`);
       if (data.success) {
         setMessages(data.messages);
         setHasMore(data.hasMore);
@@ -222,17 +280,17 @@ export default function Messages() {
     } finally {
       setLoadingMessages(false);
     }
-  }, [activeConvo]);
+  }, []); // stable — no deps needed
 
   // ─── Load more (older) messages ───────────────────────────────────────────
 
   const loadMore = async () => {
-    if (!activeConvo || loadingMore || !hasMore) return;
+    if (!activeConvoRef.current || loadingMore || !hasMore) return;
     setLoadingMore(true);
     const nextPage = page + 1;
     try {
       const { data } = await api.get(
-        `/api/conversations/${activeConvo._id}/messages?page=${nextPage}`
+        `/conversations/${activeConvoRef.current._id}/messages?page=${nextPage}`
       );
       if (data.success) {
         setMessages(prev => [...data.messages, ...prev]);
@@ -250,36 +308,88 @@ export default function Messages() {
 
   const send = async () => {
     const content = draft.trim();
-    if (!content || !activeConvo || sending) return;
+    if (!content || !activeConvoRef.current || sending) return;
 
-    const recipient = activeConvo.participants.find(p => p._id !== user._id && p._id !== user?._id?.toString());
-    const recipientId = recipient?._id?.toString?.() || recipient?._id;
+    // FIX #2: Normalize both IDs to plain strings before comparing
+    const myId = normalizeId(user._id);
+    const recipient = activeConvoRef.current.participants.find(
+      p => normalizeId(p._id) !== myId
+    );
+    const recipientId = normalizeId(recipient?._id);
 
-    // Optimistic UI
+    if (!recipientId) {
+      console.error('[Messages] Could not resolve recipientId', activeConvoRef.current.participants);
+      return;
+    }
+
+    const optimisticId = `opt-${Date.now()}`;
     const optimistic = {
-      _id:          `opt-${Date.now()}`,
-      conversation: activeConvo._id,
+      _id:          optimisticId,
+      conversation: activeConvoRef.current._id,
       sender:       user._id,
       senderName:   user.name,
       content,
-      createdAt:    new Date().toISOString()
+      createdAt:    new Date().toISOString(),
     };
+
     setMessages(prev => [...prev, optimistic]);
     setDraft('');
+    setSending(true);
     scrollToBottom();
 
-    // Emit via socket (primary)
-    socketRef.current?.emit('send_dm', {
-      conversationId: activeConvo._id,
+    // Stop typing indicator immediately
+    socketRef.current?.emit('dm_typing_stop', {
+      conversationId: activeConvoRef.current._id,
       recipientId,
-      content
     });
 
-    // Stop typing indicator
-    socketRef.current?.emit('dm_typing_stop', {
-      conversationId: activeConvo._id,
-      recipientId
-    });
+    // FIX #3: Persist via REST first — socket is only for real-time delivery,
+    // not the source of truth. This guarantees the message is saved even if
+    // the socket delivery fails.
+    try {
+      const { data } = await api.post(
+        `/conversations/${activeConvoRef.current._id}/messages`,
+        { content, recipientId }
+      );
+
+      if (data.success) {
+        // FIX #4: Replace the optimistic placeholder with the real persisted message
+        setMessages(prev =>
+          prev.map(m => m._id === optimisticId ? data.message : m)
+        );
+
+        // Now notify recipient in real-time via socket (server re-emits to their room)
+        socketRef.current?.emit('send_dm', {
+          conversationId: activeConvoRef.current._id,
+          recipientId,
+          message: data.message,
+        });
+
+        // Update conversation list with real last message
+        setConversations(prev => {
+          const updated = prev.map(c => {
+            if (normalizeId(c._id) !== normalizeId(activeConvoRef.current?._id)) return c;
+            return {
+              ...c,
+              lastMessage: {
+                content:  data.message.content,
+                sender:   data.message.sender,
+                sentAt:   data.message.createdAt,
+              },
+              updatedAt: data.message.createdAt,
+            };
+          });
+          return [...updated].sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+        });
+      }
+    } catch (err) {
+      console.error('[Messages] Send failed:', err);
+      // FIX #3: Remove failed optimistic message and restore draft
+      setMessages(prev => prev.filter(m => m._id !== optimisticId));
+      setDraft(content);
+    } finally {
+      setSending(false);
+    }
   };
 
   const handleKeyDown = (e) => {
@@ -291,21 +401,26 @@ export default function Messages() {
 
   const handleDraftChange = (e) => {
     setDraft(e.target.value);
+    if (!activeConvoRef.current) return;
 
-    if (!activeConvo) return;
-    const recipient = activeConvo.participants.find(p => p._id !== user._id);
-    const recipientId = recipient?._id?.toString?.() || recipient?._id;
+    const myId = normalizeId(user._id);
+    const recipient = activeConvoRef.current.participants.find(
+      p => normalizeId(p._id) !== myId
+    );
+    const recipientId = normalizeId(recipient?._id);
+    if (!recipientId) return;
 
-    // Emit typing
     socketRef.current?.emit('dm_typing_start', {
-      conversationId: activeConvo._id,
-      recipientId
+      conversationId: activeConvoRef.current._id,
+      recipientId,
     });
-    clearTimeout(typingTimerRef.current);
-    typingTimerRef.current = setTimeout(() => {
+
+    // FIX #8: Use dedicated my-typing timer ref — never touches theyTypingTimerRef
+    clearTimeout(myTypingTimerRef.current);
+    myTypingTimerRef.current = setTimeout(() => {
       socketRef.current?.emit('dm_typing_stop', {
-        conversationId: activeConvo._id,
-        recipientId
+        conversationId: activeConvoRef.current._id,
+        recipientId,
       });
     }, 2000);
   };
@@ -320,7 +435,7 @@ export default function Messages() {
     searchTimerRef.current = setTimeout(async () => {
       setSearchingUsers(true);
       try {
-        const { data } = await api.get(`/api/conversations/users/search?q=${encodeURIComponent(q)}`);
+        const { data } = await api.get(`/conversations/users/search?q=${encodeURIComponent(q)}`);
         if (data.success) setUserResults(data.users);
       } catch {
         // silent
@@ -336,11 +451,11 @@ export default function Messages() {
     setUserResults([]);
 
     try {
-      const { data } = await api.post('/api/conversations', { userId: targetUser._id });
+      const { data } = await api.post('/conversations', { userId: targetUser._id });
       if (data.success) {
         const convo = data.conversation;
         setConversations(prev => {
-          const exists = prev.find(c => c._id === convo._id);
+          const exists = prev.find(c => normalizeId(c._id) === normalizeId(convo._id));
           return exists ? prev : [{ ...convo, myUnread: 0 }, ...prev];
         });
         openConversation({ ...convo, myUnread: 0 });
@@ -352,25 +467,23 @@ export default function Messages() {
 
   // ─── Auto-scroll ─────────────────────────────────────────────────────────
 
-  const scrollToBottom = () => {
-    setTimeout(() => {
+  // FIX #9: Use a ref flag + requestAnimationFrame instead of a blind setTimeout
+  const scrollToBottom = useCallback(() => {
+    requestAnimationFrame(() => {
       messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }, 50);
-  };
+    });
+  }, []);
 
   useEffect(() => {
     if (!loadingMessages) scrollToBottom();
-  }, [messages.length, loadingMessages]);
+  }, [messages.length, loadingMessages, scrollToBottom]);
 
   // ─── Helpers ──────────────────────────────────────────────────────────────
 
   const getOtherParticipant = (convo) => {
     if (!convo) return null;
-    return convo.participants?.find(p => {
-      const pid = p._id?.toString?.() || p._id;
-      const uid = user._id?.toString?.() || user._id;
-      return pid !== uid;
-    });
+    const myId = normalizeId(user._id);
+    return convo.participants?.find(p => normalizeId(p._id) !== myId);
   };
 
   const grouped = groupMessagesByDate(messages);
@@ -452,7 +565,7 @@ export default function Messages() {
           ) : (
             conversations.map(convo => {
               const other    = getOtherParticipant(convo);
-              const isActive = activeConvo?._id === convo._id;
+              const isActive = normalizeId(activeConvo?._id) === normalizeId(convo._id);
               const last     = convo.lastMessage;
               return (
                 <button
@@ -476,7 +589,9 @@ export default function Messages() {
                         fontWeight: (convo.myUnread || 0) > 0 ? 600 : 400,
                         color:      (convo.myUnread || 0) > 0 ? 'var(--text-primary)' : 'var(--text-muted)'
                       }}>
-                        {last?.content ? last.content.slice(0, 38) + (last.content.length > 38 ? '…' : '') : 'No messages yet'}
+                        {last?.content
+                          ? last.content.slice(0, 38) + (last.content.length > 38 ? '…' : '')
+                          : 'No messages yet'}
                       </span>
                       {(convo.myUnread || 0) > 0 && (
                         <span style={styles.unreadBadge}>
@@ -563,9 +678,12 @@ export default function Messages() {
                   );
                 }
 
-                const isMine  = (item.sender?._id || item.sender) === (user._id?.toString?.() || user._id)
-                             || item.sender === user._id;
-                const isOptimistic = item._id?.startsWith?.('opt-');
+                // FIX #7: Normalize both sides before comparing — handles ObjectId objects
+                // and plain strings interchangeably without false mismatches.
+                const senderId    = normalizeId(item.sender);
+                const myId        = normalizeId(user._id);
+                const isMine      = senderId === myId;
+                const isOptimistic = item._id?.toString?.().startsWith('opt-');
 
                 return (
                   <div
@@ -584,14 +702,15 @@ export default function Messages() {
                     )}
                     <div style={{
                       ...styles.bubble,
-                      marginLeft:  isMine ? 0   : 8,
-                      marginRight: isMine ? 0   : 0,
-                      background:  isMine ? 'var(--blue-primary)'    : 'var(--white)',
-                      color:       isMine ? '#fff'                   : 'var(--text-primary)',
+                      marginLeft:  isMine ? 0 : 8,
+                      marginRight: isMine ? 0 : 0,
+                      background:  isMine ? 'var(--blue-primary)' : 'var(--white)',
+                      color:       isMine ? '#fff'                : 'var(--text-primary)',
                       borderRadius: isMine
                         ? '18px 18px 4px 18px'
                         : '18px 18px 18px 4px',
-                      opacity: isOptimistic ? 0.75 : 1
+                      opacity: isOptimistic ? 0.7 : 1,
+                      transition: 'opacity 0.2s'
                     }}>
                       <div style={styles.bubbleContent}>{item.content}</div>
                       <div style={{
@@ -599,8 +718,14 @@ export default function Messages() {
                         color: isMine ? 'rgba(255,255,255,0.7)' : 'var(--text-muted)'
                       }}>
                         {formatTime(item.createdAt)}
-                        {isMine && item.readAt && !isOptimistic && (
+                        {isMine && isOptimistic && (
+                          <span title="Sending…" style={{ marginLeft: 4 }}>⏳</span>
+                        )}
+                        {isMine && !isOptimistic && item.readAt && (
                           <span title="Seen" style={{ marginLeft: 4 }}>✓✓</span>
+                        )}
+                        {isMine && !isOptimistic && !item.readAt && (
+                          <span title="Delivered" style={{ marginLeft: 4 }}>✓</span>
                         )}
                       </div>
                     </div>
@@ -611,7 +736,11 @@ export default function Messages() {
               {/* Typing indicator */}
               {theyTyping && (
                 <div style={{ ...styles.msgRow, justifyContent: 'flex-start' }}>
-                  <div style={{ ...styles.bubble, background: 'var(--white)', borderRadius: '18px 18px 18px 4px' }}>
+                  <div style={{
+                    ...styles.bubble,
+                    background: 'var(--white)',
+                    borderRadius: '18px 18px 18px 4px'
+                  }}>
                     <div style={styles.typingDots}>
                       <span /><span /><span />
                     </div>
@@ -641,11 +770,11 @@ export default function Messages() {
                 disabled={!draft.trim() || sending}
                 style={{
                   ...styles.sendBtn,
-                  opacity: draft.trim() ? 1 : 0.5,
-                  cursor:  draft.trim() ? 'pointer' : 'default'
+                  opacity: draft.trim() && !sending ? 1 : 0.5,
+                  cursor:  draft.trim() && !sending ? 'pointer' : 'default'
                 }}
               >
-                ➤
+                {sending ? '…' : '➤'}
               </button>
             </div>
           </>
@@ -660,7 +789,7 @@ export default function Messages() {
 const styles = {
   root: {
     display:       'flex',
-    height:        'calc(100vh - 60px)', // subtract navbar height
+    height:        'calc(100vh - 60px)',
     background:    'var(--bg-page)',
     overflow:      'hidden'
   },

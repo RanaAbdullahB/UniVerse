@@ -65,6 +65,31 @@ router.post('/', authMiddleware, async (req, res) => {
 });
 
 // ─────────────────────────────────────────────
+// GET /api/conversations/users/search
+// Search students to start a new DM
+// Query: ?q=name
+// ─────────────────────────────────────────────
+router.get('/users/search', authMiddleware, async (req, res) => {
+  try {
+    const q = req.query.q?.trim();
+    if (!q || q.length < 2)
+      return res.json({ success: true, users: [] });
+
+    const users = await User.find({
+      _id:  { $ne: req.user._id },
+      role: 'student',
+      name: { $regex: q, $options: 'i' }
+    })
+      .select('name profilePhoto department year')
+      .limit(8);
+
+    res.json({ success: true, users });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+// ─────────────────────────────────────────────
 // GET /api/conversations/:id/messages
 // Load paginated message history for a conversation
 // Query: ?page=1
@@ -150,31 +175,6 @@ router.post('/:id/messages', authMiddleware, async (req, res) => {
     await convo.save();
 
     res.json({ success: true, message });
-  } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
-  }
-});
-
-// ─────────────────────────────────────────────
-// GET /api/conversations/users/search
-// Search students to start a new DM
-// Query: ?q=name
-// ─────────────────────────────────────────────
-router.get('/users/search', authMiddleware, async (req, res) => {
-  try {
-    const q = req.query.q?.trim();
-    if (!q || q.length < 2)
-      return res.json({ success: true, users: [] });
-
-    const users = await User.find({
-      _id:  { $ne: req.user._id },
-      role: 'student',
-      name: { $regex: q, $options: 'i' }
-    })
-      .select('name profilePhoto department year')
-      .limit(8);
-
-    res.json({ success: true, users });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }
