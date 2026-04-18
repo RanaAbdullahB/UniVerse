@@ -7,6 +7,7 @@ import Events from './Events';
 import StudyGroups from './StudyGroups';
 import Profile from './Profile';
 import Messages from './Messages';
+import ResourcePool from './ResourcePool';
 
 export default function Dashboard() {
   const [activeTab, setActiveTab] = useState('home');
@@ -20,6 +21,7 @@ export default function Dashboard() {
     case 'studygroups': return <StudyGroups />;
     case 'profile': return <Profile />;
     case 'messages': return <Messages />;
+    case 'resource-pool': return <ResourcePool />;
     default: return <DashboardHome onTabChange={setActiveTab} />;
   }
 };

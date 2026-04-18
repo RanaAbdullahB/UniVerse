@@ -3,12 +3,13 @@ import { NavLink } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 const navItems = [
-  { key: 'home', label: 'Home', icon: '🏠' },
-  { key: 'clubs', label: 'Societies & Clubs', icon: '🏛️' },
-  { key: 'events', label: 'Upcoming Events', icon: '📅' },
-  { key: 'studygroups', label: 'Study Groups', icon: '📚' },
-  { key: 'messages', label: 'Messages', icon: '💬' }, // ✅ Added here
-  { key: 'profile', label: 'My Profile', icon: '👤' },
+  { key: 'home',          label: 'Home',               icon: '🏠' },
+  { key: 'clubs',         label: 'Societies & Clubs',  icon: '🏛️' },
+  { key: 'events',        label: 'Upcoming Events',    icon: '📅' },
+  { key: 'studygroups',   label: 'Study Groups',       icon: '📚' },
+  { key: 'messages',      label: 'Messages',           icon: '💬' },
+  { key: 'resource-pool', label: 'Resource Pool',      icon: '📚' },
+  { key: 'profile',       label: 'My Profile',         icon: '👤' },
 ];
 
 export default function Sidebar({ activeTab, onTabChange, mobileOpen, onClose }) {
@@ -101,17 +102,19 @@ export default function Sidebar({ activeTab, onTabChange, mobileOpen, onClose })
           <p style={{ color: 'rgba(245,240,232,0.3)', fontSize: '0.65rem', letterSpacing: '0.1em', textTransform: 'uppercase', padding: '8px 4px', marginBottom: 4 }}>
             Navigation
           </p>
-          {navItems.map((item) => (
-            <button
-              key={item.key}
-              className={`nav-item w-full text-left ${activeTab === item.key ? 'active' : ''}`}
-              onClick={() => { onTabChange(item.key); onClose && onClose(); }}
-              style={{ border: 'none', background: 'none', width: '100%', cursor: 'pointer', marginBottom: 2 }}
-            >
-              <span style={{ fontSize: '1rem' }}>{item.icon}</span>
-              <span>{item.label}</span>
-            </button>
-          ))}
+          {navItems.map((item) => {
+            return (
+              <button
+                key={item.key}
+                className={`nav-item w-full text-left ${activeTab === item.key ? 'active' : ''}`}
+                onClick={() => { onTabChange(item.key); onClose && onClose(); }}
+                style={{ border: 'none', background: 'none', width: '100%', cursor: 'pointer', marginBottom: 2 }}
+              >
+                <span style={{ fontSize: '1rem' }}>{item.icon}</span>
+                <span>{item.label}</span>
+              </button>
+            );
+          })}
         </nav>
 
         {/* Bottom */}

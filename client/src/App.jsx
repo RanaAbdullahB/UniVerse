@@ -13,7 +13,7 @@ import ResetPassword from './pages/ResetPassword';
 import NotFound from './pages/NotFound';
 import Messages from './pages/Messages';
 import CheckIn from './pages/CheckIn';
-
+import ResourcePool from './pages/ResourcePool';
 // Student pages
 import Dashboard from './pages/Dashboard';
 
@@ -49,6 +49,7 @@ export default function App() {
               {/* Student dashboard */}
               <Route path="/dashboard" element={<StudentRoute><Dashboard /></StudentRoute>}>
                 <Route path="messages" element={<Messages />} />
+                <Route path="resource-pool" element={<ResourcePool />} />
               </Route>
 
               {/* Admin dashboard */}

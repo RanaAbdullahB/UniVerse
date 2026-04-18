@@ -32,7 +32,7 @@ app.use('/api/search',        require('./routes/search'));
 app.use('/api/upload',        require('./routes/upload'));
 app.use('/uploads',           express.static(path.join(__dirname, 'uploads')));
 app.use('/api/conversations', require('./routes/conversations'));
-
+app.use('/api/resources', require('./routes/resources'));
 // ── Health check ──────────────────────────────────────────────
 app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', message: 'UniVerse API is running' });
