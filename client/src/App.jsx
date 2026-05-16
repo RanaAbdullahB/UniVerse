@@ -18,7 +18,7 @@ import ResourcePool from './pages/ResourcePool';
 import Dashboard from './pages/Dashboard';
 
 // Admin pages
-import AdminDashboard from './pages/admin/AdminDashboard';
+import AdminDashboard from './pages/Admin/AdminDashboard';
 
 // ✅ Define your theme
 const theme = {
