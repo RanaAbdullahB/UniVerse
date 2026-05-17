@@ -9,8 +9,14 @@ const router = express.Router();
 // @access  Private
 router.get('/my-groups', authMiddleware, async (req, res, next) => {
   try {
-    const user = await User.findById(req.user._id).populate('joinedStudyGroups');
-    res.json({ success: true, groups: user.joinedStudyGroups });
+    const user = await User.findById(req.user._id).populate({
+      path: 'joinedStudyGroups',
+      populate: [
+        { path: 'creator', select: 'name studentId department profilePhoto' },
+        { path: 'members', select: 'name studentId department profilePhoto' },
+      ],
+    });
+    res.json({ success: true, groups: user.joinedStudyGroups || [] });
   } catch (error) {
     next(error);
   }
@@ -86,7 +92,9 @@ router.post('/', authMiddleware, async (req, res, next) => {
     // Add to user's joined groups
     await User.findByIdAndUpdate(req.user._id, { $addToSet: { joinedStudyGroups: group._id } });
 
-    const populated = await StudyGroup.findById(group._id).populate('creator', 'name studentId');
+    const populated = await StudyGroup.findById(group._id)
+      .populate('creator', 'name studentId department profilePhoto')
+      .populate('members', 'name studentId department profilePhoto');
 
     res.status(201).json({ success: true, message: 'Study group created successfully', group: populated });
   } catch (error) {
@@ -110,7 +118,7 @@ router.post('/:id/join', authMiddleware, async (req, res, next) => {
     }
 
     const userId = req.user._id;
-    if (group.members.includes(userId)) {
+    if (group.members.some(m => m.toString() === userId.toString())) {
       return res.status(400).json({ success: false, message: 'You are already a member of this group' });
     }
 
@@ -141,7 +149,7 @@ router.post('/:id/leave', authMiddleware, async (req, res, next) => {
       });
     }
 
-    if (!group.members.includes(userId)) {
+    if (!group.members.some(m => m.toString() === userId.toString())) {
       return res.status(400).json({ success: false, message: 'You are not a member of this group' });
     }
 

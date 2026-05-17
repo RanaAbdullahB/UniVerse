@@ -7,17 +7,18 @@
 // Example in Navbar.jsx:
 //   import GlobalSearch from './GlobalSearch';
 //   const [searchOpen, setSearchOpen] = useState(false);
-//   <button onClick={() => setSearchOpen(true)}>🔍 Search</button>
+//   <button onClick={() => setSearchOpen(true)}>Search</button>
 //   {searchOpen && <GlobalSearch onClose={() => setSearchOpen(false)} onTabChange={onTabChange} />}
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import api from '../utils/api';
+import AppIcon from './AppIcon';
 
 const TYPE_CONFIG = {
-  clubs:    { icon: '🏛️', label: 'Club',        color: 'var(--dark-accent)',  bg: 'rgba(29,47,111,0.08)',  tab: 'clubs' },
-  events:   { icon: '📅', label: 'Event',       color: 'var(--success)',       bg: 'rgba(25,135,84,0.08)', tab: 'events' },
-  groups:   { icon: '📚', label: 'Study Group', color: 'var(--blue-primary)',  bg: 'rgba(13,110,253,0.08)', tab: 'studygroups' },
-  students: { icon: '🎓', label: 'Student',     color: '#fd7e14',              bg: 'rgba(253,126,20,0.08)', tab: null },
+  clubs:    { icon: 'landmark',   label: 'Club',        color: 'var(--dark-accent)',  bg: 'rgba(29,47,111,0.08)',  tab: 'clubs' },
+  events:   { icon: 'calendar',   label: 'Event',       color: 'var(--success)',       bg: 'rgba(25,135,84,0.08)', tab: 'events' },
+  groups:   { icon: 'book',       label: 'Study Group', color: 'var(--blue-primary)',  bg: 'rgba(13,110,253,0.08)', tab: 'studygroups' },
+  students: { icon: 'graduation', label: 'Student',     color: '#fd7e14',              bg: 'rgba(253,126,20,0.08)', tab: null },
 };
 
 function useDebounce(value, delay) {
@@ -82,7 +83,7 @@ export default function GlobalSearch({ onClose, onTabChange }) {
 
         {/* Search input */}
         <div style={{ padding: '1rem 1.25rem', display: 'flex', alignItems: 'center', gap: '0.75rem', borderBottom: '1px solid var(--border)' }}>
-          <span style={{ fontSize: '1.15rem', flexShrink: 0 }}>🔍</span>
+          <AppIcon name="search" size={20} />
           <input
             ref={inputRef}
             value={query}
@@ -114,7 +115,12 @@ export default function GlobalSearch({ onClose, onTabChange }) {
                 color: activeFilter === f ? 'var(--blue-primary)' : 'var(--text-muted)',
                 textTransform: 'capitalize', transition: 'all 0.15s', whiteSpace: 'nowrap',
               }}>
-              {f === 'all' ? '✦ All' : `${TYPE_CONFIG[f]?.icon} ${f.charAt(0).toUpperCase() + f.slice(1)}`}
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+                {f === 'all'
+                  ? <AppIcon name="search" size={14} />
+                  : <AppIcon name={TYPE_CONFIG[f]?.icon} size={14} />}
+                {f === 'all' ? 'All' : f.charAt(0).toUpperCase() + f.slice(1)}
+              </span>
             </button>
           ))}
         </div>
@@ -124,7 +130,7 @@ export default function GlobalSearch({ onClose, onTabChange }) {
           {/* Empty state */}
           {!query || query.length < 2 ? (
             <div style={{ padding: '2.5rem 1.5rem', textAlign: 'center' }}>
-              <div style={{ fontSize: '2.5rem', marginBottom: '0.625rem' }}>🔍</div>
+              <AppIcon name="search" size={40} style={{ color: 'var(--text-muted)', marginBottom: '0.625rem' }} />
               <p style={{ color: 'var(--text-muted)', margin: 0, fontSize: '0.875rem', fontWeight: 500 }}>Type to search across UniVerse</p>
               <div style={{ display: 'flex', justifyContent: 'center', gap: '0.5rem', marginTop: '1rem', flexWrap: 'wrap' }}>
                 {['Clubs', 'Events', 'Study Groups', 'Students'].map(s => (
@@ -134,7 +140,7 @@ export default function GlobalSearch({ onClose, onTabChange }) {
             </div>
           ) : !hasResults && !loading ? (
             <div style={{ padding: '2.5rem 1.5rem', textAlign: 'center' }}>
-              <div style={{ fontSize: '2.5rem', marginBottom: '0.625rem' }}>😕</div>
+              <AppIcon name="help" size={40} style={{ color: 'var(--text-muted)', marginBottom: '0.625rem' }} />
               <p style={{ color: 'var(--text-muted)', margin: 0, fontWeight: 500 }}>No results for "{query}"</p>
               <p style={{ color: 'var(--text-muted)', fontSize: '0.78rem', margin: '0.25rem 0 0' }}>Try different keywords</p>
             </div>
@@ -142,10 +148,10 @@ export default function GlobalSearch({ onClose, onTabChange }) {
             <div>
               {/* Clubs */}
               {results.clubs?.length > 0 && (activeFilter === 'all' || activeFilter === 'clubs') && (
-                <ResultSection title="Clubs" icon="🏛️" color="var(--dark-accent)">
+                <ResultSection title="Clubs" icon="landmark" color="var(--dark-accent)">
                   {results.clubs.map(club => (
                     <ResultRow key={club._id} onClick={() => handleResultClick('clubs')}
-                      avatar={club.coverImage} avatarFallback="🏛️"
+                      avatar={club.coverImage} avatarIcon="landmark"
                       title={club.name}
                       subtitle={`${club.category} · ${club.totalMembers || 0} members`}
                       badge={club.category} badgeColor="var(--dark-accent)" badgeBg="rgba(29,47,111,0.08)" />
@@ -155,10 +161,10 @@ export default function GlobalSearch({ onClose, onTabChange }) {
 
               {/* Events */}
               {results.events?.length > 0 && (activeFilter === 'all' || activeFilter === 'events') && (
-                <ResultSection title="Events" icon="📅" color="var(--success)">
+                <ResultSection title="Events" icon="calendar" color="var(--success)">
                   {results.events.map(event => (
                     <ResultRow key={event._id} onClick={() => handleResultClick('events')}
-                      avatarFallback="📅"
+                      avatarIcon="calendar"
                       title={event.title}
                       subtitle={`${new Date(event.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })} · ${event.venue}`}
                       badge={event.eventType} badgeColor="var(--success)" badgeBg="rgba(25,135,84,0.08)" />
@@ -168,10 +174,10 @@ export default function GlobalSearch({ onClose, onTabChange }) {
 
               {/* Study Groups */}
               {results.groups?.length > 0 && (activeFilter === 'all' || activeFilter === 'groups') && (
-                <ResultSection title="Study Groups" icon="📚" color="var(--blue-primary)">
+                <ResultSection title="Study Groups" icon="book" color="var(--blue-primary)">
                   {results.groups.map(group => (
                     <ResultRow key={group._id} onClick={() => handleResultClick('groups')}
-                      avatarFallback="📚"
+                      avatarIcon="book"
                       title={group.name}
                       subtitle={`${group.subject} · ${group.department} · ${group.members?.length || 0}/${group.maxMembers} members`}
                       badge={group.semester} badgeColor="var(--blue-primary)" badgeBg="rgba(13,110,253,0.08)" />
@@ -181,7 +187,7 @@ export default function GlobalSearch({ onClose, onTabChange }) {
 
               {/* Students */}
               {results.students?.length > 0 && (activeFilter === 'all' || activeFilter === 'students') && (
-                <ResultSection title="Students" icon="🎓" color="#fd7e14">
+                <ResultSection title="Students" icon="graduation" color="#fd7e14">
                   {results.students.map((student, i) => (
                     <ResultRow key={student._id || i}
                       avatar={student.profilePhoto} avatarFallback={student.name?.charAt(0).toUpperCase()}
@@ -212,7 +218,7 @@ function ResultSection({ title, icon, color, children }) {
   return (
     <div style={{ borderBottom: '1px solid var(--border)' }}>
       <div style={{ padding: '0.5rem 1.25rem', display: 'flex', alignItems: 'center', gap: '0.4rem', background: 'var(--bg-page)', borderBottom: '1px solid var(--border)' }}>
-        <span style={{ fontSize: '0.85rem' }}>{icon}</span>
+        <AppIcon name={icon} size={15} style={{ color }} />
         <span style={{ fontSize: '0.7rem', fontWeight: 700, color, textTransform: 'uppercase', letterSpacing: '0.07em' }}>{title}</span>
       </div>
       {children}
@@ -220,7 +226,7 @@ function ResultSection({ title, icon, color, children }) {
   );
 }
 
-function ResultRow({ onClick, avatar, avatarFallback, title, subtitle, badge, badgeColor, badgeBg }) {
+function ResultRow({ onClick, avatar, avatarFallback, avatarIcon, title, subtitle, badge, badgeColor, badgeBg }) {
   return (
     <div
       onClick={onClick}
@@ -232,7 +238,7 @@ function ResultRow({ onClick, avatar, avatarFallback, title, subtitle, badge, ba
       <div style={{ width: 36, height: 36, borderRadius: 8, background: 'var(--blue-tint)', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', flexShrink: 0, fontSize: '1rem' }}>
         {avatar
           ? <img src={avatar} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-          : avatarFallback}
+          : avatarIcon ? <AppIcon name={avatarIcon} size={18} /> : avatarFallback}
       </div>
 
       {/* Text */}

@@ -25,8 +25,9 @@ router.get('/:eventId/token', authMiddleware, adminMiddleware, async (req, res) 
     if (!event)
       return res.status(404).json({ success: false, message: 'Event not found' });
 
+    const clientUrl  = process.env.CLIENT_URL || 'http://localhost:3000';
     const token      = generateCheckInToken(eventId);
-    const checkInUrl = `${process.env.CLIENT_URL}/checkin/${eventId}/${token}`;
+    const checkInUrl = `${clientUrl}/checkin/${eventId}/${token}`;
 
     res.json({
       success:    true,

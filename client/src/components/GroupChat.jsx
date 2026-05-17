@@ -10,8 +10,9 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { io } from 'socket.io-client';
 import api from '../utils/api';
+import AppIcon from './AppIcon';
 
-const SOCKET_URL = 'http://localhost:5000';
+const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || 'http://localhost:5000';
 
 function formatTime(dateStr) {
   const d = new Date(dateStr);
@@ -90,6 +91,7 @@ export default function GroupChat({ group, currentUser, onClose }) {
     });
 
     socket.on('disconnect', () => setConnected(false));
+    socket.on('connect_error', () => setConnected(false));
 
     socket.on('receive_message', (msg) => {
       setMessages(prev => {
@@ -184,8 +186,8 @@ export default function GroupChat({ group, currentUser, onClose }) {
 
         {/* ── Header ── */}
         <div style={{ background: 'linear-gradient(135deg, var(--dark-primary), var(--dark-accent))', padding: '1rem 1.25rem', display: 'flex', alignItems: 'center', gap: '0.875rem', flexShrink: 0 }}>
-          <div style={{ width: 40, height: 40, borderRadius: '50%', background: 'rgba(255,255,255,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.2rem', flexShrink: 0 }}>
-            📚
+          <div style={{ width: 40, height: 40, borderRadius: '50%', background: 'rgba(255,255,255,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, color: '#fff' }}>
+            <AppIcon name="book" size={21} />
           </div>
           <div style={{ flex: 1, minWidth: 0 }}>
             <h3 style={{ margin: 0, color: '#fff', fontFamily: 'Playfair Display, serif', fontSize: '1rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
@@ -222,7 +224,7 @@ export default function GroupChat({ group, currentUser, onClose }) {
             </div>
           ) : messages.length === 0 ? (
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)', gap: '0.5rem' }}>
-              <div style={{ fontSize: '2.5rem' }}>💬</div>
+              <AppIcon name="message" size={40} />
               <p style={{ margin: 0, fontWeight: 500, fontSize: '0.875rem' }}>No messages yet</p>
               <p style={{ margin: 0, fontSize: '0.78rem' }}>Be the first to say something!</p>
             </div>
@@ -347,7 +349,7 @@ export default function GroupChat({ group, currentUser, onClose }) {
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 fontSize: '1rem', flexShrink: 0, transition: 'all 0.15s',
               }}>
-              ➤
+              <AppIcon name="send" size={17} />
             </button>
           </div>
           <p style={{ margin: '0.35rem 0 0', fontSize: '0.68rem', color: 'var(--text-muted)' }}>

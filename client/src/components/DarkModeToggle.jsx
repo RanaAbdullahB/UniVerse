@@ -2,11 +2,12 @@
  * DarkModeToggle.jsx
  * Place at: client/src/components/DarkModeToggle.jsx
  *
- * Animated sun ☀️ / moon 🌙 toggle.
+ * Animated sun / moon toggle.
  * Drop it anywhere — already used in Navbar.jsx.
  */
 
 import { useTheme } from '../context/ThemeContext';
+import AppIcon from './AppIcon';
 
 export default function DarkModeToggle({ size = 36 }) {
   const { isDark, toggleTheme } = useTheme();
@@ -42,7 +43,7 @@ export default function DarkModeToggle({ size = 36 }) {
           opacity:     1
         }}
       >
-        {isDark ? '☀️' : '🌙'}
+        <AppIcon name={isDark ? 'sun' : 'moon'} size={size * 0.5} />
       </span>
     </button>
   );

@@ -8,6 +8,7 @@ const User          = require('./models/User');
 const Message       = require('./models/Message');
 const DirectMessage = require('./models/DirectMessage');
 const Conversation  = require('./models/Conversation');
+const StudyGroup    = require('./models/StudyGroup');
 
 module.exports = function initSocket(server) {
   const { Server } = require('socket.io');
@@ -25,7 +26,7 @@ module.exports = function initSocket(server) {
       const token = socket.handshake.auth.token;
       if (!token) return next(new Error('Authentication error: no token'));
 
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback_secret');
       const user    = await User.findById(decoded.id).select('-password');
       if (!user)    return next(new Error('Authentication error: user not found'));
 
@@ -60,6 +61,15 @@ module.exports = function initSocket(server) {
       try {
         if (!content?.trim()) return;
 
+        const group = await StudyGroup.findById(groupId).select('creator members');
+        if (!group) return socket.emit('error', { message: 'Group not found' });
+
+        const isMember = group.members.some(m => m.toString() === uid);
+        const isCreator = group.creator.toString() === uid;
+        if (!isMember && !isCreator) {
+          return socket.emit('error', { message: 'You are not a member of this group' });
+        }
+
         const msg = await Message.create({
           studyGroup:       groupId,
           sender:           socket.user._id,
@@ -67,7 +77,8 @@ module.exports = function initSocket(server) {
           senderDepartment: socket.user.department,
           senderYear:       socket.user.year,
           senderPhoto:      socket.user.profilePhoto || '',
-          content:          content.trim()
+          content:          content.trim(),
+          readBy:           [socket.user._id]
         });
 
         io.to(`group_${groupId}`).emit('receive_message', msg);

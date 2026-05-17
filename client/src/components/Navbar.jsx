@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import GlobalSearch from './GlobalSearch';
-import DarkModeToggle from './DarkModeToggle'; // ✅ IMPORT ADDED
+import DarkModeToggle from './DarkModeToggle';
+import AppIcon from './AppIcon';
 
 export default function Navbar({ onMobileMenuToggle, activeTab }) {
   const [searchOpen, setSearchOpen] = useState(false);
@@ -39,7 +40,7 @@ export default function Navbar({ onMobileMenuToggle, activeTab }) {
           style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.2rem', color: '#4a5568', padding: 4 }}
           className="md:hidden"
         >
-          ☰
+          <AppIcon name="menu" size={22} />
         </button>
 
         <button
@@ -59,7 +60,7 @@ export default function Navbar({ onMobileMenuToggle, activeTab }) {
           onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--blue-primary)'; e.currentTarget.style.color = 'var(--blue-primary)'; }}
           onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--text-muted)'; }}
         >
-          🔍 <span>Search</span>
+          <AppIcon name="search" size={16} /><span>Search</span>
           <span style={{ background: 'var(--border)', borderRadius: 4, padding: '1px 5px', fontSize: '0.65rem', marginLeft: 2 }}>Ctrl+K</span>
         </button>
 
@@ -86,7 +87,6 @@ export default function Navbar({ onMobileMenuToggle, activeTab }) {
       {/* Right */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
 
-        {/* ✅ DARK MODE TOGGLE ADDED HERE */}
         <DarkModeToggle />
 
         {/* Notification */}
@@ -104,7 +104,7 @@ export default function Navbar({ onMobileMenuToggle, activeTab }) {
           }}
           title="Notifications"
         >
-          🔔
+          <AppIcon name="bell" size={20} />
           <span
             style={{
               position: 'absolute',
@@ -196,7 +196,7 @@ export default function Navbar({ onMobileMenuToggle, activeTab }) {
                     gap: 8,
                   }}
                 >
-                  🚪 Sign Out
+                  <AppIcon name="logout" size={16} /> Sign Out
                 </button>
               </div>
             </div>

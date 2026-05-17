@@ -4,6 +4,7 @@ import api from '../../utils/api';
 import { useToast } from '../../context/ToastContext';
 import { PageLoader } from '../../components/LoadingSpinner';
 import { exportStudyGroups } from '../../utils/csvExport';
+import AppIcon from '../../components/AppIcon';
 
 const SEMESTERS = ['Fall', 'Spring', 'Summer'];
 const DEPARTMENTS = [
@@ -108,10 +109,10 @@ export default function AdminStudyGroups() {
   if (loading) return <PageLoader />;
 
   const statCards = [
-    { label: 'Total Groups',  value: groups.length,                                                color: 'var(--blue-primary)', bg: 'rgba(13,110,253,0.08)', icon: '📚' },
-    { label: 'Open Groups',   value: groups.filter(g => g.groupType === 'Open').length,            color: 'var(--success)',      bg: 'rgba(25,135,84,0.08)',  icon: '🔓' },
-    { label: 'Online Groups', value: groups.filter(g => g.isOnline).length,                        color: 'var(--dark-accent)',  bg: 'rgba(29,47,111,0.08)',  icon: '🌐' },
-    { label: 'Total Members', value: groups.reduce((a, g) => a + (g.members?.length || 0), 0),    color: '#fd7e14',             bg: 'rgba(253,126,20,0.08)', icon: '👤' },
+    { label: 'Total Groups',  value: groups.length,                                                color: 'var(--blue-primary)', bg: 'rgba(13,110,253,0.08)', icon: 'book' },
+    { label: 'Open Groups',   value: groups.filter(g => g.groupType === 'Open').length,            color: 'var(--success)',      bg: 'rgba(25,135,84,0.08)',  icon: 'unlock' },
+    { label: 'Online Groups', value: groups.filter(g => g.isOnline).length,                        color: 'var(--dark-accent)',  bg: 'rgba(29,47,111,0.08)',  icon: 'globe' },
+    { label: 'Total Members', value: groups.reduce((a, g) => a + (g.members?.length || 0), 0),    color: '#fd7e14',             bg: 'rgba(253,126,20,0.08)', icon: 'user' },
   ];
 
   return (
@@ -120,7 +121,7 @@ export default function AdminStudyGroups() {
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1rem', marginBottom: '1.75rem' }}>
         {statCards.map(card => (
           <div key={card.label} style={{ background: '#fff', borderRadius: '12px', padding: '1rem 1.25rem', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            <div style={{ width: 40, height: 40, borderRadius: '10px', background: card.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.25rem', flexShrink: 0 }}>{card.icon}</div>
+            <div style={{ width: 40, height: 40, borderRadius: '10px', background: card.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}><AppIcon name={card.icon} size={22} style={{ color: card.color }} /></div>
             <div>
               <div style={{ fontSize: '1.4rem', fontWeight: 700, color: card.color, lineHeight: 1.1, fontFamily: 'Playfair Display, serif' }}>{card.value}</div>
               <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.15rem' }}>{card.label}</div>
@@ -154,7 +155,7 @@ export default function AdminStudyGroups() {
           style={{ padding: '0.55rem 1rem', borderRadius: '8px', border: '1.5px solid var(--border)', background: '#fff', cursor: 'pointer', fontSize: '0.82rem', color: 'var(--text-body)', fontWeight: 500, whiteSpace: 'nowrap', transition: 'all 0.15s' }}
           onMouseEnter={e => (e.currentTarget.style.borderColor = 'var(--blue-primary)')}
           onMouseLeave={e => (e.currentTarget.style.borderColor = 'var(--border)')}>
-          ⬇️ Export CSV
+          Export CSV
         </button>
       </div>
 
@@ -163,7 +164,7 @@ export default function AdminStudyGroups() {
       {/* Table */}
       {filtered.length === 0 ? (
         <div style={{ textAlign: 'center', padding: '4rem 2rem', background: '#fff', borderRadius: '12px', border: '1px solid var(--border)' }}>
-          <div style={{ fontSize: '3rem', marginBottom: '0.75rem' }}>📚</div>
+          <AppIcon name="book" size={48} style={{ marginBottom: '0.75rem', color: 'var(--text-muted)' }} />
           <p style={{ color: 'var(--text-muted)', margin: 0, fontWeight: 500 }}>No study groups found</p>
         </div>
       ) : (
@@ -212,12 +213,12 @@ export default function AdminStudyGroups() {
                     <td style={{ padding: '0.875rem 1rem', color: 'var(--text-muted)', fontSize: '0.82rem', whiteSpace: 'nowrap' }}>{group.semester || '—'}</td>
                     <td style={{ padding: '0.875rem 1rem' }}>
                       <span style={{ padding: '0.2rem 0.6rem', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 600, background: group.groupType === 'Open' ? 'rgba(25,135,84,0.1)' : 'rgba(255,193,7,0.15)', color: group.groupType === 'Open' ? 'var(--success)' : '#856404' }}>
-                        {group.groupType === 'Open' ? '🔓 Open' : '🔒 Invite'}
+                        <span style={iconLabelStyle}><AppIcon name={group.groupType === 'Open' ? 'unlock' : 'lock'} size={12} /> {group.groupType === 'Open' ? 'Open' : 'Invite'}</span>
                       </span>
                     </td>
                     <td style={{ padding: '0.875rem 1rem' }}>
                       <span style={{ fontSize: '0.8rem', color: group.isOnline ? 'var(--blue-primary)' : 'var(--text-muted)', fontWeight: 500 }}>
-                        {group.isOnline ? '🌐 Online' : '📍 Offline'}
+                        <span style={iconLabelStyle}><AppIcon name={group.isOnline ? 'globe' : 'mapPin'} size={13} /> {group.isOnline ? 'Online' : 'Offline'}</span>
                       </span>
                     </td>
                     <td style={{ padding: '0.875rem 1rem' }}>
@@ -342,7 +343,7 @@ export default function AdminStudyGroups() {
           onClick={() => !deleting && setDeleteId(null)}>
           <div style={{ background: '#fff', borderRadius: '16px', padding: '2rem', maxWidth: '400px', width: '100%', textAlign: 'center', boxShadow: '0 20px 60px rgba(1,8,24,0.25)' }}
             onClick={e => e.stopPropagation()}>
-            <div style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>🗑️</div>
+            <AppIcon name="trash" size={40} style={{ marginBottom: '1rem', color: 'var(--error)' }} />
             <h3 style={{ fontFamily: 'Playfair Display, serif', margin: '0 0 0.5rem', fontSize: '1.2rem' }}>Delete Study Group?</h3>
             <p style={{ color: 'var(--text-muted)', margin: '0 0 1.75rem', fontSize: '0.875rem', lineHeight: 1.6 }}>This will permanently remove the group and all memberships.</p>
             <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'center' }}>
@@ -368,3 +369,4 @@ function FL({ label, children }) {
 }
 const selectStyle = { padding: '0.55rem 0.875rem', border: '1.5px solid var(--border)', borderRadius: '8px', fontSize: '0.875rem', background: '#fff', color: 'var(--text-primary)', cursor: 'pointer', outline: 'none' };
 const inputStyle  = { width: '100%', padding: '0.55rem 0.75rem', border: '1.5px solid var(--border)', borderRadius: '8px', fontSize: '0.875rem', outline: 'none', color: 'var(--text-primary)', background: '#fff', boxSizing: 'border-box' };
+const iconLabelStyle = { display: 'inline-flex', alignItems: 'center', gap: 4 };

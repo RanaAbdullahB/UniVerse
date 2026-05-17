@@ -1,12 +1,13 @@
 // client/src/components/AnnouncementBanner.jsx
 import { useState, useEffect } from 'react';
 import api from '../utils/api';
+import AppIcon from './AppIcon';
 
 const TYPE_CONFIG = {
-  info:    { bg: 'rgba(13,110,253,0.08)',  border: 'rgba(13,110,253,0.25)',  color: '#0d6efd',  icon: 'ℹ️',  label: 'Info' },
-  warning: { bg: 'rgba(253,126,20,0.08)',  border: 'rgba(253,126,20,0.3)',   color: '#fd7e14',  icon: '⚠️',  label: 'Notice' },
-  urgent:  { bg: 'rgba(220,53,69,0.07)',   border: 'rgba(220,53,69,0.3)',    color: '#dc3545',  icon: '🚨',  label: 'Urgent' },
-  success: { bg: 'rgba(25,135,84,0.07)',   border: 'rgba(25,135,84,0.25)',   color: '#198754',  icon: '✅',  label: 'Update' },
+  info:    { bg: 'rgba(13,110,253,0.08)',  border: 'rgba(13,110,253,0.25)',  color: '#0d6efd',  icon: 'info',         label: 'Info' },
+  warning: { bg: 'rgba(253,126,20,0.08)',  border: 'rgba(253,126,20,0.3)',   color: '#fd7e14',  icon: 'warning',      label: 'Notice' },
+  urgent:  { bg: 'rgba(220,53,69,0.07)',   border: 'rgba(220,53,69,0.3)',    color: '#dc3545',  icon: 'megaphone',    label: 'Urgent' },
+  success: { bg: 'rgba(25,135,84,0.07)',   border: 'rgba(25,135,84,0.25)',   color: '#198754',  icon: 'checkCircle',  label: 'Update' },
 };
 
 export default function AnnouncementBanner({ userDepartment }) {
@@ -56,7 +57,7 @@ export default function AnnouncementBanner({ userDepartment }) {
               animation: 'slideDown 0.25s ease',
             }}>
 
-            <span style={{ fontSize: '1.15rem', lineHeight: 1, flexShrink: 0, marginTop: '0.1rem' }}>{cfg.icon}</span>
+            <AppIcon name={cfg.icon} size={20} style={{ color: cfg.color, marginTop: '0.1rem' }} />
 
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '0.2rem' }}>
@@ -68,7 +69,7 @@ export default function AnnouncementBanner({ userDepartment }) {
               <p style={{ margin: 0, fontSize: '0.82rem', color: 'var(--text-body)', lineHeight: 1.55 }}>{a.message}</p>
               {a.expiresAt && (
                 <p style={{ margin: '0.3rem 0 0', fontSize: '0.72rem', color: 'var(--text-muted)' }}>
-                  ⏳ Expires {new Date(a.expiresAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                  Expires {new Date(a.expiresAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                 </p>
               )}
             </div>

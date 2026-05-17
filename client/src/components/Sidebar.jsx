@@ -1,15 +1,16 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import AppIcon from './AppIcon';
 
 const navItems = [
-  { key: 'home',          label: 'Home',               icon: '🏠' },
-  { key: 'clubs',         label: 'Societies & Clubs',  icon: '🏛️' },
-  { key: 'events',        label: 'Upcoming Events',    icon: '📅' },
-  { key: 'studygroups',   label: 'Study Groups',       icon: '📚' },
-  { key: 'messages',      label: 'Messages',           icon: '💬' },
-  { key: 'resource-pool', label: 'Resource Pool',      icon: '📚' },
-  { key: 'profile',       label: 'My Profile',         icon: '👤' },
+  { key: 'home',          label: 'Home',               icon: 'home' },
+  { key: 'clubs',         label: 'Societies & Clubs',  icon: 'landmark' },
+  { key: 'events',        label: 'Upcoming Events',    icon: 'calendar' },
+  { key: 'studygroups',   label: 'Study Groups',       icon: 'book' },
+  { key: 'messages',      label: 'Messages',           icon: 'message' },
+  { key: 'resource-pool', label: 'Resource Pool',      icon: 'package' },
+  { key: 'profile',       label: 'My Profile',         icon: 'user' },
 ];
 
 export default function Sidebar({ activeTab, onTabChange, mobileOpen, onClose }) {
@@ -110,7 +111,7 @@ export default function Sidebar({ activeTab, onTabChange, mobileOpen, onClose })
                 onClick={() => { onTabChange(item.key); onClose && onClose(); }}
                 style={{ border: 'none', background: 'none', width: '100%', cursor: 'pointer', marginBottom: 2 }}
               >
-                <span style={{ fontSize: '1rem' }}>{item.icon}</span>
+                <AppIcon name={item.icon} size={17} />
                 <span>{item.label}</span>
               </button>
             );

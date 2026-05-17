@@ -34,6 +34,7 @@ app.use('/uploads',           express.static(path.join(__dirname, 'uploads')));
 app.use('/api/conversations', require('./routes/conversations'));
 app.use('/api/resources', require('./routes/resources'));
 app.use('/api/chatbot',   require('./routes/chatbot'));
+app.use('/api/checkin',   require('./routes/checkin'));
 // ── Health check ──────────────────────────────────────────────
 app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', message: 'UniVerse API is running' });
@@ -44,8 +45,6 @@ app.use((req, res) => {
   res.status(404).json({ success: false, message: 'Route not found' });
 });
 app.use(errorHandler);
-//QR routes 
-app.use('/api/checkin', require('./routes/checkin'));
 
 // ── Start server ──────────────────────────────────────────────
 const PORT = process.env.PORT || 5000;
@@ -53,13 +52,13 @@ const PORT = process.env.PORT || 5000;
 mongoose
   .connect(process.env.MONGO_URI || 'mongodb://localhost:27017/university-portal')
   .then(() => {
-    console.log('✅ MongoDB connected successfully');
+    console.log('MongoDB connected successfully');
     server.listen(PORT, () => {
-      console.log(`🚀 Server running on port ${PORT}`);
+      console.log(`Server running on port ${PORT}`);
     });
   })
   .catch((err) => {
-    console.error('❌ MongoDB connection error:', err.message);
+    console.error('MongoDB connection error:', err.message);
     process.exit(1);
   });
 

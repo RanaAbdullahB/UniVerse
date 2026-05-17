@@ -5,6 +5,7 @@ import { Chart } from 'chart.js/auto';
 import api from '../../utils/api';
 import { useToast } from '../../context/ToastContext';
 import { PageLoader, InlineLoader } from '../../components/LoadingSpinner';
+import AppIcon from '../../components/AppIcon';
 
 // ── Month helper ──────────────────────────────────────────────
 const MONTH_NAMES = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
@@ -264,7 +265,7 @@ function AnalyticsSection() {
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.25rem' }}>
         <div style={{ height: 2, flex: 1, background: 'var(--border)' }} />
         <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.1em', whiteSpace: 'nowrap' }}>
-          📊 Analytics Dashboard
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}><AppIcon name="analytics" size={15} /> Analytics Dashboard</span>
         </span>
         <div style={{ height: 2, flex: 1, background: 'var(--border)' }} />
       </div>
@@ -356,7 +357,7 @@ export default function AdminOverview({ onTabChange }) {
     {
       label: 'Total Students',
       value: stats?.totalStudents ?? 0,
-      icon: '🎓',
+      icon: 'graduation',
       color: 'var(--blue-primary)',
       bg: 'rgba(13,110,253,0.08)',
       tab: 'users',
@@ -365,7 +366,7 @@ export default function AdminOverview({ onTabChange }) {
     {
       label: 'Active Clubs',
       value: stats?.totalClubs ?? 0,
-      icon: '🏛️',
+      icon: 'landmark',
       color: 'var(--dark-accent)',
       bg: 'rgba(29,47,111,0.08)',
       tab: 'clubs',
@@ -374,7 +375,7 @@ export default function AdminOverview({ onTabChange }) {
     {
       label: 'Events',
       value: stats?.totalEvents ?? 0,
-      icon: '📅',
+      icon: 'calendar',
       color: '#198754',
       bg: 'rgba(25,135,84,0.08)',
       tab: 'events',
@@ -383,7 +384,7 @@ export default function AdminOverview({ onTabChange }) {
     {
       label: 'Study Groups',
       value: stats?.totalStudyGroups ?? 0,
-      icon: '📚',
+      icon: 'book',
       color: '#fd7e14',
       bg: 'rgba(253,126,20,0.08)',
       tab: 'studyGroups',
@@ -409,7 +410,7 @@ export default function AdminOverview({ onTabChange }) {
             onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'none'; e.currentTarget.style.borderColor = 'var(--border)'; }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
               <div style={{ width: 44, height: 44, borderRadius: '12px', background: card.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.4rem' }}>
-                {card.icon}
+                <AppIcon name={card.icon} size={25} style={{ color: card.color }} />
               </div>
               <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', background: 'var(--bg-page)', padding: '0.2rem 0.5rem', borderRadius: '4px', border: '1px solid var(--border)', whiteSpace: 'nowrap' }}>
                 →
@@ -506,7 +507,7 @@ export default function AdminOverview({ onTabChange }) {
                   { label: 'Student ID', value: profileModal.studentId || '—' },
                   { label: 'Department', value: profileModal.department || '—' },
                   { label: 'Academic Year', value: profileModal.year ? `Year ${profileModal.year}` : '—' },
-                  { label: 'Role', value: profileModal.role === 'admin' ? '👑 Admin' : '🎓 Student' },
+                  { label: 'Role', value: profileModal.role === 'admin' ? 'Admin' : 'Student' },
                   { label: 'Clubs Joined', value: profileModal.joinedClubs?.length ?? 0 },
                   { label: 'Events Registered', value: profileModal.registeredEvents?.length ?? 0 },
                   { label: 'Study Groups', value: profileModal.joinedStudyGroups?.length ?? 0 },

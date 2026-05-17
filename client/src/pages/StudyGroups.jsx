@@ -8,6 +8,7 @@ import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import { InlineLoader } from '../components/LoadingSpinner';
 import GroupChat from '../components/GroupChat';
+import AppIcon from '../components/AppIcon';
 
 const DEPARTMENTS = [
   'Computer Science', 'Software Engineering', 'Electrical Engineering',
@@ -21,6 +22,9 @@ const emptyForm = {
   semester: 'Fall', maxMembers: 10, isOnline: false, groupType: 'Open',
   meetingSchedule: { day: '', time: '', location: '' },
 };
+
+const getStudyGroupList = (payload) =>
+  payload?.data || payload?.studyGroups || payload?.groups || [];
 
 export default function StudyGroups() {
   const { user, refreshUser } = useAuth();
@@ -49,8 +53,8 @@ export default function StudyGroups() {
         api.get('/study-groups'),
         api.get('/study-groups/my-groups'),
       ]);
-      setGroups(allRes.data.data || allRes.data.studyGroups || []);
-      setMyGroups(myRes.data.data || myRes.data.studyGroups || []);
+      setGroups(getStudyGroupList(allRes.data));
+      setMyGroups(getStudyGroupList(myRes.data));
     } catch {
       showToast('Failed to load study groups', 'error');
     } finally {
@@ -91,15 +95,34 @@ export default function StudyGroups() {
 
   const handleCreate = async (e) => {
     e.preventDefault();
-    if (!form.name.trim() || !form.subject.trim()) {
-      showToast('Name and subject are required', 'error'); return;
+    if (!form.name.trim() || !form.subject.trim() || !form.course.trim() || !form.department) {
+      showToast('Name, subject, course code, and department are required', 'error'); return;
     }
     setCreating(true);
     try {
-      await api.post('/study-groups', form);
+      const payload = {
+        ...form,
+        name: form.name.trim(),
+        subject: form.subject.trim(),
+        course: form.course.trim(),
+        description: form.description.trim(),
+        maxMembers: Number(form.maxMembers) || 10,
+        meetingSchedule: {
+          day: form.meetingSchedule.day || 'TBD',
+          time: form.meetingSchedule.time.trim() || 'TBD',
+          location: form.meetingSchedule.location.trim() || 'TBD',
+        },
+      };
+      const { data } = await api.post('/study-groups', payload);
+      const createdGroup = data.group || data.data;
       showToast('Study group created!', 'success');
       setShowCreate(false);
       setForm(emptyForm);
+      if (createdGroup) {
+        setGroups(prev => [createdGroup, ...prev.filter(g => g._id !== createdGroup._id)]);
+        setMyGroups(prev => [createdGroup, ...prev.filter(g => g._id !== createdGroup._id)]);
+        setActiveTab('mine');
+      }
       await fetchAll();
     } catch (err) {
       showToast(err.response?.data?.message || 'Failed to create group', 'error');
@@ -145,8 +168,8 @@ export default function StudyGroups() {
                 <FL label="Group Name *"><input value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} placeholder="e.g. DS Final Exam Prep" style={iStyle} /></FL>
               </div>
               <FL label="Subject *"><input value={form.subject} onChange={e => setForm(f => ({ ...f, subject: e.target.value }))} placeholder="e.g. Data Structures" style={iStyle} /></FL>
-              <FL label="Course Code"><input value={form.course} onChange={e => setForm(f => ({ ...f, course: e.target.value }))} placeholder="e.g. CS301" style={iStyle} /></FL>
-              <FL label="Department">
+              <FL label="Course Code *"><input value={form.course} onChange={e => setForm(f => ({ ...f, course: e.target.value }))} placeholder="e.g. CS301" style={iStyle} /></FL>
+              <FL label="Department *">
                 <select value={form.department} onChange={e => setForm(f => ({ ...f, department: e.target.value }))} style={iStyle}>
                   <option value="">Select...</option>
                   {DEPARTMENTS.map(d => <option key={d} value={d}>{d}</option>)}
@@ -166,14 +189,19 @@ export default function StudyGroups() {
               </FL>
               <FL label="Mode">
                 <select value={form.isOnline} onChange={e => setForm(f => ({ ...f, isOnline: e.target.value === 'true' }))} style={iStyle}>
-                  <option value="false">📍 In-person</option>
-                  <option value="true">🌐 Online</option>
+                  <option value="false">In-person</option>
+                  <option value="true">Online</option>
                 </select>
               </FL>
               <div style={{ gridColumn: '1 / -1' }}>
                 <FL label="Description"><textarea value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} placeholder="What will you study together?" rows={3} style={{ ...iStyle, resize: 'vertical' }} /></FL>
               </div>
-              <FL label="Meeting Day"><input value={form.meetingSchedule.day} onChange={e => setForm(f => ({ ...f, meetingSchedule: { ...f.meetingSchedule, day: e.target.value } }))} placeholder="e.g. Monday" style={iStyle} /></FL>
+              <FL label="Meeting Day">
+                <select value={form.meetingSchedule.day} onChange={e => setForm(f => ({ ...f, meetingSchedule: { ...f.meetingSchedule, day: e.target.value } }))} style={iStyle}>
+                  <option value="">TBD</option>
+                  {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map(day => <option key={day} value={day}>{day}</option>)}
+                </select>
+              </FL>
               <FL label="Meeting Time"><input value={form.meetingSchedule.time} onChange={e => setForm(f => ({ ...f, meetingSchedule: { ...f.meetingSchedule, time: e.target.value } }))} placeholder="e.g. 4:00 PM" style={iStyle} /></FL>
               <div style={{ gridColumn: '1 / -1' }}>
                 <FL label="Location / Link"><input value={form.meetingSchedule.location} onChange={e => setForm(f => ({ ...f, meetingSchedule: { ...f.meetingSchedule, location: e.target.value } }))} placeholder="Room number or Google Meet link" style={iStyle} /></FL>
@@ -192,7 +220,7 @@ export default function StudyGroups() {
       {/* Page header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 20, flexWrap: 'wrap', gap: 12 }}>
         <div>
-          <h2 style={{ fontFamily: 'Playfair Display, serif', fontSize: '1.6rem', color: 'var(--dark-primary)', marginBottom: 4 }}>📚 Study Groups</h2>
+          <h2 style={{ fontFamily: 'Playfair Display, serif', fontSize: '1.6rem', color: 'var(--dark-primary)', marginBottom: 4, display: 'flex', alignItems: 'center', gap: 8 }}><AppIcon name="book" size={25} /> Study Groups</h2>
           <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>Join groups, collaborate, and chat with your study partners</p>
         </div>
         <button onClick={() => setShowCreate(true)}
@@ -203,10 +231,10 @@ export default function StudyGroups() {
 
       {/* Tabs */}
       <div style={{ display: 'flex', borderBottom: '1px solid var(--border)', marginBottom: 20 }}>
-        {[{ id: 'browse', label: `🌐 Browse (${groups.length})` }, { id: 'mine', label: `📚 My Groups (${myGroups.length})` }].map(tab => (
+        {[{ id: 'browse', label: `Browse (${groups.length})`, icon: 'globe' }, { id: 'mine', label: `My Groups (${myGroups.length})`, icon: 'book' }].map(tab => (
           <button key={tab.id} onClick={() => setActiveTab(tab.id)}
             style={{ padding: '0.6rem 1.25rem', border: 'none', borderBottom: activeTab === tab.id ? '2px solid var(--blue-primary)' : '2px solid transparent', background: 'transparent', cursor: 'pointer', fontSize: '0.875rem', fontWeight: activeTab === tab.id ? 700 : 400, color: activeTab === tab.id ? 'var(--blue-primary)' : 'var(--text-muted)', transition: 'all 0.15s' }}>
-            {tab.label}
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}><AppIcon name={tab.icon} size={15} /> {tab.label}</span>
           </button>
         ))}
       </div>
@@ -224,8 +252,8 @@ export default function StudyGroups() {
           </select>
           <select value={filterMode} onChange={e => setFilterMode(e.target.value)} style={sStyle}>
             <option value="">All Modes</option>
-            <option value="online">🌐 Online</option>
-            <option value="offline">📍 In-person</option>
+            <option value="online">Online</option>
+            <option value="offline">In-person</option>
           </select>
         </div>
       )}
@@ -233,7 +261,7 @@ export default function StudyGroups() {
       {/* Groups grid */}
       {displayGroups.length === 0 ? (
         <div style={{ textAlign: 'center', padding: '4rem 2rem', background: '#fff', borderRadius: 12, border: '1px solid var(--border)' }}>
-          <div style={{ fontSize: '3rem', marginBottom: '0.75rem' }}>📚</div>
+          <AppIcon name="book" size={48} style={{ marginBottom: '0.75rem', color: 'var(--text-muted)' }} />
           <p style={{ color: 'var(--text-muted)', margin: 0, fontWeight: 500 }}>
             {activeTab === 'mine' ? "You haven't joined any groups yet" : 'No groups found'}
           </p>
@@ -262,22 +290,22 @@ export default function StudyGroups() {
                 <div style={{ padding: '1.125rem 1.25rem' }}>
                   {/* Badges row */}
                   <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 10 }}>
-                    {member && <span style={{ background: 'var(--blue-tint)', color: 'var(--blue-primary)', fontSize: '0.68rem', fontWeight: 700, padding: '2px 8px', borderRadius: 20 }}>✓ Joined</span>}
+                    {member && <span style={{ background: 'var(--blue-tint)', color: 'var(--blue-primary)', fontSize: '0.68rem', fontWeight: 700, padding: '2px 8px', borderRadius: 20 }}>Joined</span>}
                     <span style={{ background: group.isOnline ? 'rgba(13,110,253,0.08)' : 'rgba(25,135,84,0.08)', color: group.isOnline ? 'var(--blue-primary)' : 'var(--success)', fontSize: '0.68rem', fontWeight: 600, padding: '2px 8px', borderRadius: 20 }}>
-                      {group.isOnline ? '🌐 Online' : '📍 In-person'}
+                      <span style={badgeIconStyle}><AppIcon name={group.isOnline ? 'globe' : 'mapPin'} size={12} /> {group.isOnline ? 'Online' : 'In-person'}</span>
                     </span>
                     <span style={{ background: group.groupType === 'Open' ? 'rgba(25,135,84,0.08)' : 'rgba(253,126,20,0.1)', color: group.groupType === 'Open' ? 'var(--success)' : '#fd7e14', fontSize: '0.68rem', fontWeight: 600, padding: '2px 8px', borderRadius: 20 }}>
-                      {group.groupType === 'Open' ? '🔓 Open' : '🔒 Invite'}
+                      <span style={badgeIconStyle}><AppIcon name={group.groupType === 'Open' ? 'unlock' : 'lock'} size={12} /> {group.groupType === 'Open' ? 'Open' : 'Invite'}</span>
                     </span>
                   </div>
 
                   {/* Name + subject */}
                   <h3 style={{ fontFamily: 'Playfair Display, serif', fontSize: '0.975rem', color: 'var(--dark-primary)', marginBottom: 4, lineHeight: 1.3 }}>{group.name}</h3>
-                  <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginBottom: 4 }}>📖 {group.subject}{group.course ? ` · ${group.course}` : ''}</p>
-                  {group.department && <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: 4 }}>🏛️ {group.department}</p>}
+                  <p style={groupMetaStyle}><AppIcon name="book" size={14} /> {group.subject}{group.course ? ` · ${group.course}` : ''}</p>
+                  {group.department && <p style={groupMetaStyle}><AppIcon name="building" size={14} /> {group.department}</p>}
                   {group.meetingSchedule?.day && (
                     <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: 8 }}>
-                      🕐 {group.meetingSchedule.day}{group.meetingSchedule.time ? ` · ${group.meetingSchedule.time}` : ''}
+                      <AppIcon name="clock" size={14} /> {group.meetingSchedule.day}{group.meetingSchedule.time ? ` · ${group.meetingSchedule.time}` : ''}
                       {group.meetingSchedule.location ? ` · ${group.meetingSchedule.location}` : ''}
                     </p>
                   )}
@@ -310,7 +338,7 @@ export default function StudyGroups() {
                         }}
                         onMouseEnter={e => (e.currentTarget.style.background = 'rgb(11,94,215)')}
                         onMouseLeave={e => (e.currentTarget.style.background = 'var(--blue-primary)')}>
-                        💬 Group Chat
+                        <AppIcon name="message" size={15} /> Group Chat
                       </button>
                     )}
 
@@ -336,7 +364,7 @@ export default function StudyGroups() {
                           borderColor: full || group.groupType === 'Invite-Only' ? 'var(--border)' : 'var(--blue-primary)',
                           opacity: joiningId === group._id ? 0.6 : 1,
                         }}>
-                        {joiningId === group._id ? 'Joining...' : full ? 'Full' : group.groupType === 'Invite-Only' ? '🔒 Invite Only' : 'Join Group'}
+                        {joiningId === group._id ? 'Joining...' : full ? 'Full' : group.groupType === 'Invite-Only' ? 'Invite Only' : 'Join Group'}
                       </button>
                     )}
                   </div>
@@ -361,3 +389,5 @@ function FL({ label, children }) {
 
 const iStyle = { width: '100%', padding: '0.55rem 0.75rem', border: '1.5px solid var(--border)', borderRadius: 8, fontSize: '0.875rem', outline: 'none', color: 'var(--text-primary)', background: '#fff', boxSizing: 'border-box', fontFamily: 'DM Sans, sans-serif' };
 const sStyle = { padding: '0.55rem 0.875rem', border: '1.5px solid var(--border)', borderRadius: 8, fontSize: '0.875rem', background: '#fff', color: 'var(--text-primary)', cursor: 'pointer', outline: 'none' };
+const badgeIconStyle = { display: 'inline-flex', alignItems: 'center', gap: 4 };
+const groupMetaStyle = { fontSize: '0.78rem', color: 'var(--text-muted)', marginBottom: 4, display: 'flex', alignItems: 'center', gap: 5 };

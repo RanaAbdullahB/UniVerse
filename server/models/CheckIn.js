@@ -38,7 +38,7 @@ checkInSchema.index({ event: 1, student: 1 }, { unique: true });
 // ← FIX: moved BEFORE module.exports so it can be exported and used by routes
 function generateCheckInToken(eventId) {
   return crypto
-    .createHmac('sha256', process.env.JWT_SECRET)
+    .createHmac('sha256', process.env.JWT_SECRET || 'fallback_secret')
     .update(eventId.toString())
     .digest('hex')
     .slice(0, 32);

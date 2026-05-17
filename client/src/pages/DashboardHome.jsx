@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import api from '../utils/api';
 import { InlineLoader } from '../components/LoadingSpinner';
 import AnnouncementBanner from '../components/AnnouncementBanner'; 
+import AppIcon from '../components/AppIcon';
 
 const categoryColors = {
   Technical: '#dbeafe', Sports: '#dcfce7', Arts: '#fce7f3',
@@ -24,7 +25,7 @@ const eventTypeText = {
 function StatCard({ icon, label, value, sub }) {
   return (
     <div className="stat-card" style={{ flex: 1 }}>
-      <div style={{ fontSize: '1.6rem', marginBottom: 10 }}>{icon}</div>
+      <AppIcon name={icon} size={28} style={{ marginBottom: 10, color: '#e8c97a' }} />
       <div className="text-2xl sm:text-3xl" style={{ fontWeight: 700, color: '#e8c97a', fontFamily: 'Playfair Display, serif', lineHeight: 1 }}>{value}</div>
       <div style={{ color: 'rgba(245,240,232,0.9)', fontSize: '0.82rem', marginTop: 4, fontWeight: 500 }}>{label}</div>
       {sub && <div style={{ color: 'rgba(245,240,232,0.4)', fontSize: '0.72rem', marginTop: 2 }}>{sub}</div>}
@@ -68,7 +69,7 @@ export default function DashboardHome({ onTabChange }) {
       {/* Welcome */}
       <div style={{ marginBottom: 28 }}>
         <p style={{ color: '#8a6f30', fontSize: '0.82rem', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 4 }}>
-          {greeting} 👋
+          {greeting}
         </p>
         <h2 className="text-2xl sm:text-3xl" style={{ fontFamily: 'Playfair Display, serif', color: '#0f1b2d', lineHeight: 1.2 }}>
           Welcome back, <span style={{ color: '#c9a84c' }}>{user?.name?.split(' ')[0]}</span>
@@ -80,10 +81,10 @@ export default function DashboardHome({ onTabChange }) {
 
       {/* Stats row */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-8">
-        <StatCard icon="🏛️" label="Clubs Joined" value={user?.joinedClubs?.length || 0} sub="Active memberships" />
-        <StatCard icon="📅" label="Events Registered" value={user?.registeredEvents?.length || 0} sub="Upcoming activities" />
-        <StatCard icon="📚" label="Study Groups" value={user?.joinedStudyGroups?.length || 0} sub="Current groups" />
-        <StatCard icon="🎓" label="Year" value={user?.year || 1} sub={user?.department} />
+        <StatCard icon="landmark" label="Clubs Joined" value={user?.joinedClubs?.length || 0} sub="Active memberships" />
+        <StatCard icon="calendar" label="Events Registered" value={user?.registeredEvents?.length || 0} sub="Upcoming activities" />
+        <StatCard icon="book" label="Study Groups" value={user?.joinedStudyGroups?.length || 0} sub="Current groups" />
+        <StatCard icon="graduation" label="Year" value={user?.year || 1} sub={user?.department} />
       </div>
 
       {/* Two columns */}
@@ -92,7 +93,7 @@ export default function DashboardHome({ onTabChange }) {
         <div>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
             <h3 style={{ fontFamily: 'Playfair Display, serif', fontSize: '1.15rem', color: '#0f1b2d' }}>
-              📅 Upcoming Events
+              <AppIcon name="calendar" size={20} /> Upcoming Events
             </h3>
             <button
               onClick={() => onTabChange('events')}
@@ -104,7 +105,7 @@ export default function DashboardHome({ onTabChange }) {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }} className="stagger-children">
             {events.length === 0 ? (
               <div className="empty-state" style={{ padding: '30px 0' }}>
-                <span className="empty-state-icon">📅</span>
+                <AppIcon name="calendar" size={42} className="empty-state-icon" />
                 <p>No upcoming events</p>
               </div>
             ) : events.map((event) => (
@@ -112,7 +113,7 @@ export default function DashboardHome({ onTabChange }) {
                 <div style={{ width: 44, height: 44, borderRadius: 10, overflow: 'hidden', flexShrink: 0, background: '#f0ebe2' }}>
                   {event.coverImage ? (
                     <img src={event.coverImage} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                  ) : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.2rem' }}>📅</div>}
+                  ) : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><AppIcon name="calendar" size={22} /></div>}
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <p style={{ fontWeight: 600, fontSize: '0.875rem', color: '#0f1b2d', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{event.title}</p>
@@ -132,7 +133,7 @@ export default function DashboardHome({ onTabChange }) {
         <div>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
             <h3 style={{ fontFamily: 'Playfair Display, serif', fontSize: '1.15rem', color: '#0f1b2d' }}>
-              🏛️ Discover Clubs
+              <AppIcon name="landmark" size={20} /> Discover Clubs
             </h3>
             <button
               onClick={() => onTabChange('clubs')}
@@ -144,7 +145,7 @@ export default function DashboardHome({ onTabChange }) {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }} className="stagger-children">
             {clubs.length === 0 ? (
               <div className="empty-state" style={{ padding: '30px 0' }}>
-                <span className="empty-state-icon">🏛️</span>
+                <AppIcon name="landmark" size={42} className="empty-state-icon" />
                 <p>No clubs available</p>
               </div>
             ) : clubs.map((club) => (
@@ -152,7 +153,7 @@ export default function DashboardHome({ onTabChange }) {
                 <div style={{ width: 44, height: 44, borderRadius: 10, overflow: 'hidden', flexShrink: 0, background: '#f0ebe2' }}>
                   {club.coverImage ? (
                     <img src={club.coverImage} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                  ) : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.2rem' }}>🏛️</div>}
+                  ) : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><AppIcon name="landmark" size={22} /></div>}
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <p style={{ fontWeight: 600, fontSize: '0.875rem', color: '#0f1b2d', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{club.name}</p>
@@ -174,10 +175,10 @@ export default function DashboardHome({ onTabChange }) {
         </h3>
         <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-3">
           {[
-            { label: 'Browse Clubs', icon: '🏛️', tab: 'clubs' },
-            { label: 'View Events', icon: '📅', tab: 'events' },
-            { label: 'Study Groups', icon: '📚', tab: 'studygroups' },
-            { label: 'My Profile', icon: '👤', tab: 'profile' },
+            { label: 'Browse Clubs', icon: 'landmark', tab: 'clubs' },
+            { label: 'View Events', icon: 'calendar', tab: 'events' },
+            { label: 'Study Groups', icon: 'book', tab: 'studygroups' },
+            { label: 'My Profile', icon: 'user', tab: 'profile' },
           ].map((action) => (
             <button
               key={action.tab}
@@ -201,7 +202,7 @@ export default function DashboardHome({ onTabChange }) {
               onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(201,168,76,0.18)')}
               onMouseLeave={(e) => (e.currentTarget.style.background = 'rgba(201,168,76,0.1)')}
             >
-              {action.icon} {action.label}
+              <AppIcon name={action.icon} size={16} /> {action.label}
             </button>
           ))}
         </div>

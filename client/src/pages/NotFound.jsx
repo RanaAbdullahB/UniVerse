@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import AppIcon from '../components/AppIcon';
 
 export default function NotFound() {
   return (
@@ -8,7 +9,7 @@ export default function NotFound() {
       background: '#f7f5f0', flexDirection: 'column', textAlign: 'center', padding: 24,
     }}>
       <div className="animate-fade-in">
-        <div style={{ fontSize: '5rem', marginBottom: 20 }}>🎓</div>
+        <AppIcon name="graduation" size={80} style={{ marginBottom: 20, color: '#0f1b2d' }} />
         <h1 style={{ fontFamily: 'Playfair Display, serif', fontSize: '5rem', color: '#0f1b2d', lineHeight: 1, marginBottom: 8 }}>
           404
         </h1>

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import AppIcon from '../components/AppIcon';
 
 const DEPARTMENTS = [
   'Computer Science', 'Electrical Engineering', 'Mechanical Engineering',
@@ -36,7 +37,7 @@ const Field = ({ label, name, type = 'text', placeholder, value, onChange, error
       onFocus={(e) => { e.target.style.borderColor = 'rgb(13,110,253)'; e.target.style.boxShadow = '0 0 0 3px rgba(13,110,253,0.15)'; }}
       onBlur={(e) => { e.target.style.borderColor = error ? '#e53e3e' : '#e2ddd5'; e.target.style.boxShadow = 'none'; }}
     />
-    {error && <p style={{ color: '#c53030', fontSize: '0.75rem', marginTop: 4 }}>⚠ {error}</p>}
+    {error && <p style={{ color: '#c53030', fontSize: '0.75rem', marginTop: 4 }}>Warning: {error}</p>}
   </div>
 );
 
@@ -108,7 +109,7 @@ export default function Register() {
 
           {errors.api && (
             <div style={{ background: '#fef2f2', border: '1px solid #fca5a5', borderRadius: 8, padding: '11px 14px', marginBottom: 20, color: '#991b1b', fontSize: '0.85rem' }}>
-              ⚠️ {errors.api}
+              <AppIcon name="warning" size={16} /> {errors.api}
             </div>
           )}
 
@@ -149,7 +150,7 @@ export default function Register() {
                   <option value="">Select department</option>
                   {DEPARTMENTS.map((d) => <option key={d} value={d}>{d}</option>)}
                 </select>
-                {errors.department && <p style={{ color: '#c53030', fontSize: '0.75rem', marginTop: 4 }}>⚠ {errors.department}</p>}
+                {errors.department && <p style={{ color: '#c53030', fontSize: '0.75rem', marginTop: 4 }}>Warning: {errors.department}</p>}
               </div>
 
               {/* Year dropdown */}
@@ -182,7 +183,7 @@ export default function Register() {
 
             {/* Domain notice */}
             <div style={{ background: 'rgb(231,237,254)', border: '1px solid rgb(210,224,255)', borderRadius: 8, padding: '10px 14px', fontSize: '0.8rem', color: 'rgb(29,47,111)' }}>
-              🔒 Only LGU email addresses ending in <strong>@cs.lgu.edu.pk</strong> are accepted
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}><AppIcon name="lock" size={15} /> Only LGU email addresses ending in <strong>@cs.lgu.edu.pk</strong> are accepted</span>
             </div>
 
             {/* Submit */}

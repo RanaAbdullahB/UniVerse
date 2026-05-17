@@ -4,6 +4,7 @@ import api from '../../utils/api';
 import { useToast } from '../../context/ToastContext';
 import { PageLoader, InlineLoader } from '../../components/LoadingSpinner';
 import { exportUsers } from '../../utils/csvExport';
+import AppIcon from '../../components/AppIcon';
 
 const EVENT_TYPE_COLORS = { Workshop:'#0d6efd', Seminar:'#1d2f6f', Competition:'#dc3545', Social:'#198754', Sports:'#fd7e14', Cultural:'#6f42c1' };
 const CLUB_CAT_COLORS   = { Technical:'#0d6efd', Sports:'#198754', Arts:'#6f42c1', Cultural:'#fd7e14', Academic:'#0dcaf0', Social:'#ffc107' };
@@ -118,7 +119,7 @@ export default function AdminUsers() {
           style={{ padding: '0.55rem 1rem', borderRadius: '8px', border: '1.5px solid var(--border)', background: '#fff', cursor: 'pointer', fontSize: '0.82rem', color: 'var(--text-body)', fontWeight: 500, whiteSpace: 'nowrap', transition: 'all 0.15s' }}
           onMouseEnter={e => (e.currentTarget.style.borderColor = 'var(--blue-primary)')}
           onMouseLeave={e => (e.currentTarget.style.borderColor = 'var(--border)')}>
-          ⬇️ Export CSV
+          Export CSV
         </button>
       </div>
 
@@ -127,7 +128,7 @@ export default function AdminUsers() {
       {/* Table */}
       {filtered.length === 0 ? (
         <div style={{ textAlign: 'center', padding: '4rem 2rem', background: '#fff', borderRadius: '12px', border: '1px solid var(--border)' }}>
-          <div style={{ fontSize: '3rem', marginBottom: '0.75rem' }}>👥</div>
+          <AppIcon name="users" size={48} style={{ marginBottom: '0.75rem', color: 'var(--text-muted)' }} />
           <p style={{ color: 'var(--text-muted)', margin: 0, fontWeight: 500 }}>No users found</p>
         </div>
       ) : (
@@ -166,7 +167,7 @@ export default function AdminUsers() {
                     <td style={{ padding: '0.875rem 1rem', color: 'var(--text-body)', fontSize: '0.85rem' }}>{user.year ? `Year ${user.year}` : '—'}</td>
                     <td style={{ padding: '0.875rem 1rem' }}>
                       <span style={{ padding: '0.2rem 0.6rem', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 700, background: user.role === 'admin' ? 'rgba(111,66,193,0.1)' : 'rgba(13,110,253,0.08)', color: user.role === 'admin' ? '#6f42c1' : 'var(--blue-primary)' }}>
-                        {user.role === 'admin' ? '👑 Admin' : '🎓 Student'}
+                        {user.role === 'admin' ? 'Admin' : 'Student'}
                       </span>
                     </td>
                     <td style={{ padding: '0.875rem 1rem', color: 'var(--text-muted)', fontSize: '0.8rem', whiteSpace: 'nowrap' }}>
@@ -179,7 +180,7 @@ export default function AdminUsers() {
                           style={{ padding: '0.35rem 0.65rem', borderRadius: '6px', border: '1px solid var(--border)', background: 'var(--bg-page)', cursor: 'pointer', fontSize: '0.75rem', color: 'var(--text-body)', fontWeight: 500, whiteSpace: 'nowrap', transition: 'all 0.15s' }}
                           onMouseEnter={e => (e.currentTarget.style.borderColor = 'var(--blue-primary)')}
                           onMouseLeave={e => (e.currentTarget.style.borderColor = 'var(--border)')}>
-                          {user.role === 'admin' ? '⬇️ Demote' : '⬆️ Promote'}
+                          {user.role === 'admin' ? 'Demote' : 'Promote'}
                         </button>
                         <button onClick={() => setDeleteId(user._id)}
                           style={{ padding: '0.35rem 0.65rem', borderRadius: '6px', border: '1px solid rgba(220,53,69,0.2)', background: 'rgba(220,53,69,0.08)', cursor: 'pointer', fontSize: '0.75rem', color: 'var(--error)', fontWeight: 500, transition: 'all 0.15s' }}
@@ -219,14 +220,14 @@ export default function AdminUsers() {
             {/* Activity Tabs */}
             <div style={{ display: 'flex', borderBottom: '1px solid var(--border)', background: 'var(--bg-page)', padding: '0 1rem' }}>
               {[
-                { id: 'profile', label: '👤 Profile' },
-                { id: 'clubs',   label: `🏛️ Clubs (${activityData?.joinedClubs?.length ?? '…'})` },
-                { id: 'events',  label: `📅 Events (${activityData?.registeredEvents?.length ?? '…'})` },
-                { id: 'groups',  label: `📚 Groups (${activityData?.joinedStudyGroups?.length ?? '…'})` },
+                { id: 'profile', label: 'Profile', icon: 'user' },
+                { id: 'clubs',   label: `Clubs (${activityData?.joinedClubs?.length ?? '...'})`, icon: 'landmark' },
+                { id: 'events',  label: `Events (${activityData?.registeredEvents?.length ?? '...'})`, icon: 'calendar' },
+                { id: 'groups',  label: `Groups (${activityData?.joinedStudyGroups?.length ?? '...'})`, icon: 'book' },
               ].map(tab => (
                 <button key={tab.id} onClick={() => setActivityTab(tab.id)}
                   style={{ padding: '0.75rem 1rem', border: 'none', borderBottom: activityTab === tab.id ? '2px solid var(--blue-primary)' : '2px solid transparent', background: 'transparent', cursor: 'pointer', fontSize: '0.82rem', fontWeight: activityTab === tab.id ? 700 : 400, color: activityTab === tab.id ? 'var(--blue-primary)' : 'var(--text-muted)', whiteSpace: 'nowrap', transition: 'all 0.15s' }}>
-                  {tab.label}
+                  <span style={iconLabelStyle}><AppIcon name={tab.icon} size={14} /> {tab.label}</span>
                 </button>
               ))}
             </div>
@@ -246,7 +247,7 @@ export default function AdminUsers() {
                         { label: 'Student ID',     value: u?.studentId || '—' },
                         { label: 'Department',      value: u?.department || '—' },
                         { label: 'Academic Year',   value: u?.year ? `Year ${u.year}` : '—' },
-                        { label: 'Role',            value: u?.role === 'admin' ? '👑 Admin' : '🎓 Student' },
+                        { label: 'Role',            value: u?.role === 'admin' ? 'Admin' : 'Student' },
                         { label: 'Clubs Joined',    value: activityData?.joinedClubs?.length ?? activityModal.joinedClubs?.length ?? 0 },
                         { label: 'Events Registered', value: activityData?.registeredEvents?.length ?? activityModal.registeredEvents?.length ?? 0 },
                         { label: 'Study Groups',    value: activityData?.joinedStudyGroups?.length ?? activityModal.joinedStudyGroups?.length ?? 0 },
@@ -264,7 +265,7 @@ export default function AdminUsers() {
                   {activityTab === 'clubs' && (
                     <div style={{ padding: '1rem 1.5rem' }}>
                       {!activityData?.joinedClubs?.length ? (
-                        <EmptyState icon="🏛️" text="Not a member of any clubs yet" />
+                        <EmptyState icon="landmark" text="Not a member of any clubs yet" />
                       ) : activityData.joinedClubs.map(club => (
                         <div key={club._id} style={{ padding: '0.875rem', marginBottom: '0.75rem', background: 'var(--bg-page)', borderRadius: '10px', border: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                           <div>
@@ -283,13 +284,13 @@ export default function AdminUsers() {
                   {activityTab === 'events' && (
                     <div style={{ padding: '1rem 1.5rem' }}>
                       {!activityData?.registeredEvents?.length ? (
-                        <EmptyState icon="📅" text="Not registered for any events" />
+                        <EmptyState icon="calendar" text="Not registered for any events" />
                       ) : activityData.registeredEvents.map(event => (
                         <div key={event._id} style={{ padding: '0.875rem', marginBottom: '0.75rem', background: 'var(--bg-page)', borderRadius: '10px', border: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                           <div>
                             <div style={{ fontWeight: 600, fontSize: '0.875rem', color: 'var(--text-primary)' }}>{event.title}</div>
                             <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.2rem' }}>
-                              📅 {new Date(event.date).toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' })} · 📍 {event.venue}
+                              <span style={iconLabelStyle}><AppIcon name="calendar" size={13} /> {new Date(event.date).toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' })}</span> · <span style={iconLabelStyle}><AppIcon name="mapPin" size={13} /> {event.venue}</span>
                             </div>
                           </div>
                           <span style={{ fontSize: '0.72rem', fontWeight: 700, padding: '0.2rem 0.6rem', borderRadius: '20px', background: `${EVENT_TYPE_COLORS[event.eventType] || '#0d6efd'}18`, color: EVENT_TYPE_COLORS[event.eventType] || '#0d6efd', flexShrink: 0, marginLeft: '0.75rem' }}>
@@ -304,7 +305,7 @@ export default function AdminUsers() {
                   {activityTab === 'groups' && (
                     <div style={{ padding: '1rem 1.5rem' }}>
                       {!activityData?.joinedStudyGroups?.length ? (
-                        <EmptyState icon="📚" text="Not in any study groups" />
+                        <EmptyState icon="book" text="Not in any study groups" />
                       ) : activityData.joinedStudyGroups.map(group => (
                         <div key={group._id} style={{ padding: '0.875rem', marginBottom: '0.75rem', background: 'var(--bg-page)', borderRadius: '10px', border: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                           <div>
@@ -313,7 +314,7 @@ export default function AdminUsers() {
                           </div>
                           <div style={{ display: 'flex', gap: '0.4rem', flexShrink: 0, marginLeft: '0.75rem' }}>
                             <span style={{ fontSize: '0.72rem', fontWeight: 600, padding: '0.15rem 0.5rem', borderRadius: '4px', background: 'var(--blue-tint)', color: 'var(--dark-accent)' }}>{group.semester}</span>
-                            <span style={{ fontSize: '0.72rem', fontWeight: 600, padding: '0.15rem 0.5rem', borderRadius: '4px', background: 'var(--bg-page)', color: 'var(--text-muted)', border: '1px solid var(--border)' }}>{group.isOnline ? '🌐' : '📍'}</span>
+                            <span style={{ fontSize: '0.72rem', fontWeight: 600, padding: '0.15rem 0.5rem', borderRadius: '4px', background: 'var(--bg-page)', color: 'var(--text-muted)', border: '1px solid var(--border)' }}>{group.isOnline ? 'Online' : 'On campus'}</span>
                           </div>
                         </div>
                       ))}
@@ -337,7 +338,7 @@ export default function AdminUsers() {
           onClick={() => !deleting && setDeleteId(null)}>
           <div style={{ background: '#fff', borderRadius: '16px', padding: '2rem', maxWidth: '400px', width: '100%', textAlign: 'center', boxShadow: '0 20px 60px rgba(1,8,24,0.25)' }}
             onClick={e => e.stopPropagation()}>
-            <div style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>🗑️</div>
+            <AppIcon name="trash" size={40} style={{ marginBottom: '1rem', color: 'var(--error)' }} />
             <h3 style={{ fontFamily: 'Playfair Display, serif', margin: '0 0 0.5rem', fontSize: '1.2rem' }}>Delete User?</h3>
             <p style={{ color: 'var(--text-muted)', margin: '0 0 1.75rem', fontSize: '0.875rem', lineHeight: 1.6 }}>This will permanently delete the user account and all associated data.</p>
             <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'center' }}>
@@ -356,10 +357,11 @@ export default function AdminUsers() {
 function EmptyState({ icon, text }) {
   return (
     <div style={{ textAlign: 'center', padding: '2.5rem 1rem', color: 'var(--text-muted)' }}>
-      <div style={{ fontSize: '2.5rem', marginBottom: '0.625rem' }}>{icon}</div>
+      <AppIcon name={icon} size={40} style={{ marginBottom: '0.625rem' }} />
       <p style={{ margin: 0, fontWeight: 500, fontSize: '0.875rem' }}>{text}</p>
     </div>
   );
 }
 
 const selectStyle = { padding: '0.55rem 0.875rem', border: '1.5px solid var(--border)', borderRadius: '8px', fontSize: '0.875rem', background: '#fff', color: 'var(--text-primary)', cursor: 'pointer', outline: 'none' };
+const iconLabelStyle = { display: 'inline-flex', alignItems: 'center', gap: 4 };

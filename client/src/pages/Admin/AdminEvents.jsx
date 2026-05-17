@@ -5,6 +5,7 @@ import api from '../../utils/api';
 import { useToast } from '../../context/ToastContext';
 import { PageLoader, InlineLoader } from '../../components/LoadingSpinner';
 import EventQRModal from '../../components/EventQRModal';
+import AppIcon from '../../components/AppIcon';
 
 const EVENT_TYPES = ['Workshop', 'Seminar', 'Competition', 'Social', 'Sports', 'Cultural'];
 
@@ -203,7 +204,7 @@ export default function AdminEvents() {
       {/* Events Grid */}
       {filtered.length === 0 ? (
         <div style={{ textAlign: 'center', padding: '4rem 2rem', background: '#fff', borderRadius: '12px', border: '1px solid var(--border)' }}>
-          <div style={{ fontSize: '3rem', marginBottom: '0.75rem' }}>📅</div>
+          <AppIcon name="calendar" size={48} style={{ marginBottom: '0.75rem', color: 'var(--text-muted)' }} />
           <p style={{ color: 'var(--text-muted)', margin: 0, fontWeight: 500 }}>No events found</p>
         </div>
       ) : (
@@ -241,13 +242,13 @@ export default function AdminEvents() {
 
                   {/* Meta */}
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', marginBottom: '1rem', flex: 1 }}>
-                    <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                      📅 {new Date(event.date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
+                    <span style={metaIconStyle}>
+                      <AppIcon name="calendar" size={14} /> {new Date(event.date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
                       {event.time && ` · ${event.time}`}
                     </span>
-                    <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>📍 {event.venue}</span>
+                    <span style={metaIconStyle}><AppIcon name="mapPin" size={14} /> {event.venue}</span>
                     {event.organizerName && (
-                      <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>🏛️ {event.organizerName}</span>
+                      <span style={metaIconStyle}><AppIcon name="building" size={14} /> {event.organizerName}</span>
                     )}
                   </div>
 
@@ -273,7 +274,7 @@ export default function AdminEvents() {
                       style={{ flex: 1, padding: '0.5rem 0.5rem', borderRadius: '7px', border: '1.5px solid var(--blue-primary)', background: 'var(--blue-tint)', color: 'var(--blue-primary)', cursor: 'pointer', fontSize: '0.78rem', fontWeight: 600, whiteSpace: 'nowrap', transition: 'all 0.15s' }}
                       onMouseEnter={e => { e.currentTarget.style.background = 'var(--blue-primary)'; e.currentTarget.style.color = '#fff'; }}
                       onMouseLeave={e => { e.currentTarget.style.background = 'var(--blue-tint)'; e.currentTarget.style.color = 'var(--blue-primary)'; }}>
-                      👥 Registrations ({regCount})
+                      <AppIcon name="users" size={14} /> Registrations ({regCount})
                     </button>
                     <button onClick={() => openEdit(event)}
                       style={{ padding: '0.5rem 0.75rem', borderRadius: '7px', border: '1.5px solid var(--border)', background: '#fff', color: 'var(--text-body)', cursor: 'pointer', fontSize: '0.78rem', fontWeight: 500, transition: 'all 0.15s' }}
@@ -293,7 +294,7 @@ export default function AdminEvents() {
                       style={{ padding: '0.5rem 0.75rem', borderRadius: '7px', border: '1.5px solid var(--blue-primary)', background: 'var(--blue-tint)', color: 'var(--blue-primary)', cursor: 'pointer', fontSize: '0.78rem', fontWeight: 600, transition: 'all 0.15s' }}
                       onMouseEnter={e => { e.currentTarget.style.background = 'var(--blue-primary)'; e.currentTarget.style.color = '#fff'; }}
                       onMouseLeave={e => { e.currentTarget.style.background = 'var(--blue-tint)'; e.currentTarget.style.color = 'var(--blue-primary)'; }}>
-                      📲 QR
+                      <AppIcon name="qr" size={14} /> QR
                     </button>
                   </div>
                 </div>
@@ -326,7 +327,7 @@ export default function AdminEvents() {
                 </h3>
                 {regData?.eventDate && (
                   <p style={{ margin: '0.25rem 0 0', fontSize: '0.78rem', color: 'rgba(255,255,255,0.6)' }}>
-                    📅 {new Date(regData.eventDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+                    <span style={metaIconStyle}><AppIcon name="calendar" size={13} /> {new Date(regData.eventDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
                   </p>
                 )}
               </div>
@@ -358,7 +359,7 @@ export default function AdminEvents() {
                 </div>
               ) : !regData?.registrations?.length ? (
                 <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--text-muted)' }}>
-                  <div style={{ fontSize: '2.5rem', marginBottom: '0.625rem' }}>🎟️</div>
+                  <AppIcon name="ticket" size={40} style={{ marginBottom: '0.625rem' }} />
                   <p style={{ margin: 0, fontWeight: 500 }}>No registrations yet</p>
                 </div>
               ) : filteredReg.length === 0 ? (
@@ -512,7 +513,7 @@ export default function AdminEvents() {
           onClick={() => !deleting && setDeleteId(null)}>
           <div style={{ background: '#fff', borderRadius: '16px', padding: '2rem', maxWidth: '400px', width: '100%', textAlign: 'center', boxShadow: '0 20px 60px rgba(1,8,24,0.25)' }}
             onClick={e => e.stopPropagation()}>
-            <div style={{ width: 56, height: 56, borderRadius: '50%', background: 'rgba(220,53,69,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.25rem', fontSize: '1.75rem' }}>🗑️</div>
+            <div style={{ width: 56, height: 56, borderRadius: '50%', background: 'rgba(220,53,69,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.25rem', color: 'var(--error)' }}><AppIcon name="trash" size={30} /></div>
             <h3 style={{ fontFamily: 'Playfair Display, serif', margin: '0 0 0.5rem', color: 'var(--dark-primary)', fontSize: '1.2rem' }}>Delete Event?</h3>
             <p style={{ color: 'var(--text-muted)', margin: '0 0 1.75rem', fontSize: '0.875rem', lineHeight: 1.6 }}>
               This will permanently delete the event and all registration data. This action cannot be undone.
@@ -554,3 +555,4 @@ const inputStyle = {
   borderRadius: '8px', fontSize: '0.875rem', outline: 'none', color: 'var(--text-primary)',
   background: '#fff', boxSizing: 'border-box',
 };
+const metaIconStyle = { fontSize: '0.8rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 5 };
