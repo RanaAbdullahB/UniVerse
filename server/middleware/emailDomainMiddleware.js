@@ -1,4 +1,4 @@
-// Used on REGISTER only — enforces @lgu.edu.pk for all new student accounts
+// Used on REGISTER only — enforces @cs.lgu.edu.pk for all new student accounts
 const emailDomainMiddleware = (req, res, next) => {
   const { universityEmail } = req.body;
 
@@ -21,10 +21,10 @@ const emailDomainMiddleware = (req, res, next) => {
   }
 
   // Enforce LGU domain
-  if (!emailLower.endsWith('@lgu.edu.pk')) {
+  if (!emailLower.endsWith('@cs.lgu.edu.pk')) {
     return res.status(400).json({
       success: false,
-      message: 'Only LGU email addresses are permitted. Your email must end with @lgu.edu.pk',
+      message: 'Only LGU email addresses are permitted. Your email must end with @cs.lgu.edu.pk',
     });
   }
 

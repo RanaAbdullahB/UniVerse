@@ -100,7 +100,7 @@ export default function ForgotPassword() {
                     type="email"
                     value={email}
                     onChange={(e) => { setEmail(e.target.value); setError(''); }}
-                    placeholder="yourname@lgu.edu.pk"
+                    placeholder="yourname@cs.lgu.edu.pk"
                     className={`input-field ${error ? 'error' : ''}`}
                     autoComplete="email"
                     autoFocus

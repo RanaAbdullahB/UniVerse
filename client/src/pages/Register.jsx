@@ -60,8 +60,8 @@ export default function Register() {
     const newErrors = {};
     if (!form.name.trim()) newErrors.name = 'Full name is required';
     if (!form.universityEmail) newErrors.universityEmail = 'University email is required';
-    else if (!form.universityEmail.toLowerCase().endsWith('@lgu.edu.pk'))
-      newErrors.universityEmail = 'Email must end with @lgu.edu.pk';
+    else if (!form.universityEmail.toLowerCase().endsWith('@cs.lgu.edu.pk'))
+      newErrors.universityEmail = 'Email must end with @cs.lgu.edu.pk';
     if (!form.studentId.trim()) newErrors.studentId = 'Student ID is required';
     if (!form.department) newErrors.department = 'Please select your department';
     if (!form.password) newErrors.password = 'Password is required';
@@ -123,7 +123,7 @@ export default function Register() {
             {/* Email */}
             <Field
               label="LGU Email *" name="universityEmail" type="email"
-              placeholder="yourname@lgu.edu.pk"
+              placeholder="yourname@cs.lgu.edu.pk"
               value={form.universityEmail} onChange={handleChange} error={errors.universityEmail}
             />
 
@@ -182,7 +182,7 @@ export default function Register() {
 
             {/* Domain notice */}
             <div style={{ background: 'rgb(231,237,254)', border: '1px solid rgb(210,224,255)', borderRadius: 8, padding: '10px 14px', fontSize: '0.8rem', color: 'rgb(29,47,111)' }}>
-              🔒 Only LGU email addresses ending in <strong>@lgu.edu.pk</strong> are accepted
+              🔒 Only LGU email addresses ending in <strong>@cs.lgu.edu.pk</strong> are accepted
             </div>
 
             {/* Submit */}

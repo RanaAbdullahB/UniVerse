@@ -71,7 +71,7 @@ const sendResetEmail = async (toEmail, resetURL, userName) => {
 };
 
 // ── REGISTER ──────────────────────────────────────────────────────────────
-// emailDomainMiddleware enforces @lgu.edu.pk for all registrations
+// emailDomainMiddleware enforces @cs.lgu.edu.pk for all registrations
 router.post('/register', emailDomainMiddleware, async (req, res, next) => {
   try {
     const { name, universityEmail, password, studentId, department, year } = req.body;
@@ -130,7 +130,7 @@ router.post('/register', emailDomainMiddleware, async (req, res, next) => {
 });
 
 // ── LOGIN ─────────────────────────────────────────────────────────────────
-// Students: must use @lgu.edu.pk
+// Students: must use @cs.lgu.edu.pk
 // Admins: can use any email — no domain restriction
 router.post('/login', async (req, res, next) => {
   try {
@@ -165,10 +165,10 @@ router.post('/login', async (req, res, next) => {
     }
 
     // Domain check — only for students, admins bypass this
-    if (user.role !== 'admin' && !emailLower.endsWith('@lgu.edu.pk')) {
+    if (user.role !== 'admin' && !emailLower.endsWith('@cs.lgu.edu.pk')) {
       return res.status(401).json({
         success: false,
-        message: 'Students must log in with their LGU email (@lgu.edu.pk)',
+        message: 'Students must log in with their LGU email (@cs.lgu.edu.pk)',
       });
     }
 

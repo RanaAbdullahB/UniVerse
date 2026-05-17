@@ -11,7 +11,7 @@ const PushSubscription = require('../models/PushSubscription');
 
 // Configure VAPID once (called automatically on first import)
 webpush.setVapidDetails(
-  `mailto:${process.env.EMAIL_USER || 'admin@lgu.edu.pk'}`,
+  `mailto:${process.env.EMAIL_USER || 'admin@cs.lgu.edu.pk'}`,
   process.env.VAPID_PUBLIC_KEY,
   process.env.VAPID_PRIVATE_KEY
 );
