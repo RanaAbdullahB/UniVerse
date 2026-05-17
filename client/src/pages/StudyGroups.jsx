@@ -23,6 +23,9 @@ const emptyForm = {
   meetingSchedule: { day: '', time: '', location: '' },
 };
 
+const getStudyGroupList = (payload) =>
+  payload?.data || payload?.studyGroups || payload?.groups || [];
+
 export default function StudyGroups() {
   const { user, refreshUser } = useAuth();
   const { showToast } = useToast();
@@ -50,8 +53,8 @@ export default function StudyGroups() {
         api.get('/study-groups'),
         api.get('/study-groups/my-groups'),
       ]);
-      setGroups(allRes.data.data || allRes.data.studyGroups || []);
-      setMyGroups(myRes.data.data || myRes.data.studyGroups || []);
+      setGroups(getStudyGroupList(allRes.data));
+      setMyGroups(getStudyGroupList(myRes.data));
     } catch {
       showToast('Failed to load study groups', 'error');
     } finally {
@@ -92,15 +95,34 @@ export default function StudyGroups() {
 
   const handleCreate = async (e) => {
     e.preventDefault();
-    if (!form.name.trim() || !form.subject.trim()) {
-      showToast('Name and subject are required', 'error'); return;
+    if (!form.name.trim() || !form.subject.trim() || !form.course.trim() || !form.department) {
+      showToast('Name, subject, course code, and department are required', 'error'); return;
     }
     setCreating(true);
     try {
-      await api.post('/study-groups', form);
+      const payload = {
+        ...form,
+        name: form.name.trim(),
+        subject: form.subject.trim(),
+        course: form.course.trim(),
+        description: form.description.trim(),
+        maxMembers: Number(form.maxMembers) || 10,
+        meetingSchedule: {
+          day: form.meetingSchedule.day || 'TBD',
+          time: form.meetingSchedule.time.trim() || 'TBD',
+          location: form.meetingSchedule.location.trim() || 'TBD',
+        },
+      };
+      const { data } = await api.post('/study-groups', payload);
+      const createdGroup = data.group || data.data;
       showToast('Study group created!', 'success');
       setShowCreate(false);
       setForm(emptyForm);
+      if (createdGroup) {
+        setGroups(prev => [createdGroup, ...prev.filter(g => g._id !== createdGroup._id)]);
+        setMyGroups(prev => [createdGroup, ...prev.filter(g => g._id !== createdGroup._id)]);
+        setActiveTab('mine');
+      }
       await fetchAll();
     } catch (err) {
       showToast(err.response?.data?.message || 'Failed to create group', 'error');
@@ -146,8 +168,8 @@ export default function StudyGroups() {
                 <FL label="Group Name *"><input value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} placeholder="e.g. DS Final Exam Prep" style={iStyle} /></FL>
               </div>
               <FL label="Subject *"><input value={form.subject} onChange={e => setForm(f => ({ ...f, subject: e.target.value }))} placeholder="e.g. Data Structures" style={iStyle} /></FL>
-              <FL label="Course Code"><input value={form.course} onChange={e => setForm(f => ({ ...f, course: e.target.value }))} placeholder="e.g. CS301" style={iStyle} /></FL>
-              <FL label="Department">
+              <FL label="Course Code *"><input value={form.course} onChange={e => setForm(f => ({ ...f, course: e.target.value }))} placeholder="e.g. CS301" style={iStyle} /></FL>
+              <FL label="Department *">
                 <select value={form.department} onChange={e => setForm(f => ({ ...f, department: e.target.value }))} style={iStyle}>
                   <option value="">Select...</option>
                   {DEPARTMENTS.map(d => <option key={d} value={d}>{d}</option>)}
@@ -174,7 +196,12 @@ export default function StudyGroups() {
               <div style={{ gridColumn: '1 / -1' }}>
                 <FL label="Description"><textarea value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} placeholder="What will you study together?" rows={3} style={{ ...iStyle, resize: 'vertical' }} /></FL>
               </div>
-              <FL label="Meeting Day"><input value={form.meetingSchedule.day} onChange={e => setForm(f => ({ ...f, meetingSchedule: { ...f.meetingSchedule, day: e.target.value } }))} placeholder="e.g. Monday" style={iStyle} /></FL>
+              <FL label="Meeting Day">
+                <select value={form.meetingSchedule.day} onChange={e => setForm(f => ({ ...f, meetingSchedule: { ...f.meetingSchedule, day: e.target.value } }))} style={iStyle}>
+                  <option value="">TBD</option>
+                  {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map(day => <option key={day} value={day}>{day}</option>)}
+                </select>
+              </FL>
               <FL label="Meeting Time"><input value={form.meetingSchedule.time} onChange={e => setForm(f => ({ ...f, meetingSchedule: { ...f.meetingSchedule, time: e.target.value } }))} placeholder="e.g. 4:00 PM" style={iStyle} /></FL>
               <div style={{ gridColumn: '1 / -1' }}>
                 <FL label="Location / Link"><input value={form.meetingSchedule.location} onChange={e => setForm(f => ({ ...f, meetingSchedule: { ...f.meetingSchedule, location: e.target.value } }))} placeholder="Room number or Google Meet link" style={iStyle} /></FL>

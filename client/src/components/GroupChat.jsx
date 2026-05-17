@@ -12,7 +12,7 @@ import { io } from 'socket.io-client';
 import api from '../utils/api';
 import AppIcon from './AppIcon';
 
-const SOCKET_URL = 'http://localhost:5000';
+const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || 'http://localhost:5000';
 
 function formatTime(dateStr) {
   const d = new Date(dateStr);
@@ -91,6 +91,7 @@ export default function GroupChat({ group, currentUser, onClose }) {
     });
 
     socket.on('disconnect', () => setConnected(false));
+    socket.on('connect_error', () => setConnected(false));
 
     socket.on('receive_message', (msg) => {
       setMessages(prev => {
