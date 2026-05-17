@@ -26,7 +26,7 @@ export default function EventQRModal({ event, onClose }) {
   useEffect(() => {
     (async () => {
       try {
-        const { data } = await api.get(`/api/checkin/${event._id}/token`);
+        const { data } = await api.get(`/checkin/${event._id}/token`);
         if (data.success) setTokenData(data);
       } catch {
         // silent
@@ -42,7 +42,7 @@ export default function EventQRModal({ event, onClose }) {
     (async () => {
       setLoadingList(true);
       try {
-        const { data } = await api.get(`/api/checkin/${event._id}/list`);
+        const { data } = await api.get(`/checkin/${event._id}/list`);
         if (data.success) setCheckIns(data.checkIns);
       } catch {
         // silent
