@@ -62,7 +62,7 @@ function ClubModal({ club, onClose, onSave }) {
             { label: 'Club Name *',       name: 'name',          placeholder: 'e.g. CS Programming Club' },
             { label: 'Cover Image URL',   name: 'coverImage',    placeholder: 'https://...' },
             { label: 'President Name *',  name: 'presidentName', placeholder: 'Full name' },
-            { label: 'President Email *', name: 'presidentEmail', placeholder: 'president@lgu.edu.pk', type: 'email' },
+            { label: 'President Email *', name: 'presidentEmail', placeholder: 'president@cs.lgu.edu.pk', type: 'email' },
           ].map(({ label, name, placeholder, type }) => (
             <div key={name}>
               <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 500, color: 'rgb(88,85,94)', marginBottom: 5 }}>{label}</label>

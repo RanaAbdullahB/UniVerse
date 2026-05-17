@@ -106,13 +106,12 @@ export default function Login() {
 
         {/* ── Glassmorphism sign-in card ── */}
         <div style={{ width: '100%', maxWidth: 420 }} className="animate-fade-in">
-          <div style={{
+          <div className="px-5 py-8 sm:px-9 sm:py-9" style={{
             background: 'rgba(255,255,255,0.13)',
             backdropFilter: 'blur(28px)',
             WebkitBackdropFilter: 'blur(28px)',
             border: '1px solid rgba(255,255,255,0.22)',
             borderRadius: 20,
-            padding: '36px 36px',
             boxShadow: '0 8px 40px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.15)',
           }}>
 
@@ -159,7 +158,7 @@ export default function Login() {
                 <input
                   type="email" name="universityEmail"
                   value={form.universityEmail} onChange={handleChange}
-                  placeholder="yourname@lgu.edu.pk" autoComplete="email"
+                  placeholder="yourname@cs.lgu.edu.pk" autoComplete="email"
                   style={{
                     width: '100%', padding: '11px 14px',
                     background: 'rgba(255,255,255,0.12)',
@@ -229,7 +228,7 @@ export default function Login() {
 
             <div style={{ marginTop: 14, padding: '9px 14px', background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8, textAlign: 'center' }}>
               <p style={{ fontSize: '0.73rem', color: 'rgba(255,255,255,0.45)', fontWeight: 500 }}>
-               Students: use your @lgu.edu.pk email
+               Students: use your @cs.lgu.edu.pk email
               </p>
             </div>
           </div>

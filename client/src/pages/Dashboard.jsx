@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Sidebar from '../components/Sidebar';
 import Navbar from '../components/Navbar';
+import ChatBot from '../components/ChatBot';
 import DashboardHome from './DashboardHome';
 import Clubs from './Clubs';
 import Events from './Events';
@@ -45,6 +46,8 @@ export default function Dashboard() {
           {renderContent()}
         </main>
       </div>
+
+      <ChatBot activeTab={activeTab} />
 
       <style>{`
         @media (max-width: 768px) {

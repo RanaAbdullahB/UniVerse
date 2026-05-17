@@ -385,7 +385,18 @@ h1, h2, h3 {
   opacity: 0.5;
 }
 
-/* Responsive layout */
+/* ═══════════════════════════════════════════════════════════════
+   RESPONSIVE LAYOUT
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── Tablet (≤ 1024px) ────────────────────────────────────────── */
+@media (max-width: 1024px) {
+  .modal-content {
+    max-width: 90vw;
+  }
+}
+
+/* ── Mobile (≤ 768px) ─────────────────────────────────────────── */
 @media (max-width: 768px) {
   .sidebar-mobile {
     transform: translateX(-100%);
@@ -393,6 +404,59 @@ h1, h2, h3 {
   }
   .sidebar-mobile.open {
     transform: translateX(0);
+  }
+
+  .modal-backdrop {
+    padding: 12px;
+    align-items: flex-end;
+  }
+  .modal-content {
+    max-height: 85vh;
+    border-radius: 16px 16px 0 0;
+  }
+
+  .btn-primary, .btn-gold, .btn-outline {
+    padding: 10px 16px;
+    font-size: 0.85rem;
+    width: 100%;
+    justify-content: center;
+  }
+
+  .stat-card {
+    padding: 14px;
+  }
+
+  .empty-state {
+    padding: 32px 16px;
+  }
+}
+
+/* ── Small phones (≤ 480px) ───────────────────────────────────── */
+@media (max-width: 480px) {
+  .card {
+    border-radius: 10px;
+  }
+
+  .badge {
+    font-size: 0.65rem;
+    padding: 2px 8px;
+  }
+
+  .input-field {
+    padding: 10px 12px;
+    font-size: 0.85rem;
+  }
+}
+
+/* ── PWA standalone mode adjustments ──────────────────────────── */
+@media (display-mode: standalone) {
+  body {
+    -webkit-user-select: none;
+    user-select: none;
+  }
+  body * {
+    -webkit-user-select: text;
+    user-select: text;
   }
 }
 /* DM Typing Indicator */
