@@ -104,7 +104,7 @@ export default function Register() {
         </div>
 
         {/* Card */}
-        <div style={{ background: '#fff', borderRadius: 16, border: '1px solid rgb(222,226,230)', boxShadow: '0 2px 12px rgba(0,0,0,0.08)', padding: '32px' }}>
+        <div className="p-5 sm:p-8" style={{ background: '#fff', borderRadius: 16, border: '1px solid rgb(222,226,230)', boxShadow: '0 2px 12px rgba(0,0,0,0.08)' }}>
 
           {errors.api && (
             <div style={{ background: '#fef2f2', border: '1px solid #fca5a5', borderRadius: 8, padding: '11px 14px', marginBottom: 20, color: '#991b1b', fontSize: '0.85rem' }}>
@@ -115,7 +115,7 @@ export default function Register() {
           <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
 
             {/* Row 1 */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Field label="Full Name *" name="name" placeholder="Ali Khan" value={form.name} onChange={handleChange} error={errors.name} />
               <Field label="Student ID *" name="studentId" placeholder="2024-CS-001" value={form.studentId} onChange={handleChange} error={errors.studentId} />
             </div>
@@ -128,7 +128,7 @@ export default function Register() {
             />
 
             {/* Row 2 */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {/* Department dropdown */}
               <div>
                 <label style={{ display: 'block', fontSize: '0.825rem', fontWeight: 500, color: '#4a5568', marginBottom: 5 }}>
@@ -175,7 +175,7 @@ export default function Register() {
             </div>
 
             {/* Passwords */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Field label="Password *" name="password" type="password" placeholder="Min. 6 characters" value={form.password} onChange={handleChange} error={errors.password} />
               <Field label="Confirm Password *" name="confirmPassword" type="password" placeholder="Re-enter password" value={form.confirmPassword} onChange={handleChange} error={errors.confirmPassword} />
             </div>

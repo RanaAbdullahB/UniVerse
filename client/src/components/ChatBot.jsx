@@ -143,15 +143,8 @@ export default function ChatBot({ activeTab }) {
 
       {/* Chat window */}
       {isOpen && (
-        <div style={{
+        <div className="chatbot-window" style={{
           position: 'fixed',
-          bottom: 24,
-          right: 24,
-          width: 380,
-          maxWidth: 'calc(100vw - 48px)',
-          height: 520,
-          maxHeight: 'calc(100vh - 48px)',
-          borderRadius: 16,
           background: '#fff',
           border: '1px solid rgba(15,27,45,0.12)',
           boxShadow: '0 12px 48px rgba(15,27,45,0.18)',
@@ -396,6 +389,26 @@ export default function ChatBot({ activeTab }) {
       )}
 
       <style>{`
+        .chatbot-window {
+          bottom: 24px;
+          right: 24px;
+          width: 380px;
+          max-width: calc(100vw - 48px);
+          height: 520px;
+          max-height: calc(100vh - 48px);
+          border-radius: 16px;
+        }
+        @media (max-width: 480px) {
+          .chatbot-window {
+            bottom: 0;
+            right: 0;
+            width: 100vw;
+            max-width: 100vw;
+            height: 100vh;
+            max-height: 100vh;
+            border-radius: 0;
+          }
+        }
         @keyframes chatbotSlideUp {
           from { opacity: 0; transform: translateY(16px); }
           to   { opacity: 1; transform: translateY(0); }

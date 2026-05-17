@@ -106,13 +106,12 @@ export default function Login() {
 
         {/* ── Glassmorphism sign-in card ── */}
         <div style={{ width: '100%', maxWidth: 420 }} className="animate-fade-in">
-          <div style={{
+          <div className="px-5 py-8 sm:px-9 sm:py-9" style={{
             background: 'rgba(255,255,255,0.13)',
             backdropFilter: 'blur(28px)',
             WebkitBackdropFilter: 'blur(28px)',
             border: '1px solid rgba(255,255,255,0.22)',
             borderRadius: 20,
-            padding: '36px 36px',
             boxShadow: '0 8px 40px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.15)',
           }}>
 

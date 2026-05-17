@@ -23,9 +23,9 @@ const eventTypeText = {
 
 function StatCard({ icon, label, value, sub }) {
   return (
-    <div className="stat-card" style={{ flex: 1, minWidth: 160 }}>
+    <div className="stat-card" style={{ flex: 1 }}>
       <div style={{ fontSize: '1.6rem', marginBottom: 10 }}>{icon}</div>
-      <div style={{ fontSize: '2rem', fontWeight: 700, color: '#e8c97a', fontFamily: 'Playfair Display, serif', lineHeight: 1 }}>{value}</div>
+      <div className="text-2xl sm:text-3xl" style={{ fontWeight: 700, color: '#e8c97a', fontFamily: 'Playfair Display, serif', lineHeight: 1 }}>{value}</div>
       <div style={{ color: 'rgba(245,240,232,0.9)', fontSize: '0.82rem', marginTop: 4, fontWeight: 500 }}>{label}</div>
       {sub && <div style={{ color: 'rgba(245,240,232,0.4)', fontSize: '0.72rem', marginTop: 2 }}>{sub}</div>}
     </div>
@@ -62,14 +62,15 @@ export default function DashboardHome({ onTabChange }) {
   const greeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
 
   return (
-    <div className="animate-fade-in" style={{ padding: '28px 24px', maxWidth: 1100 }}>
+    <div className="animate-fade-in" style={{ maxWidth: 1100 }}>
+       <div className="px-4 sm:px-6 py-5 sm:py-7">
        <AnnouncementBanner userDepartment={user?.department} />
       {/* Welcome */}
       <div style={{ marginBottom: 28 }}>
         <p style={{ color: '#8a6f30', fontSize: '0.82rem', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 4 }}>
           {greeting} 👋
         </p>
-        <h2 style={{ fontFamily: 'Playfair Display, serif', fontSize: '2rem', color: '#0f1b2d', lineHeight: 1.2 }}>
+        <h2 className="text-2xl sm:text-3xl" style={{ fontFamily: 'Playfair Display, serif', color: '#0f1b2d', lineHeight: 1.2 }}>
           Welcome back, <span style={{ color: '#c9a84c' }}>{user?.name?.split(' ')[0]}</span>
         </h2>
         <p style={{ color: '#718096', marginTop: 6, fontSize: '0.875rem' }}>
@@ -78,7 +79,7 @@ export default function DashboardHome({ onTabChange }) {
       </div>
 
       {/* Stats row */}
-      <div style={{ display: 'flex', gap: 16, marginBottom: 32, flexWrap: 'wrap' }}>
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-8">
         <StatCard icon="🏛️" label="Clubs Joined" value={user?.joinedClubs?.length || 0} sub="Active memberships" />
         <StatCard icon="📅" label="Events Registered" value={user?.registeredEvents?.length || 0} sub="Upcoming activities" />
         <StatCard icon="📚" label="Study Groups" value={user?.joinedStudyGroups?.length || 0} sub="Current groups" />
@@ -86,7 +87,7 @@ export default function DashboardHome({ onTabChange }) {
       </div>
 
       {/* Two columns */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 }} className="grid-cols-1 lg:grid-cols-2">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Upcoming Events */}
         <div>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
@@ -167,11 +168,11 @@ export default function DashboardHome({ onTabChange }) {
       </div>
 
       {/* Quick actions */}
-      <div style={{ marginTop: 28, background: 'linear-gradient(135deg, #0f1b2d, #1a2d4a)', borderRadius: 16, padding: '24px', border: '1px solid rgba(201,168,76,0.2)' }}>
+      <div style={{ marginTop: 28, background: 'linear-gradient(135deg, #0f1b2d, #1a2d4a)', borderRadius: 16, border: '1px solid rgba(201,168,76,0.2)' }} className="p-4 sm:p-6">
         <h3 style={{ fontFamily: 'Playfair Display, serif', color: '#e8c97a', fontSize: '1.1rem', marginBottom: 16 }}>
           Quick Actions
         </h3>
-        <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+        <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-3">
           {[
             { label: 'Browse Clubs', icon: '🏛️', tab: 'clubs' },
             { label: 'View Events', icon: '📅', tab: 'events' },
@@ -191,6 +192,7 @@ export default function DashboardHome({ onTabChange }) {
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
+                justifyContent: 'center',
                 gap: 8,
                 fontFamily: 'DM Sans, sans-serif',
                 fontWeight: 500,
@@ -203,6 +205,7 @@ export default function DashboardHome({ onTabChange }) {
             </button>
           ))}
         </div>
+      </div>
       </div>
     </div>
   );
