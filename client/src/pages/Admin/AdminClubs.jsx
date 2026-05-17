@@ -3,6 +3,7 @@ import api from '../../utils/api';
 import { useToast } from '../../context/ToastContext';
 import { InlineLoader, Spinner } from '../../components/LoadingSpinner';
 import { exportClubMembers } from '../../utils/csvExport';
+import AppIcon from '../../components/AppIcon';
 
 const CATEGORIES = ['Technical', 'Sports', 'Arts', 'Cultural', 'Academic', 'Social'];
 const catColors = {
@@ -55,7 +56,7 @@ function ClubModal({ club, onClose, onSave }) {
           <h3 style={{ fontFamily: 'Playfair Display, serif', color: 'rgb(1,8,24)', fontSize: '1.1rem' }}>
             {club?._id ? 'Edit Club' : '+ Create New Club'}
           </h3>
-          <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.2rem', color: 'rgb(126,126,126)' }}>✕</button>
+          <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.2rem', color: 'rgb(126,126,126)' }}>×</button>
         </div>
         <form onSubmit={handleSubmit} style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: 14 }}>
           {[
@@ -132,7 +133,7 @@ function MemberPanel({ club }) {
       {/* Panel header */}
       <div style={{ padding: '10px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, flexWrap: 'wrap', borderBottom: '1px solid rgb(222,226,230)' }}>
         <span style={{ fontSize: '0.78rem', fontWeight: 700, color: 'rgb(29,47,111)' }}>
-          👥 {members.length} Member{members.length !== 1 ? 's' : ''}
+          <span style={iconLabelStyle}><AppIcon name="users" size={14} /> {members.length} Member{members.length !== 1 ? 's' : ''}</span>
         </span>
         <div style={{ display: 'flex', gap: 6, flex: 1, justifyContent: 'flex-end', flexWrap: 'wrap' }}>
           <input
@@ -150,7 +151,7 @@ function MemberPanel({ club }) {
               style={{ padding: '4px 10px', borderRadius: 6, border: '1.5px solid rgb(222,226,230)', background: '#fff', cursor: 'pointer', fontSize: '0.72rem', fontWeight: 500, color: 'rgb(88,85,94)', whiteSpace: 'nowrap', transition: 'border-color 0.15s' }}
               onMouseEnter={e => (e.currentTarget.style.borderColor = 'rgb(13,110,253)')}
               onMouseLeave={e => (e.currentTarget.style.borderColor = 'rgb(222,226,230)')}>
-              ⬇️ CSV
+              CSV
             </button>
           )}
         </div>
@@ -284,7 +285,7 @@ export default function AdminClubs() {
       {/* Page header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 24, flexWrap: 'wrap', gap: 16 }}>
         <div>
-          <h2 style={{ fontFamily: 'Playfair Display, serif', fontSize: '1.6rem', color: 'rgb(1,8,24)', marginBottom: 4 }}>🏛️ Manage Clubs</h2>
+          <h2 style={{ fontFamily: 'Playfair Display, serif', fontSize: '1.6rem', color: 'rgb(1,8,24)', marginBottom: 4, display: 'flex', alignItems: 'center', gap: 8 }}><AppIcon name="landmark" size={25} /> Manage Clubs</h2>
           <p style={{ color: 'rgb(126,126,126)', fontSize: '0.875rem' }}>Create, edit, remove clubs and view their members</p>
         </div>
         <button onClick={() => { setEditClub(null); setShowModal(true); }}
@@ -297,7 +298,7 @@ export default function AdminClubs() {
         <InlineLoader text="Loading clubs..." />
       ) : clubs.length === 0 ? (
         <div style={{ textAlign: 'center', padding: '60px 0', color: 'rgb(126,126,126)' }}>
-          <div style={{ fontSize: '3rem', marginBottom: 16 }}>🏛️</div>
+          <AppIcon name="landmark" size={48} style={{ marginBottom: 16 }} />
           <p>No clubs yet. Create the first one!</p>
         </div>
       ) : (
@@ -313,7 +314,7 @@ export default function AdminClubs() {
                 <div style={{ height: 100, overflow: 'hidden', background: 'rgb(239,243,249)', position: 'relative' }}>
                   {club.coverImage
                     ? <img src={club.coverImage} alt={club.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                    : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '2rem' }}>🏛️</div>
+                    : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><AppIcon name="landmark" size={32} /></div>
                   }
                   <span style={{ position: 'absolute', top: 8, left: 8, background: c.bg, color: c.text, fontSize: '0.68rem', fontWeight: 700, padding: '2px 8px', borderRadius: 20, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                     {club.category}
@@ -323,8 +324,8 @@ export default function AdminClubs() {
                 {/* Club info */}
                 <div style={{ padding: '14px 16px' }}>
                   <h3 style={{ fontFamily: 'Playfair Display, serif', fontSize: '0.95rem', color: 'rgb(1,8,24)', marginBottom: 4 }}>{club.name}</h3>
-                  <p style={{ fontSize: '0.75rem', color: 'rgb(126,126,126)', marginBottom: 2 }}>👤 {club.presidentName}</p>
-                  <p style={{ fontSize: '0.75rem', color: 'rgb(126,126,126)', marginBottom: 12 }}>👥 {club.totalMembers} members</p>
+                  <p style={clubMetaStyle}><AppIcon name="user" size={13} /> {club.presidentName}</p>
+                  <p style={clubMetaStyle}><AppIcon name="users" size={13} /> {club.totalMembers} members</p>
 
                   {/* Action buttons */}
                   <div style={{ display: 'flex', gap: 6 }}>
@@ -342,19 +343,19 @@ export default function AdminClubs() {
                       }}
                       onMouseEnter={e => { if (!isExpanded) { e.currentTarget.style.background = 'rgb(231,237,254)'; e.currentTarget.style.borderColor = 'rgb(13,110,253)'; e.currentTarget.style.color = 'rgb(29,47,111)'; } }}
                       onMouseLeave={e => { if (!isExpanded) { e.currentTarget.style.background = 'rgb(248,249,250)'; e.currentTarget.style.borderColor = 'rgb(222,226,230)'; e.currentTarget.style.color = 'rgb(88,85,94)'; } }}>
-                      {isExpanded ? '▲ Hide Members' : `👥 Members (${club.totalMembers})`}
+                      {isExpanded ? 'Hide Members' : <><AppIcon name="users" size={14} /> Members ({club.totalMembers})</>}
                     </button>
 
                     {/* Edit */}
                     <button onClick={() => { setEditClub(club); setShowModal(true); }}
                       style={{ padding: '7px 10px', borderRadius: 7, border: '1.5px solid rgb(210,224,255)', background: 'rgb(231,237,254)', color: 'rgb(29,47,111)', fontSize: '0.78rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'DM Sans, sans-serif' }}>
-                      ✏️
+                      <AppIcon name="pencil" size={15} />
                     </button>
 
                     {/* Delete */}
                     <button onClick={() => setDeleteConfirm(club)}
                       style={{ padding: '7px 10px', borderRadius: 7, border: '1.5px solid rgba(220,53,69,0.3)', background: '#fef2f2', color: 'rgb(220,53,69)', fontSize: '0.78rem', cursor: 'pointer' }}>
-                      🗑️
+                      <AppIcon name="trash" size={15} />
                     </button>
                   </div>
                 </div>
@@ -369,3 +370,6 @@ export default function AdminClubs() {
     </div>
   );
 }
+
+const iconLabelStyle = { display: 'inline-flex', alignItems: 'center', gap: 4 };
+const clubMetaStyle = { fontSize: '0.75rem', color: 'rgb(126,126,126)', marginBottom: 2, display: 'flex', alignItems: 'center', gap: 5 };

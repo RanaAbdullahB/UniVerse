@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import api from '../utils/api';
 import { useToast } from '../context/ToastContext';
 import { InlineLoader, Spinner } from '../components/LoadingSpinner';
+import AppIcon from '../components/AppIcon';
 
 const CATEGORIES = ['All', 'Technical', 'Sports', 'Arts', 'Cultural', 'Academic', 'Social'];
 const catColors = {
@@ -37,14 +38,16 @@ function ClubCard({ club, onJoinLeave }) {
         {club.coverImage ? (
           <img src={club.coverImage} alt={club.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
         ) : (
-          <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '3rem', background: 'linear-gradient(135deg, #e8e0d0, #d4c9b4)' }}>🏛️</div>
+          <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(135deg, #e8e0d0, #d4c9b4)' }}>
+            <AppIcon name="landmark" size={44} />
+          </div>
         )}
         <div style={{ position: 'absolute', top: 10, left: 10 }}>
           <span className="badge" style={{ background: c.bg, color: c.text }}>{club.category}</span>
         </div>
         {club.isMember && (
           <div style={{ position: 'absolute', top: 10, right: 10, background: '#0f1b2d', color: '#c9a84c', fontSize: '0.68rem', fontWeight: 600, padding: '3px 8px', borderRadius: 20, letterSpacing: '0.04em' }}>
-            ✓ MEMBER
+            MEMBER
           </div>
         )}
       </div>
@@ -59,7 +62,7 @@ function ClubCard({ club, onJoinLeave }) {
         </p>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 14 }}>
           <div style={{ fontSize: '0.78rem', color: '#4a5568' }}>
-            👥 <strong>{club.totalMembers}</strong> members
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}><AppIcon name="users" size={14} /> <strong>{club.totalMembers}</strong> members</span>
           </div>
           <button
             onClick={handleAction}
@@ -128,7 +131,7 @@ export default function Clubs() {
       {/* Header */}
       <div style={{ marginBottom: 24 }}>
         <h2 style={{ fontFamily: 'Playfair Display, serif', fontSize: '1.7rem', color: '#0f1b2d', marginBottom: 4 }}>
-          🏛️ Societies & Clubs
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}><AppIcon name="landmark" size={25} /> Societies & Clubs</span>
         </h2>
         <p style={{ color: '#718096', fontSize: '0.875rem' }}>
           Discover student organizations and expand your university experience
@@ -201,7 +204,7 @@ export default function Clubs() {
         <InlineLoader text="Loading clubs..." />
       ) : displayedClubs.length === 0 ? (
         <div className="empty-state">
-          <span className="empty-state-icon">🏛️</span>
+          <AppIcon name="landmark" size={48} className="empty-state-icon" />
           <h3 style={{ fontFamily: 'Playfair Display, serif', fontSize: '1.1rem', color: '#0f1b2d', marginBottom: 8 }}>
             {activeTab === 'mine' ? 'You haven\'t joined any clubs yet' : 'No clubs found'}
           </h3>

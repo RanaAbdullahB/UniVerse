@@ -11,6 +11,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import api from '../utils/api';
 import { useAuth } from '../context/AuthContext';
+import AppIcon from '../components/AppIcon';
 
 export default function CheckIn() {
   const { eventId, token } = useParams();
@@ -27,7 +28,7 @@ export default function CheckIn() {
   useEffect(() => {
     (async () => {
       try {
-        const { data } = await api.get(`/api/checkin/${eventId}/verify/${token}`);
+        const { data } = await api.get(`/checkin/${eventId}/verify/${token}`);
         if (data.success) {
           setEvent(data.event);
           setStatus(user ? 'ready' : 'login');
@@ -51,7 +52,7 @@ export default function CheckIn() {
 
     setLoading(true);
     try {
-      const { data } = await api.post(`/api/checkin/${eventId}`, { token });
+      const { data } = await api.post(`/checkin/${eventId}`, { token });
       if (data.success) {
         setStatus('success');
         setMessage(data.message);
@@ -108,7 +109,7 @@ export default function CheckIn() {
         {/* ── Invalid QR ── */}
         {status === 'invalid' && (
           <div style={styles.centerContent}>
-            <div style={styles.iconCircle('#fee2e2')}>❌</div>
+            <div style={styles.iconCircle('#fee2e2')}><AppIcon name="alert" size={32} /></div>
             <h2 style={styles.heading}>Invalid QR Code</h2>
             <p style={styles.hint}>This QR code is not valid or has expired. Please scan again.</p>
           </div>
@@ -120,15 +121,15 @@ export default function CheckIn() {
             <div style={styles.eventBadge}>{event.eventType}</div>
             <h2 style={styles.eventTitle}>{event.title}</h2>
             <div style={styles.eventMeta}>
-              <div style={styles.metaItem}>📅 {formatDate(event.date)}</div>
-              {event.time  && <div style={styles.metaItem}>🕐 {event.time}</div>}
-              {event.venue && <div style={styles.metaItem}>📍 {event.venue}</div>}
+              <div style={styles.metaItem}><AppIcon name="calendar" size={16} /> {formatDate(event.date)}</div>
+              {event.time  && <div style={styles.metaItem}><AppIcon name="clock" size={16} /> {event.time}</div>}
+              {event.venue && <div style={styles.metaItem}><AppIcon name="mapPin" size={16} /> {event.venue}</div>}
             </div>
 
             {user ? (
               <>
                 <div style={styles.userPill}>
-                  <span style={styles.userDot}>👤</span>
+                  <AppIcon name="user" size={15} style={styles.userDot} />
                   Checking in as <strong style={{ marginLeft: 4 }}>{user.name}</strong>
                 </div>
                 <button
@@ -136,7 +137,7 @@ export default function CheckIn() {
                   disabled={loading}
                   style={{ ...styles.checkInBtn, opacity: loading ? 0.7 : 1 }}
                 >
-                  {loading ? 'Checking in…' : '✅ Check In Now'}
+                  {loading ? 'Checking in…' : <><AppIcon name="checkCircle" size={17} /> Check In Now</>}
                 </button>
               </>
             ) : (
@@ -145,7 +146,7 @@ export default function CheckIn() {
                   You need to be logged in to check in to this event.
                 </p>
                 <button onClick={handleCheckIn} style={styles.checkInBtn}>
-                  🔐 Log in to Check In
+                  <AppIcon name="login" size={17} /> Log in to Check In
                 </button>
               </>
             )}
@@ -155,7 +156,7 @@ export default function CheckIn() {
         {/* ── Success ── */}
         {status === 'success' && event && (
           <div style={styles.centerContent}>
-            <div style={styles.iconCircle('#dcfce7')}>✅</div>
+            <div style={styles.iconCircle('#dcfce7')}><AppIcon name="checkCircle" size={32} /></div>
             <h2 style={{ ...styles.heading, color: 'var(--success)' }}>Checked In!</h2>
             <p style={styles.eventTitle}>{event.title}</p>
             <p style={styles.hint}>{message}</p>
@@ -174,7 +175,7 @@ export default function CheckIn() {
         {/* ── Already checked in ── */}
         {status === 'already' && event && (
           <div style={styles.centerContent}>
-            <div style={styles.iconCircle('#fef9c3')}>⚠️</div>
+            <div style={styles.iconCircle('#fef9c3')}><AppIcon name="warning" size={32} /></div>
             <h2 style={styles.heading}>Already Checked In</h2>
             <p style={styles.eventTitle}>{event.title}</p>
             <p style={styles.hint}>
@@ -193,7 +194,7 @@ export default function CheckIn() {
         {/* ── Error ── */}
         {status === 'error' && (
           <div style={styles.centerContent}>
-            <div style={styles.iconCircle('#fee2e2')}>⚠️</div>
+            <div style={styles.iconCircle('#fee2e2')}><AppIcon name="warning" size={32} /></div>
             <h2 style={styles.heading}>Check-in Failed</h2>
             <p style={styles.hint}>{message}</p>
             <button onClick={handleCheckIn} style={styles.checkInBtn}>Try Again</button>
@@ -326,7 +327,11 @@ const styles = {
     fontWeight:      700,
     cursor:          'pointer',
     fontFamily:      'DM Sans, sans-serif',
-    transition:      'opacity 0.2s'
+    transition:      'opacity 0.2s',
+    display:         'inline-flex',
+    alignItems:      'center',
+    justifyContent:  'center',
+    gap:             7
   },
   secondaryBtn: {
     marginTop:       8,

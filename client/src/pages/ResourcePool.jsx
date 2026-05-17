@@ -3,13 +3,14 @@
  * Place at: client/src/pages/ResourcePool.jsx
  *
  * Two tabs:
- *   📚 Resources  — browse & download shared files
- *   🙋 Requests   — ask for something / fulfill others' requests
+ *   Resources  — browse & download shared files
+ *   Requests   — ask for something / fulfill others' requests
  */
 
 import { useState, useEffect, useRef } from 'react';
 import api from '../utils/api';
 import { useAuth } from '../context/AuthContext';
+import AppIcon from '../components/AppIcon';
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -22,7 +23,7 @@ const DEPARTMENTS = [
 ];
 
 const TYPE_ICONS = {
-  PDF: '📄', Notes: '📝', Slides: '📊', Book: '📚', Assignment: '📋', Other: '📁'
+  PDF: 'file', Notes: 'pencil', Slides: 'analytics', Book: 'book', Assignment: 'clipboard', Other: 'package'
 };
 
 const TYPE_COLORS = {
@@ -107,9 +108,9 @@ function UploadModal({ onClose, onUploaded, fulfillRequest = null }) {
         {/* Header */}
         <div style={mStyles.header}>
           <h3 style={mStyles.title}>
-            {fulfillRequest ? `✅ Fulfill: "${fulfillRequest.title}"` : '📤 Share a Resource'}
+            <span style={iconLabelStyle}><AppIcon name={fulfillRequest ? 'checkCircle' : 'upload'} size={18} /> {fulfillRequest ? `Fulfill: "${fulfillRequest.title}"` : 'Share a Resource'}</span>
           </h3>
-          <button onClick={onClose} style={mStyles.closeBtn}>✕</button>
+          <button onClick={onClose} style={mStyles.closeBtn}>×</button>
         </div>
 
         <div style={mStyles.body}>
@@ -174,14 +175,14 @@ function UploadModal({ onClose, onUploaded, fulfillRequest = null }) {
             >
               {file ? (
                 <>
-                  <div style={{ fontSize: 28, marginBottom: 4 }}>✅</div>
+                  <AppIcon name="checkCircle" size={28} style={{ marginBottom: 4, color: 'var(--success)' }} />
                   <div style={{ fontWeight: 600, fontSize: 14, color: 'var(--success)' }}>{file.name}</div>
                   <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>{formatSize(file.size)}</div>
                   <div style={{ fontSize: 12, color: 'var(--blue-primary)', marginTop: 6 }}>Click to change</div>
                 </>
               ) : (
                 <>
-                  <div style={{ fontSize: 28, marginBottom: 4 }}>📎</div>
+                  <AppIcon name="paperclip" size={28} style={{ marginBottom: 4, color: 'var(--text-muted)' }} />
                   <div style={{ fontSize: 14, color: 'var(--text-muted)' }}>Click to select file</div>
                   <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>PDF, DOCX, PPTX, XLSX, TXT, ZIP</div>
                 </>
@@ -238,8 +239,8 @@ function RequestModal({ onClose, onRequested }) {
     <div style={overlay} onClick={e => e.target === e.currentTarget && onClose()}>
       <div style={modal}>
         <div style={mStyles.header}>
-          <h3 style={mStyles.title}>🙋 Request a Resource</h3>
-          <button onClick={onClose} style={mStyles.closeBtn}>✕</button>
+          <h3 style={mStyles.title}><span style={iconLabelStyle}><AppIcon name="help" size={18} /> Request a Resource</span></h3>
+          <button onClick={onClose} style={mStyles.closeBtn}>×</button>
         </div>
 
         <div style={mStyles.body}>
@@ -409,15 +410,15 @@ export default function ResourcePool() {
       {/* ── Page header ── */}
       <div style={s.pageHeader}>
         <div>
-          <h1 style={s.pageTitle}>📚 Resource Pool</h1>
+          <h1 style={s.pageTitle}><span style={iconLabelStyle}><AppIcon name="book" size={27} /> Resource Pool</span></h1>
           <p style={s.pageSubtitle}>Share study materials · Ask for what you need · Help each other succeed</p>
         </div>
         <div style={s.headerActions}>
           <button onClick={() => setShowRequest(true)} style={s.secondaryBtn}>
-            🙋 Request
+            <AppIcon name="help" size={16} /> Request
           </button>
           <button onClick={() => setShowUpload(true)} style={s.primaryBtn}>
-            📤 Share Resource
+            <AppIcon name="upload" size={16} /> Share Resource
           </button>
         </div>
       </div>
@@ -425,8 +426,8 @@ export default function ResourcePool() {
       {/* ── Tabs ── */}
       <div style={s.tabs}>
         {[
-          { key: 'resources', label: `📚 Resources (${resources.length})` },
-          { key: 'requests',  label: `🙋 Requests` }
+          { key: 'resources', label: `Resources (${resources.length})`, icon: 'book' },
+          { key: 'requests',  label: 'Requests', icon: 'help' }
         ].map(t => (
           <button
             key={t.key}
@@ -438,7 +439,7 @@ export default function ResourcePool() {
               fontWeight:   tab === t.key ? 700 : 400
             }}
           >
-            {t.label}
+            <span style={iconLabelStyle}><AppIcon name={t.icon} size={15} /> {t.label}</span>
           </button>
         ))}
       </div>
@@ -471,13 +472,13 @@ export default function ResourcePool() {
             <div style={s.center}><div style={s.spinner} /></div>
           ) : resources.length === 0 ? (
             <div style={s.emptyState}>
-              <div style={{ fontSize: 48, marginBottom: 12 }}>📭</div>
+              <AppIcon name="inbox" size={48} style={{ marginBottom: 12, color: 'var(--text-muted)' }} />
               <div style={{ fontWeight: 600, marginBottom: 4 }}>No resources yet</div>
               <div style={{ fontSize: 14, color: 'var(--text-muted)' }}>
                 Be the first to share something!
               </div>
               <button onClick={() => setShowUpload(true)} style={{ ...s.primaryBtn, marginTop: 16 }}>
-                📤 Share Resource
+                <AppIcon name="upload" size={16} /> Share Resource
               </button>
             </div>
           ) : (
@@ -492,11 +493,11 @@ export default function ResourcePool() {
                       {/* Type badge */}
                       <div style={s.cardTop}>
                         <span style={{ ...s.badge, background: tc.bg, color: tc.color }}>
-                          {TYPE_ICONS[resource.resourceType]} {resource.resourceType}
+                          <span style={iconLabelStyle}><AppIcon name={TYPE_ICONS[resource.resourceType]} size={13} /> {resource.resourceType}</span>
                         </span>
                         {resource.fulfilledRequest && (
                           <span style={{ ...s.badge, background: 'rgba(25,135,84,0.08)', color: 'var(--success)', fontSize: 11 }}>
-                            ✅ Fulfilled
+                            <span style={iconLabelStyle}><AppIcon name="checkCircle" size={12} /> Fulfilled</span>
                           </span>
                         )}
                       </div>
@@ -509,10 +510,10 @@ export default function ResourcePool() {
 
                       {/* Meta */}
                       <div style={s.cardMeta}>
-                        {resource.course && <span>📖 {resource.course}</span>}
-                        <span>🏛️ {resource.department}</span>
-                        <span>⬇️ {resource.downloads} downloads</span>
-                        {resource.fileSize > 0 && <span>💾 {formatSize(resource.fileSize)}</span>}
+                        {resource.course && <span style={iconLabelStyle}><AppIcon name="book" size={13} /> {resource.course}</span>}
+                        <span style={iconLabelStyle}><AppIcon name="building" size={13} /> {resource.department}</span>
+                        <span style={iconLabelStyle}><AppIcon name="download" size={13} /> {resource.downloads} downloads</span>
+                        {resource.fileSize > 0 && <span style={iconLabelStyle}><AppIcon name="file" size={13} /> {formatSize(resource.fileSize)}</span>}
                       </div>
 
                       {/* Footer */}
@@ -527,14 +528,14 @@ export default function ResourcePool() {
                               style={s.deleteBtn}
                               title="Delete"
                             >
-                              🗑️
+                              <AppIcon name="trash" size={15} />
                             </button>
                           )}
                           <button
                             onClick={() => handleDownload(resource)}
                             style={s.downloadBtn}
                           >
-                            ⬇️ Download
+                            <AppIcon name="download" size={15} /> Download
                           </button>
                         </div>
                       </div>
@@ -572,7 +573,7 @@ export default function ResourcePool() {
             <div style={s.center}><div style={s.spinner} /></div>
           ) : requests.length === 0 ? (
             <div style={s.emptyState}>
-              <div style={{ fontSize: 48, marginBottom: 12 }}>🙋</div>
+              <AppIcon name="help" size={48} style={{ marginBottom: 12, color: 'var(--text-muted)' }} />
               <div style={{ fontWeight: 600, marginBottom: 4 }}>No requests yet</div>
               <div style={{ fontSize: 14, color: 'var(--text-muted)' }}>
                 Need something? Post a request and a fellow student might help!
@@ -606,15 +607,15 @@ export default function ResourcePool() {
                         )}
                         <div style={s.requestMeta}>
                           <span style={{ ...s.badge, background: tc.bg, color: tc.color, fontSize: 11 }}>
-                            {TYPE_ICONS[req.resourceType]} {req.resourceType}
+                            <span style={iconLabelStyle}><AppIcon name={TYPE_ICONS[req.resourceType]} size={13} /> {req.resourceType}</span>
                           </span>
-                          {req.course && <span>📖 {req.course}</span>}
-                          <span>🏛️ {req.department}</span>
+                          {req.course && <span style={iconLabelStyle}><AppIcon name="book" size={13} /> {req.course}</span>}
+                          <span style={iconLabelStyle}><AppIcon name="building" size={13} /> {req.department}</span>
                           <span>By <strong>{req.requesterName}</strong> · {timeAgo(req.createdAt)}</span>
                         </div>
                         {isFulfilled && (
                           <div style={{ fontSize: 12, color: 'var(--success)', marginTop: 4, fontWeight: 600 }}>
-                            ✅ Fulfilled by {req.fulfilledByName}
+                            <span style={iconLabelStyle}><AppIcon name="checkCircle" size={13} /> Fulfilled by {req.fulfilledByName}</span>
                           </div>
                         )}
                       </div>
@@ -627,7 +628,7 @@ export default function ResourcePool() {
                           style={s.deleteBtn}
                           title="Delete request"
                         >
-                          🗑️
+                          <AppIcon name="trash" size={15} />
                         </button>
                       )}
                       {!isFulfilled && !isOwner && (
@@ -635,12 +636,12 @@ export default function ResourcePool() {
                           onClick={() => { setFulfillTarget(req); setShowUpload(true); }}
                           style={s.fulfillBtn}
                         >
-                          📤 I have this!
+                          <AppIcon name="upload" size={15} /> I have this!
                         </button>
                       )}
                       {isFulfilled && (
                         <span style={{ fontSize: 12, color: 'var(--success)', fontWeight: 600 }}>
-                          ✅ Done
+                          <span style={iconLabelStyle}><AppIcon name="checkCircle" size={13} /> Done</span>
                         </span>
                       )}
                     </div>
@@ -833,7 +834,11 @@ const s = {
     cursor:       'pointer',
     fontWeight:   600,
     fontSize:     14,
-    fontFamily:   'DM Sans, sans-serif'
+    fontFamily:   'DM Sans, sans-serif',
+    display:      'inline-flex',
+    alignItems:   'center',
+    justifyContent: 'center',
+    gap:          6
   },
   secondaryBtn: {
     padding:      '8px 18px',
@@ -844,7 +849,11 @@ const s = {
     cursor:       'pointer',
     fontWeight:   600,
     fontSize:     14,
-    fontFamily:   'DM Sans, sans-serif'
+    fontFamily:   'DM Sans, sans-serif',
+    display:      'inline-flex',
+    alignItems:   'center',
+    justifyContent: 'center',
+    gap:          6
   },
   tabs: {
     display:      'flex',
@@ -880,7 +889,11 @@ const s = {
     outline:      'none',
     background:   'var(--white)',
     color:        'var(--text-primary)',
-    fontFamily:   'DM Sans, sans-serif'
+    fontFamily:   'DM Sans, sans-serif',
+    display:      'inline-flex',
+    alignItems:   'center',
+    justifyContent: 'center',
+    gap:          6
   },
   select: {
     padding:      '8px 12px',
@@ -970,7 +983,10 @@ const s = {
     background:   'rgba(220,53,69,0.06)',
     color:        'var(--error)',
     cursor:       'pointer',
-    fontSize:     13
+    fontSize:     13,
+    display:      'inline-flex',
+    alignItems:   'center',
+    justifyContent: 'center'
   },
   requestList: {
     display:       'flex',
@@ -1029,7 +1045,11 @@ const s = {
     fontSize:     13,
     fontWeight:   600,
     fontFamily:   'DM Sans, sans-serif',
-    whiteSpace:   'nowrap'
+    whiteSpace:   'nowrap',
+    display:      'inline-flex',
+    alignItems:   'center',
+    justifyContent: 'center',
+    gap:          6
   },
   emptyState: {
     textAlign:  'center',
@@ -1052,4 +1072,10 @@ const s = {
     borderRadius: '50%',
     animation:    'spin 0.8s linear infinite'
   }
+};
+
+const iconLabelStyle = {
+  display: 'inline-flex',
+  alignItems: 'center',
+  gap: 5
 };

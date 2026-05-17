@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import api from '../utils/api';
 import { useToast } from '../context/ToastContext';
 import { InlineLoader, Spinner } from '../components/LoadingSpinner';
+import AppIcon from '../components/AppIcon';
 
 const EVENT_TYPES = ['All', 'Workshop', 'Seminar', 'Competition', 'Social', 'Sports', 'Cultural'];
 const typeColors = {
@@ -64,7 +65,9 @@ function EventCard({ event, onRegister }) {
         {event.coverImage ? (
           <img src={event.coverImage} alt={event.title} style={{ width: '100%', height: '100%', objectFit: 'cover', filter: isPast ? 'grayscale(0.5)' : 'none' }} />
         ) : (
-          <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '2.5rem' }}>📅</div>
+          <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <AppIcon name="calendar" size={42} />
+          </div>
         )}
         <div style={{ position: 'absolute', top: 10, left: 10, display: 'flex', gap: 6 }}>
           <span className="badge" style={{ background: c.bg, color: c.text }}>{event.eventType}</span>
@@ -72,12 +75,12 @@ function EventCard({ event, onRegister }) {
         </div>
         {event.isRegistered && !isPast && (
           <div style={{ position: 'absolute', top: 10, right: 10, background: '#0f1b2d', color: '#c9a84c', fontSize: '0.68rem', fontWeight: 600, padding: '3px 8px', borderRadius: 20 }}>
-            ✓ REGISTERED
+            REGISTERED
           </div>
         )}
         {!isPast && (
           <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, background: 'linear-gradient(transparent, rgba(0,0,0,0.6))', padding: '16px 12px 8px', color: '#fff', fontSize: '0.72rem' }}>
-            ⏱ <CountdownTimer date={event.date} />
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}><AppIcon name="clock" size={13} /> <CountdownTimer date={event.date} /></span>
           </div>
         )}
       </div>
@@ -87,9 +90,9 @@ function EventCard({ event, onRegister }) {
           {event.title}
         </h3>
         <div style={{ fontSize: '0.75rem', color: '#4a5568', display: 'flex', flexDirection: 'column', gap: 4, marginBottom: 10 }}>
-          <span>📅 {new Date(event.date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })} · {event.time}</span>
-          <span>📍 {event.venue}</span>
-          <span>🏛️ {event.organizerName || (event.organizer?.name) || 'University'}</span>
+          <span style={metaRowStyle}><AppIcon name="calendar" size={14} /> {new Date(event.date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })} · {event.time}</span>
+          <span style={metaRowStyle}><AppIcon name="mapPin" size={14} /> {event.venue}</span>
+          <span style={metaRowStyle}><AppIcon name="building" size={14} /> {event.organizerName || (event.organizer?.name) || 'University'}</span>
         </div>
 
         {/* Capacity bar */}
@@ -178,7 +181,7 @@ export default function Events() {
     <div style={{ padding: '28px 24px', maxWidth: 1200 }} className="animate-fade-in">
       <div style={{ marginBottom: 24 }}>
         <h2 style={{ fontFamily: 'Playfair Display, serif', fontSize: '1.7rem', color: '#0f1b2d', marginBottom: 4 }}>
-          📅 Upcoming Events
+          <span style={titleRowStyle}><AppIcon name="calendar" size={25} /> Upcoming Events</span>
         </h2>
         <p style={{ color: '#718096', fontSize: '0.875rem' }}>Register for workshops, seminars, competitions, and more</p>
       </div>
@@ -246,7 +249,7 @@ export default function Events() {
         <InlineLoader text="Loading events..." />
       ) : (activeTab === 'mine' ? myEvents : events).length === 0 ? (
         <div className="empty-state">
-          <span className="empty-state-icon">📅</span>
+          <AppIcon name="calendar" size={48} className="empty-state-icon" />
           <h3 style={{ fontFamily: 'Playfair Display, serif', fontSize: '1.1rem', color: '#0f1b2d', marginBottom: 8 }}>
             {activeTab === 'mine' ? "You haven't registered for any events" : 'No events found'}
           </h3>
@@ -264,3 +267,15 @@ export default function Events() {
     </div>
   );
 }
+
+const metaRowStyle = {
+  display: 'inline-flex',
+  alignItems: 'center',
+  gap: 5
+};
+
+const titleRowStyle = {
+  display: 'inline-flex',
+  alignItems: 'center',
+  gap: 8
+};

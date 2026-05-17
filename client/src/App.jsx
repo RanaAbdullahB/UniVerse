@@ -20,7 +20,7 @@ import Dashboard from './pages/Dashboard';
 // Admin pages
 import AdminDashboard from './pages/Admin/AdminDashboard';
 
-// ✅ Define your theme
+// Define your theme
 const theme = {
   colors: {
     primary: '#0f1b2d',
@@ -31,7 +31,7 @@ const theme = {
 
 export default function App() {
   return (
-    <ThemeProvider > {/* ✅ WRAPPED HERE */}
+      <ThemeProvider>
       <BrowserRouter>
         <AuthProvider>
           <ToastProvider>

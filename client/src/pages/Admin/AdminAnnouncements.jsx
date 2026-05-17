@@ -3,12 +3,13 @@ import { useState, useEffect, useCallback } from 'react';
 import api from '../../utils/api';
 import { useToast } from '../../context/ToastContext';
 import { PageLoader } from '../../components/LoadingSpinner';
+import AppIcon from '../../components/AppIcon';
 
 const TYPE_CONFIG = {
-  info:    { bg: 'rgba(13,110,253,0.08)', border: 'rgba(13,110,253,0.2)', color: '#0d6efd', icon: 'ℹ️',  label: 'Info' },
-  warning: { bg: 'rgba(253,126,20,0.08)', border: 'rgba(253,126,20,0.25)', color: '#fd7e14', icon: '⚠️',  label: 'Warning' },
-  urgent:  { bg: 'rgba(220,53,69,0.08)',  border: 'rgba(220,53,69,0.25)',  color: '#dc3545', icon: '🚨',  label: 'Urgent' },
-  success: { bg: 'rgba(25,135,84,0.08)',  border: 'rgba(25,135,84,0.2)',   color: '#198754', icon: '✅',  label: 'Success' },
+  info:    { bg: 'rgba(13,110,253,0.08)', border: 'rgba(13,110,253,0.2)', color: '#0d6efd', icon: 'info',        label: 'Info' },
+  warning: { bg: 'rgba(253,126,20,0.08)', border: 'rgba(253,126,20,0.25)', color: '#fd7e14', icon: 'warning',     label: 'Warning' },
+  urgent:  { bg: 'rgba(220,53,69,0.08)',  border: 'rgba(220,53,69,0.25)',  color: '#dc3545', icon: 'megaphone',   label: 'Urgent' },
+  success: { bg: 'rgba(25,135,84,0.08)',  border: 'rgba(25,135,84,0.2)',   color: '#198754', icon: 'checkCircle', label: 'Success' },
 };
 
 const EMPTY_FORM = {
@@ -150,13 +151,13 @@ export default function AdminAnnouncements() {
       {/* Stat strip */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1rem', marginBottom: '1.75rem' }}>
         {[
-          { label: 'Total', value: stats.total, color: 'var(--blue-primary)', bg: 'rgba(13,110,253,0.08)', icon: '📢' },
-          { label: 'Active', value: stats.active, color: 'var(--success)', bg: 'rgba(25,135,84,0.08)', icon: '🟢' },
-          { label: 'Urgent', value: stats.urgent, color: 'var(--error)', bg: 'rgba(220,53,69,0.08)', icon: '🚨' },
-          { label: 'Emails Sent', value: stats.emailsSent, color: '#fd7e14', bg: 'rgba(253,126,20,0.08)', icon: '📧' },
+          { label: 'Total', value: stats.total, color: 'var(--blue-primary)', bg: 'rgba(13,110,253,0.08)', icon: 'megaphone' },
+          { label: 'Active', value: stats.active, color: 'var(--success)', bg: 'rgba(25,135,84,0.08)', icon: 'checkCircle' },
+          { label: 'Urgent', value: stats.urgent, color: 'var(--error)', bg: 'rgba(220,53,69,0.08)', icon: 'warning' },
+          { label: 'Emails Sent', value: stats.emailsSent, color: '#fd7e14', bg: 'rgba(253,126,20,0.08)', icon: 'mail' },
         ].map(s => (
           <div key={s.label} style={{ background: '#fff', borderRadius: '12px', padding: '1rem 1.25rem', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            <div style={{ width: 40, height: 40, borderRadius: '10px', background: s.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.25rem', flexShrink: 0 }}>{s.icon}</div>
+            <div style={{ width: 40, height: 40, borderRadius: '10px', background: s.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}><AppIcon name={s.icon} size={22} style={{ color: s.color }} /></div>
             <div>
               <div style={{ fontSize: '1.5rem', fontWeight: 700, color: s.color, fontFamily: 'Playfair Display, serif', lineHeight: 1 }}>{s.value}</div>
               <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.15rem' }}>{s.label}</div>
@@ -189,7 +190,7 @@ export default function AdminAnnouncements() {
       {/* List */}
       {filtered.length === 0 ? (
         <div style={{ textAlign: 'center', padding: '4rem 2rem', background: '#fff', borderRadius: '12px', border: '1px solid var(--border)' }}>
-          <div style={{ fontSize: '3rem', marginBottom: '0.75rem' }}>📢</div>
+          <AppIcon name="megaphone" size={48} style={{ marginBottom: '0.75rem', color: 'var(--text-muted)' }} />
           <p style={{ color: 'var(--text-muted)', margin: 0, fontWeight: 500 }}>No announcements found</p>
         </div>
       ) : (
@@ -212,7 +213,7 @@ export default function AdminAnnouncements() {
                 onMouseLeave={e => (e.currentTarget.style.boxShadow = 'none')}>
 
                 <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.875rem', flexWrap: 'wrap' }}>
-                  <span style={{ fontSize: '1.4rem', lineHeight: 1, flexShrink: 0 }}>{cfg.icon}</span>
+                  <AppIcon name={cfg.icon} size={22} style={{ color: cfg.color }} />
 
                   <div style={{ flex: 1, minWidth: 240 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '0.35rem' }}>
@@ -221,17 +222,17 @@ export default function AdminAnnouncements() {
                       </span>
                       {!isLive && (
                         <span style={{ background: 'var(--bg-page)', color: 'var(--text-muted)', padding: '0.15rem 0.55rem', borderRadius: '20px', fontSize: '0.7rem', fontWeight: 600, border: '1px solid var(--border)' }}>
-                          {isExpired ? '⏰ Expired' : '⏸ Inactive'}
+                          {isExpired ? 'Expired' : 'Inactive'}
                         </span>
                       )}
                       {a.targetAudience === 'department' && a.targetDepartment && (
                         <span style={{ background: 'var(--blue-tint)', color: 'var(--dark-accent)', padding: '0.15rem 0.55rem', borderRadius: '20px', fontSize: '0.7rem', fontWeight: 600 }}>
-                          🏛️ {a.targetDepartment}
+                          <span style={iconLabelStyle}><AppIcon name="building" size={12} /> {a.targetDepartment}</span>
                         </span>
                       )}
                       {a.emailSent && (
                         <span style={{ background: 'rgba(25,135,84,0.08)', color: 'var(--success)', padding: '0.15rem 0.55rem', borderRadius: '20px', fontSize: '0.7rem', fontWeight: 600 }}>
-                          📧 Email Sent
+                          <span style={iconLabelStyle}><AppIcon name="mail" size={12} /> Email Sent</span>
                         </span>
                       )}
                     </div>
@@ -244,9 +245,9 @@ export default function AdminAnnouncements() {
                     </p>
 
                     <div style={{ marginTop: '0.625rem', display: 'flex', gap: '1rem', fontSize: '0.72rem', color: 'var(--text-muted)' }}>
-                      <span>📅 {new Date(a.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
-                      {a.createdBy?.name && <span>👤 {a.createdBy.name}</span>}
-                      {a.expiresAt && <span>⏳ Expires {new Date(a.expiresAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>}
+                      <span style={iconLabelStyle}><AppIcon name="calendar" size={12} /> {new Date(a.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                      {a.createdBy?.name && <span style={iconLabelStyle}><AppIcon name="user" size={12} /> {a.createdBy.name}</span>}
+                      {a.expiresAt && <span style={iconLabelStyle}><AppIcon name="clock" size={12} /> Expires {new Date(a.expiresAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>}
                     </div>
                   </div>
 
@@ -310,10 +311,10 @@ export default function AdminAnnouncements() {
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                 <FormField label="Type">
                   <select value={form.type} onChange={e => setForm(f => ({ ...f, type: e.target.value }))} style={inputStyle}>
-                    <option value="info">ℹ️ Info</option>
-                    <option value="warning">⚠️ Warning</option>
-                    <option value="urgent">🚨 Urgent</option>
-                    <option value="success">✅ Success</option>
+                    <option value="info">Info</option>
+                    <option value="warning">Warning</option>
+                    <option value="urgent">Urgent</option>
+                    <option value="success">Success</option>
                   </select>
                 </FormField>
 
@@ -384,7 +385,7 @@ export default function AdminAnnouncements() {
               </button>
               <button onClick={handleSave} disabled={saving}
                 style={{ padding: '0.6rem 1.5rem', borderRadius: '8px', border: 'none', background: 'var(--blue-primary)', color: '#fff', cursor: saving ? 'not-allowed' : 'pointer', fontWeight: 600, fontSize: '0.875rem', opacity: saving ? 0.7 : 1 }}>
-                {saving ? 'Saving...' : editingId ? 'Update' : form.sendEmail ? '📢 Post + Send Email' : '📢 Post Announcement'}
+                {saving ? 'Saving...' : editingId ? 'Update' : form.sendEmail ? 'Post + Send Email' : 'Post Announcement'}
               </button>
             </div>
           </div>
@@ -397,7 +398,7 @@ export default function AdminAnnouncements() {
           onClick={() => !deleting && setDeleteId(null)}>
           <div style={{ background: '#fff', borderRadius: '16px', padding: '2rem', maxWidth: '400px', width: '100%', textAlign: 'center', boxShadow: '0 20px 60px rgba(1,8,24,0.25)' }}
             onClick={e => e.stopPropagation()}>
-            <div style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>🗑️</div>
+            <AppIcon name="trash" size={40} style={{ marginBottom: '1rem', color: 'var(--error)' }} />
             <h3 style={{ fontFamily: 'Playfair Display, serif', margin: '0 0 0.5rem', fontSize: '1.2rem' }}>Delete Announcement?</h3>
             <p style={{ color: 'var(--text-muted)', margin: '0 0 1.75rem', fontSize: '0.875rem', lineHeight: 1.6 }}>
               This announcement will be removed from the student portal immediately.
@@ -430,3 +431,4 @@ function FormField({ label, children }) {
 
 const selectStyle = { padding: '0.55rem 0.875rem', border: '1.5px solid var(--border)', borderRadius: '8px', fontSize: '0.875rem', background: '#fff', color: 'var(--text-primary)', cursor: 'pointer', outline: 'none', width: '100%' };
 const inputStyle  = { width: '100%', padding: '0.55rem 0.75rem', border: '1.5px solid var(--border)', borderRadius: '8px', fontSize: '0.875rem', outline: 'none', color: 'var(--text-primary)', background: '#fff', boxSizing: 'border-box' };
+const iconLabelStyle = { display: 'inline-flex', alignItems: 'center', gap: 4 };

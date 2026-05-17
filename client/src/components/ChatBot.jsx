@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import api from '../utils/api';
 import { useAuth } from '../context/AuthContext';
+import AppIcon from './AppIcon';
 
 const BOT_NAME = 'UniVerse Assistant';
 
@@ -58,7 +59,7 @@ export default function ChatBot({ activeTab }) {
       setMessages([{
         id: Date.now(),
         role: 'bot',
-        text: `Hello ${user?.name || 'there'}! 👋 I'm the UniVerse Assistant. I can help you navigate the portal.\n\nTry asking about **clubs**, **events**, **study groups**, or say **"tour"** for a full walkthrough!`,
+        text: `Hello ${user?.name || 'there'}! I'm the UniVerse Assistant. I can help you navigate the portal.\n\nTry asking about **clubs**, **events**, **study groups**, or say **"tour"** for a full walkthrough!`,
       }]);
       setSuggestions(['Give me a tour', 'How do I join a club?', 'Help']);
     }
@@ -137,7 +138,7 @@ export default function ChatBot({ activeTab }) {
             e.currentTarget.style.boxShadow = '0 4px 20px rgba(15,27,45,0.4)';
           }}
         >
-          🤖
+          <AppIcon name="bot" size={28} />
         </button>
       )}
 
@@ -174,7 +175,7 @@ export default function ChatBot({ activeTab }) {
               fontSize: '1.2rem',
               flexShrink: 0,
             }}>
-              🤖
+              <AppIcon name="bot" size={21} />
             </div>
             <div style={{ flex: 1 }}>
               <p style={{
@@ -210,7 +211,7 @@ export default function ChatBot({ activeTab }) {
               onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.2)'}
               onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.1)'}
             >
-              ✕
+              ×
             </button>
           </div>
 
@@ -382,7 +383,7 @@ export default function ChatBot({ activeTab }) {
                 flexShrink: 0,
               }}
             >
-              ➤
+              <AppIcon name="send" size={17} />
             </button>
           </form>
         </div>

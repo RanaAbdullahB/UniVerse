@@ -13,6 +13,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { QRCodeCanvas } from 'qrcode.react';
 import api from '../utils/api';
+import AppIcon from './AppIcon';
 
 export default function EventQRModal({ event, onClose }) {
   const [tab,        setTab]        = useState('qr');   // 'qr' | 'checkins'
@@ -26,7 +27,7 @@ export default function EventQRModal({ event, onClose }) {
   useEffect(() => {
     (async () => {
       try {
-        const { data } = await api.get(`/api/checkin/${event._id}/token`);
+        const { data } = await api.get(`/checkin/${event._id}/token`);
         if (data.success) setTokenData(data);
       } catch {
         // silent
@@ -42,7 +43,7 @@ export default function EventQRModal({ event, onClose }) {
     (async () => {
       setLoadingList(true);
       try {
-        const { data } = await api.get(`/api/checkin/${event._id}/list`);
+        const { data } = await api.get(`/checkin/${event._id}/list`);
         if (data.success) setCheckIns(data.checkIns);
       } catch {
         // silent
@@ -90,10 +91,10 @@ export default function EventQRModal({ event, onClose }) {
         {/* Header */}
         <div style={styles.header}>
           <div>
-            <h2 style={styles.title}>📲 {event.title}</h2>
+            <h2 style={styles.title}><AppIcon name="qr" size={19} /> {event.title}</h2>
             <p style={styles.sub}>QR Check-in System</p>
           </div>
-          <button onClick={onClose} style={styles.closeBtn}>✕</button>
+          <button onClick={onClose} style={styles.closeBtn}>×</button>
         </div>
 
         {/* Tabs */}
@@ -109,7 +110,10 @@ export default function EventQRModal({ event, onClose }) {
                 fontWeight:  tab === t ? 700 : 400
               }}
             >
-              {t === 'qr' ? '🔲 QR Code' : `✅ Check-ins (${checkIns.length || '…'})`}
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                <AppIcon name={t === 'qr' ? 'qr' : 'checkCircle'} size={15} />
+                {t === 'qr' ? 'QR Code' : `Check-ins (${checkIns.length || '...'})`}
+              </span>
             </button>
           ))}
         </div>
@@ -152,18 +156,18 @@ export default function EventQRModal({ event, onClose }) {
                 {/* Actions */}
                 <div style={styles.qrActions}>
                   <button onClick={downloadQR} style={styles.actionBtn}>
-                    ⬇️ Download QR
+                    <AppIcon name="download" size={16} /> Download QR
                   </button>
                   <button
                     onClick={() => navigator.clipboard.writeText(tokenData.checkInUrl)}
                     style={{ ...styles.actionBtn, background: 'var(--bg-page)', color: 'var(--text-body)' }}
                   >
-                    📋 Copy Link
+                    <AppIcon name="copy" size={16} /> Copy Link
                   </button>
                 </div>
 
                 <p style={{ ...styles.hint, marginTop: 16, fontSize: 12 }}>
-                  💡 Print this QR code and display it at the event entrance.
+                  Print this QR code and display it at the event entrance.
                 </p>
               </>
             ) : (
@@ -205,7 +209,7 @@ export default function EventQRModal({ event, onClose }) {
               </div>
             ) : checkIns.length === 0 ? (
               <div style={styles.emptyState}>
-                <div style={{ fontSize: 36, marginBottom: 8 }}>📭</div>
+                <AppIcon name="inbox" size={36} style={{ marginBottom: 8 }} />
                 <p>No check-ins yet. Share the QR code at the event entrance.</p>
               </div>
             ) : (
@@ -265,6 +269,9 @@ const styles = {
     padding:        '24px 24px 0'
   },
   title: {
+    display:        'flex',
+    alignItems:     'center',
+    gap:            8,
     fontFamily:     'Playfair Display, serif',
     fontSize:       18,
     fontWeight:     700,
@@ -348,7 +355,11 @@ const styles = {
     fontSize:       14,
     fontWeight:     600,
     cursor:         'pointer',
-    fontFamily:     'DM Sans, sans-serif'
+    fontFamily:     'DM Sans, sans-serif',
+    display:        'inline-flex',
+    alignItems:     'center',
+    justifyContent: 'center',
+    gap:            6
   },
   checkinsHeader: {
     display:        'flex',

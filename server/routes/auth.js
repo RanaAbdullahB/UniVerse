@@ -35,7 +35,7 @@ const formatUser = (user) => ({
 const sendResetEmail = async (toEmail, resetURL, userName) => {
   if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
     console.log('\n─────────────────────────────────────────────');
-    console.log('📧 PASSWORD RESET LINK (no email config found)');
+    console.log('PASSWORD RESET LINK (no email config found)');
     console.log(`   To: ${toEmail}`);
     console.log(`   Link: ${resetURL}`);
     console.log('─────────────────────────────────────────────\n');
@@ -51,7 +51,7 @@ const sendResetEmail = async (toEmail, resetURL, userName) => {
     subject: 'Password Reset Request — UniVerse',
     html: `
       <div style="font-family:Arial,sans-serif;max-width:520px;margin:0 auto;padding:32px;background:#f8f9fa;border-radius:12px;">
-        <h1 style="color:#010818;font-size:1.4rem;">🎓 UniVerse</h1>
+        <h1 style="color:#010818;font-size:1.4rem;">UniVerse</h1>
         <div style="background:#fff;border-radius:10px;padding:28px;border:1px solid #dee2e6;margin-top:16px;">
           <h2 style="color:#010818;font-size:1.1rem;">Hi ${userName},</h2>
           <p style="color:#333;line-height:1.6;">We received a request to reset your password. Click the button below:</p>

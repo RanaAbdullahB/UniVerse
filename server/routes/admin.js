@@ -177,18 +177,18 @@ router.post('/events', async (req, res, next) => {
         const html = `
           <div style="font-family: DM Sans, Arial, sans-serif; max-width: 580px; margin: 0 auto; background: #f8f9fa; padding: 20px;">
             <div style="background: linear-gradient(135deg, #010818, #1d2f6f); padding: 30px; border-radius: 12px 12px 0 0; text-align: center;">
-              <h1 style="color: #fff; font-size: 1.3rem; margin: 0;">📅 New Event on UniVerse</h1>
+              <h1 style="color: #fff; font-size: 1.3rem; margin: 0;">New Event on UniVerse</h1>
             </div>
             <div style="background: #fff; padding: 28px; border-radius: 0 0 12px 12px; border: 1px solid #dee2e6; border-top: none;">
               <span style="background: rgba(13,110,253,0.1); color: #0d6efd; padding: 3px 12px; border-radius: 20px; font-size: 0.78rem; font-weight: 700;">${event.eventType}</span>
               <h2 style="color: #010818; font-size: 1.3rem; margin: 12px 0 8px;">${event.title}</h2>
               <p style="color: #58555e; line-height: 1.7; margin: 0 0 16px;">${event.description || ''}</p>
               <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
-                <tr><td style="padding: 6px 0; color: #7e7e7e; font-size: 0.85rem; width: 110px;">📅 Date</td><td style="padding: 6px 0; font-weight: 600; font-size: 0.85rem;">${eventDate}</td></tr>
-                ${event.time ? `<tr><td style="padding: 6px 0; color: #7e7e7e; font-size: 0.85rem;">⏰ Time</td><td style="padding: 6px 0; font-weight: 600; font-size: 0.85rem;">${event.time}</td></tr>` : ''}
-                <tr><td style="padding: 6px 0; color: #7e7e7e; font-size: 0.85rem;">📍 Venue</td><td style="padding: 6px 0; font-weight: 600; font-size: 0.85rem;">${event.venue}</td></tr>
-                ${event.organizerName ? `<tr><td style="padding: 6px 0; color: #7e7e7e; font-size: 0.85rem;">🏛️ Organizer</td><td style="padding: 6px 0; font-weight: 600; font-size: 0.85rem;">${event.organizerName}</td></tr>` : ''}
-                ${event.maxCapacity ? `<tr><td style="padding: 6px 0; color: #7e7e7e; font-size: 0.85rem;">🎟️ Capacity</td><td style="padding: 6px 0; font-weight: 600; font-size: 0.85rem;">${event.maxCapacity} seats</td></tr>` : ''}
+                <tr><td style="padding: 6px 0; color: #7e7e7e; font-size: 0.85rem; width: 110px;">Date</td><td style="padding: 6px 0; font-weight: 600; font-size: 0.85rem;">${eventDate}</td></tr>
+                ${event.time ? `<tr><td style="padding: 6px 0; color: #7e7e7e; font-size: 0.85rem;">Time</td><td style="padding: 6px 0; font-weight: 600; font-size: 0.85rem;">${event.time}</td></tr>` : ''}
+                <tr><td style="padding: 6px 0; color: #7e7e7e; font-size: 0.85rem;">Venue</td><td style="padding: 6px 0; font-weight: 600; font-size: 0.85rem;">${event.venue}</td></tr>
+                ${event.organizerName ? `<tr><td style="padding: 6px 0; color: #7e7e7e; font-size: 0.85rem;">Organizer</td><td style="padding: 6px 0; font-weight: 600; font-size: 0.85rem;">${event.organizerName}</td></tr>` : ''}
+                ${event.maxCapacity ? `<tr><td style="padding: 6px 0; color: #7e7e7e; font-size: 0.85rem;">Capacity</td><td style="padding: 6px 0; font-weight: 600; font-size: 0.85rem;">${event.maxCapacity} seats</td></tr>` : ''}
               </table>
               <a href="${process.env.CLIENT_URL || 'http://localhost:3000'}" style="display: inline-block; background: #0d6efd; color: #fff; padding: 10px 24px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 0.875rem;">
                 Register on UniVerse →
@@ -205,11 +205,11 @@ router.post('/events', async (req, res, next) => {
           await transporter.sendMail({
             from: `"UniVerse LGU" <${process.env.EMAIL_USER}>`,
             bcc: chunk,
-            subject: `📅 New Event: ${event.title} — ${eventDate}`,
+            subject: `New Event: ${event.title} — ${eventDate}`,
             html,
           });
         }
-        console.log(`📧 Event email sent to ${emailList.length} students`);
+        console.log(`Event email sent to ${emailList.length} students`);
       } catch (emailErr) {
         // Don't fail the request if email fails
         console.error('Event email error:', emailErr.message);
@@ -367,7 +367,7 @@ async function logActivity(req, action, targetType, targetId, targetName, detail
 // ── Helper: send announcement email ─────────────────────────
 async function sendAnnouncementEmail(announcement, recipients) {
   if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-    console.log('📧 Email not configured — announcement email skipped');
+    console.log('Email not configured — announcement email skipped');
     return false;
   }
   try {
@@ -376,7 +376,6 @@ async function sendAnnouncementEmail(announcement, recipients) {
       auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS },
     });
 
-    const typeEmoji = { info: 'ℹ️', warning: '⚠️', urgent: '🚨', success: '✅' };
     const typeColor = { info: '#0d6efd', warning: '#fd7e14', urgent: '#dc3545', success: '#198754' };
 
     const html = `
@@ -387,11 +386,11 @@ async function sendAnnouncementEmail(announcement, recipients) {
         </div>
         <div style="background: #fff; padding: 30px; border-radius: 0 0 12px 12px; border: 1px solid #dee2e6; border-top: none;">
           <div style="display: inline-block; background: ${typeColor[announcement.type]}18; color: ${typeColor[announcement.type]}; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; margin-bottom: 16px; border: 1px solid ${typeColor[announcement.type]}40;">
-            ${typeEmoji[announcement.type]} ${announcement.type.charAt(0).toUpperCase() + announcement.type.slice(1)} Announcement
+            ${announcement.type.charAt(0).toUpperCase() + announcement.type.slice(1)} Announcement
           </div>
           <h2 style="color: #010818; font-size: 1.3rem; margin: 0 0 12px;">${announcement.title}</h2>
           <p style="color: #58555e; line-height: 1.7; margin: 0 0 24px; font-size: 0.95rem;">${announcement.message.replace(/\n/g, '<br>')}</p>
-          ${announcement.expiresAt ? `<p style="color: #7e7e7e; font-size: 0.8rem;">⏳ This announcement expires on ${new Date(announcement.expiresAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</p>` : ''}
+          ${announcement.expiresAt ? `<p style="color: #7e7e7e; font-size: 0.8rem;">This announcement expires on ${new Date(announcement.expiresAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</p>` : ''}
           <hr style="border: none; border-top: 1px solid #dee2e6; margin: 20px 0;" />
           <p style="color: #7e7e7e; font-size: 0.8rem; text-align: center; margin: 0;">
             You received this email as a registered student of Lahore Garrison University.<br>

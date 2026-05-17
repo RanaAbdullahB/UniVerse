@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useCallback } from 'react';
+import AppIcon from '../components/AppIcon';
 
 const ToastContext = createContext(null);
 
@@ -30,10 +31,10 @@ export const useToast = () => {
 };
 
 const icons = {
-  success: '✓',
-  error: '✕',
-  warning: '⚠',
-  info: 'ℹ',
+  success: 'checkCircle',
+  error: 'alert',
+  warning: 'warning',
+  info: 'info',
 };
 
 const colors = {
@@ -64,9 +65,7 @@ const ToastContainer = ({ toasts, onRemove }) => (
             boxShadow: '0 4px 16px rgba(0,0,0,0.12)',
           }}
         >
-          <span style={{ color: c.icon, fontWeight: 700, fontSize: '1rem', flexShrink: 0 }}>
-            {icons[toast.type]}
-          </span>
+          <AppIcon name={icons[toast.type]} size={17} style={{ color: c.icon }} />
           <span style={{ color: c.text, fontSize: '0.875rem', fontWeight: 500, flex: 1 }}>
             {toast.message}
           </span>

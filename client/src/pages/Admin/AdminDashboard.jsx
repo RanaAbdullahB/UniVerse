@@ -9,15 +9,16 @@ import AdminEvents         from './AdminEvents';
 import AdminStudyGroups    from './AdminStudyGroups';
 import AdminAnnouncements  from './AdminAnnouncements';
 import AdminActivityLog    from './AdminActivityLog';
+import AppIcon from '../../components/AppIcon';
 
 const TABS = [
-  { id: 'overview',      label: 'Overview',       icon: '📊' },
-  { id: 'users',         label: 'Users',           icon: '👥' },
-  { id: 'clubs',         label: 'Clubs',           icon: '🏛️' },
-  { id: 'events',        label: 'Events',          icon: '📅' },
-  { id: 'studyGroups',   label: 'Study Groups',    icon: '📚' },
-  { id: 'announcements', label: 'Announcements',   icon: '📢' },
-  { id: 'activityLog',   label: 'Activity Log',    icon: '📋' },
+  { id: 'overview',      label: 'Overview',       icon: 'analytics' },
+  { id: 'users',         label: 'Users',           icon: 'users' },
+  { id: 'clubs',         label: 'Clubs',           icon: 'landmark' },
+  { id: 'events',        label: 'Events',          icon: 'calendar' },
+  { id: 'studyGroups',   label: 'Study Groups',    icon: 'book' },
+  { id: 'announcements', label: 'Announcements',   icon: 'megaphone' },
+  { id: 'activityLog',   label: 'Activity Log',    icon: 'clipboard' },
 ];
 
 export default function AdminDashboard() {
@@ -63,7 +64,7 @@ export default function AdminDashboard() {
                 onMouseEnter={e => { if (!isActive) { e.currentTarget.style.background = 'rgba(255,255,255,0.07)'; e.currentTarget.style.color = '#fff'; } }}
                 onMouseLeave={e => { if (!isActive) { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'rgba(255,255,255,0.55)'; } }}>
                 {isActive && <div style={{ position: 'absolute', left: 0, top: '20%', bottom: '20%', width: 3, borderRadius: '0 2px 2px 0', background: 'var(--blue-primary)' }} />}
-                <span style={{ fontSize: '1rem', lineHeight: 1, flexShrink: 0 }}>{tab.icon}</span>
+                <AppIcon name={tab.icon} size={17} />
                 <span>{tab.label}</span>
               </button>
             );
@@ -88,7 +89,7 @@ export default function AdminDashboard() {
       <main style={{ marginLeft: 240, flex: 1, minWidth: 0, padding: '2rem' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.75rem', flexWrap: 'wrap', gap: '0.75rem' }}>
           <div>
-            <h1 style={{ fontFamily: 'Playfair Display, serif', fontSize: '1.75rem', fontWeight: 700, color: 'var(--dark-primary)', margin: 0, lineHeight: 1.2 }}>{currentTab?.icon} {currentTab?.label}</h1>
+            <h1 style={{ fontFamily: 'Playfair Display, serif', fontSize: '1.75rem', fontWeight: 700, color: 'var(--dark-primary)', margin: 0, lineHeight: 1.2, display: 'flex', alignItems: 'center', gap: 10 }}><AppIcon name={currentTab?.icon} size={26} /> {currentTab?.label}</h1>
             <p style={{ color: 'var(--text-muted)', margin: '0.3rem 0 0', fontSize: '0.82rem' }}>Lahore Garrison University — Admin Portal</p>
           </div>
           <div style={{ background: '#fff', borderRadius: '8px', padding: '0.5rem 0.875rem', border: '1px solid var(--border)', fontSize: '0.78rem', color: 'var(--text-muted)', alignSelf: 'flex-end' }}>

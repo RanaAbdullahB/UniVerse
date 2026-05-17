@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../utils/api';
 import { Spinner } from '../components/LoadingSpinner';
+import AppIcon from '../components/AppIcon';
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState('');
@@ -48,7 +49,7 @@ export default function ForgotPassword() {
           {/* Success state */}
           {submitted ? (
             <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: '3rem', marginBottom: 16 }}>📧</div>
+              <AppIcon name="mail" size={48} style={{ marginBottom: 16, color: 'var(--blue-primary)' }} />
               <h3 style={{ fontFamily: 'Playfair Display, serif', fontSize: '1.2rem', color: 'var(--dark-primary)', marginBottom: 10 }}>
                 Check your inbox
               </h3>
@@ -60,7 +61,7 @@ export default function ForgotPassword() {
                 borderRadius: 8, padding: '12px 14px', margin: '16px 0',
                 fontSize: '0.8rem', color: 'var(--dark-accent)', lineHeight: 1.5,
               }}>
-                ⏱ The link expires in <strong>15 minutes</strong>.<br />
+                The link expires in <strong>15 minutes</strong>.<br />
                 Don't see it? Check your spam folder.
               </div>
 
@@ -70,7 +71,7 @@ export default function ForgotPassword() {
                 borderRadius: 8, padding: '10px 14px', margin: '12px 0',
                 fontSize: '0.78rem', color: 'rgb(102, 77, 3)',
               }}>
-                💡 <strong>Development tip:</strong> If email is not configured, check your <strong>server terminal</strong> — the reset link is printed there.
+                <AppIcon name="lightbulb" size={15} /> <strong>Development tip:</strong> If email is not configured, check your <strong>server terminal</strong> — the reset link is printed there.
               </div>
 
               <Link to="/login" style={{
@@ -89,7 +90,7 @@ export default function ForgotPassword() {
                   borderRadius: 8, padding: '11px 14px', marginBottom: 20,
                   color: 'var(--error)', fontSize: '0.85rem',
                 }}>
-                  ⚠️ {error}
+                  <AppIcon name="warning" size={16} /> {error}
                 </div>
               )}
 
@@ -115,7 +116,7 @@ export default function ForgotPassword() {
                 >
                   {loading
                     ? <><Spinner size={16} color="#fff" /> Sending link...</>
-                    : '📧 Send Reset Link'
+                    : <><AppIcon name="mail" size={16} /> Send Reset Link</>
                   }
                 </button>
               </form>

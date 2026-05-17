@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { io } from 'socket.io-client';
 import api from '../utils/api';
 import { useAuth } from '../context/AuthContext';
+import AppIcon from '../components/AppIcon';
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -510,7 +511,7 @@ export default function Messages() {
               title="New message"
               style={styles.newDmBtn}
             >
-              ✏️
+              <AppIcon name="pencil" size={17} />
             </button>
           </div>
 
@@ -556,10 +557,10 @@ export default function Messages() {
             <div style={styles.emptyState}>Loading conversations…</div>
           ) : conversations.length === 0 ? (
             <div style={styles.emptyState}>
-              <div style={{ fontSize: 36, marginBottom: 8 }}>💬</div>
+              <AppIcon name="message" size={36} style={{ marginBottom: 8 }} />
               <div style={{ fontWeight: 600, marginBottom: 4 }}>No conversations yet</div>
               <div style={{ color: 'var(--text-muted)', fontSize: 13 }}>
-                Click ✏️ to message a student
+                Click the compose button to message a student
               </div>
             </div>
           ) : (
@@ -613,12 +614,12 @@ export default function Messages() {
         {/* No conversation selected */}
         {!activeConvo ? (
           <div style={styles.noChatState}>
-            <div style={{ fontSize: 56, marginBottom: 16 }}>💬</div>
+            <AppIcon name="message" size={56} style={{ marginBottom: 16, color: 'var(--text-muted)' }} />
             <h3 style={{ fontFamily: 'Playfair Display, serif', marginBottom: 8 }}>
               Your Messages
             </h3>
             <p style={{ color: 'var(--text-muted)', maxWidth: 300, textAlign: 'center' }}>
-              Select a conversation on the left, or click ✏️ to start a new one.
+              Select a conversation on the left, or click the compose button to start a new one.
             </p>
           </div>
         ) : (
@@ -663,7 +664,7 @@ export default function Messages() {
               {/* Empty state */}
               {!loadingMessages && messages.length === 0 && (
                 <div style={styles.emptyChat}>
-                  <div style={{ fontSize: 32, marginBottom: 8 }}>👋</div>
+                  <AppIcon name="message" size={32} style={{ marginBottom: 8 }} />
                   <div>Say hello! This is the beginning of your conversation.</div>
                 </div>
               )}
@@ -719,13 +720,13 @@ export default function Messages() {
                       }}>
                         {formatTime(item.createdAt)}
                         {isMine && isOptimistic && (
-                          <span title="Sending…" style={{ marginLeft: 4 }}>⏳</span>
+                          <span title="Sending..." style={{ marginLeft: 4 }}>Sending</span>
                         )}
                         {isMine && !isOptimistic && item.readAt && (
-                          <span title="Seen" style={{ marginLeft: 4 }}>✓✓</span>
+                          <span title="Seen" style={{ marginLeft: 4 }}>Seen</span>
                         )}
                         {isMine && !isOptimistic && !item.readAt && (
-                          <span title="Delivered" style={{ marginLeft: 4 }}>✓</span>
+                          <span title="Delivered" style={{ marginLeft: 4 }}>Delivered</span>
                         )}
                       </div>
                     </div>
@@ -774,7 +775,7 @@ export default function Messages() {
                   cursor:  draft.trim() && !sending ? 'pointer' : 'default'
                 }}
               >
-                {sending ? '…' : '➤'}
+                {sending ? '...' : <AppIcon name="send" size={17} />}
               </button>
             </div>
           </>

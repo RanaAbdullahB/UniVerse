@@ -3,17 +3,18 @@ import { useState, useEffect, useCallback } from 'react';
 import api from '../../utils/api';
 import { PageLoader, InlineLoader } from '../../components/LoadingSpinner';
 import { useToast } from '../../context/ToastContext';
+import AppIcon from '../../components/AppIcon';
 
 const ACTION_CONFIG = {
-  CREATE:    { color: '#198754', bg: 'rgba(25,135,84,0.08)',   border: 'rgba(25,135,84,0.2)',   icon: '➕', label: 'Created' },
-  UPDATE:    { color: '#0d6efd', bg: 'rgba(13,110,253,0.08)',  border: 'rgba(13,110,253,0.2)',  icon: '✏️', label: 'Updated' },
-  DELETE:    { color: '#dc3545', bg: 'rgba(220,53,69,0.08)',   border: 'rgba(220,53,69,0.2)',   icon: '🗑️', label: 'Deleted' },
-  PROMOTE:   { color: '#6f42c1', bg: 'rgba(111,66,193,0.08)', border: 'rgba(111,66,193,0.2)',  icon: '⬆️', label: 'Promoted' },
-  DEMOTE:    { color: '#fd7e14', bg: 'rgba(253,126,20,0.08)',  border: 'rgba(253,126,20,0.2)',  icon: '⬇️', label: 'Demoted' },
-  BROADCAST: { color: '#0dcaf0', bg: 'rgba(13,202,240,0.08)',  border: 'rgba(13,202,240,0.2)',  icon: '📢', label: 'Announced' },
+  CREATE:    { color: '#198754', bg: 'rgba(25,135,84,0.08)',   border: 'rgba(25,135,84,0.2)',   icon: 'plus',       label: 'Created' },
+  UPDATE:    { color: '#0d6efd', bg: 'rgba(13,110,253,0.08)',  border: 'rgba(13,110,253,0.2)',  icon: 'pencil',     label: 'Updated' },
+  DELETE:    { color: '#dc3545', bg: 'rgba(220,53,69,0.08)',   border: 'rgba(220,53,69,0.2)',   icon: 'trash',      label: 'Deleted' },
+  PROMOTE:   { color: '#6f42c1', bg: 'rgba(111,66,193,0.08)', border: 'rgba(111,66,193,0.2)',  icon: 'arrowRight', label: 'Promoted' },
+  DEMOTE:    { color: '#fd7e14', bg: 'rgba(253,126,20,0.08)',  border: 'rgba(253,126,20,0.2)',  icon: 'arrowRight', label: 'Demoted' },
+  BROADCAST: { color: '#0dcaf0', bg: 'rgba(13,202,240,0.08)',  border: 'rgba(13,202,240,0.2)',  icon: 'megaphone',  label: 'Announced' },
 };
 
-const TARGET_ICONS = { User: '👤', Club: '🏛️', Event: '📅', StudyGroup: '📚', Announcement: '📢' };
+const TARGET_ICONS = { User: 'user', Club: 'landmark', Event: 'calendar', StudyGroup: 'book', Announcement: 'megaphone' };
 
 function timeAgo(dateStr) {
   const diff = Math.floor((Date.now() - new Date(dateStr)) / 1000);
@@ -80,13 +81,13 @@ export default function AdminActivityLog() {
       {/* Stats strip */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1rem', marginBottom: '1.75rem' }}>
         {[
-          { label: 'Total Actions', value: summaryStats.total, color: 'var(--blue-primary)', bg: 'rgba(13,110,253,0.08)', icon: '📋' },
-          { label: 'Today', value: summaryStats.today, color: 'var(--dark-accent)', bg: 'rgba(29,47,111,0.08)', icon: '📅' },
-          { label: 'Created', value: summaryStats.creates, color: 'var(--success)', bg: 'rgba(25,135,84,0.08)', icon: '➕' },
-          { label: 'Deleted', value: summaryStats.deletes, color: 'var(--error)', bg: 'rgba(220,53,69,0.08)', icon: '🗑️' },
+          { label: 'Total Actions', value: summaryStats.total, color: 'var(--blue-primary)', bg: 'rgba(13,110,253,0.08)', icon: 'clipboard' },
+          { label: 'Today', value: summaryStats.today, color: 'var(--dark-accent)', bg: 'rgba(29,47,111,0.08)', icon: 'calendar' },
+          { label: 'Created', value: summaryStats.creates, color: 'var(--success)', bg: 'rgba(25,135,84,0.08)', icon: 'plus' },
+          { label: 'Deleted', value: summaryStats.deletes, color: 'var(--error)', bg: 'rgba(220,53,69,0.08)', icon: 'trash' },
         ].map(s => (
           <div key={s.label} style={{ background: '#fff', borderRadius: '12px', padding: '1rem 1.25rem', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            <div style={{ width: 40, height: 40, borderRadius: '10px', background: s.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.25rem', flexShrink: 0 }}>{s.icon}</div>
+            <div style={{ width: 40, height: 40, borderRadius: '10px', background: s.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}><AppIcon name={s.icon} size={22} style={{ color: s.color }} /></div>
             <div>
               <div style={{ fontSize: '1.5rem', fontWeight: 700, color: s.color, fontFamily: 'Playfair Display, serif', lineHeight: 1 }}>{s.value}</div>
               <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.15rem' }}>{s.label}</div>
@@ -100,18 +101,18 @@ export default function AdminActivityLog() {
         <select value={filterAction} onChange={e => setFilterAction(e.target.value)} style={selectStyle}>
           <option value="">All Actions</option>
           {Object.entries(ACTION_CONFIG).map(([k, v]) => (
-            <option key={k} value={k}>{v.icon} {v.label}</option>
+            <option key={k} value={k}>{v.label}</option>
           ))}
         </select>
         <select value={filterTarget} onChange={e => setFilterTarget(e.target.value)} style={selectStyle}>
           <option value="">All Resources</option>
           {Object.keys(TARGET_ICONS).map(t => (
-            <option key={t} value={t}>{TARGET_ICONS[t]} {t}</option>
+            <option key={t} value={t}>{t}</option>
           ))}
         </select>
         <button onClick={() => fetchLogs(1)}
           style={{ padding: '0.55rem 1rem', borderRadius: '8px', border: '1.5px solid var(--border)', background: '#fff', cursor: 'pointer', fontSize: '0.82rem', color: 'var(--text-body)', fontWeight: 500 }}>
-          🔄 Refresh
+          Refresh
         </button>
         {pagination && (
           <span style={{ marginLeft: 'auto', fontSize: '0.78rem', color: 'var(--text-muted)' }}>
@@ -123,7 +124,7 @@ export default function AdminActivityLog() {
       {/* Log entries grouped by date */}
       {logs.length === 0 ? (
         <div style={{ textAlign: 'center', padding: '4rem 2rem', background: '#fff', borderRadius: '12px', border: '1px solid var(--border)' }}>
-          <div style={{ fontSize: '3rem', marginBottom: '0.75rem' }}>📋</div>
+          <AppIcon name="clipboard" size={48} style={{ marginBottom: '0.75rem', color: 'var(--text-muted)' }} />
           <p style={{ color: 'var(--text-muted)', margin: 0, fontWeight: 500 }}>No activity recorded yet</p>
           <p style={{ color: 'var(--text-muted)', fontSize: '0.82rem', margin: '0.25rem 0 0' }}>Actions taken by admins will appear here</p>
         </div>
@@ -152,7 +153,7 @@ export default function AdminActivityLog() {
 
                       {/* Action badge */}
                       <div style={{ width: 38, height: 38, borderRadius: '10px', background: ac.bg, border: `1px solid ${ac.border}`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.1rem', flexShrink: 0 }}>
-                        {ac.icon}
+                        <AppIcon name={ac.icon} size={20} style={{ color: ac.color }} />
                       </div>
 
                       {/* Content */}
@@ -166,7 +167,7 @@ export default function AdminActivityLog() {
                           </span>
                           {log.targetType && (
                             <span style={{ color: 'var(--text-muted)', fontSize: '0.82rem' }}>
-                              {TARGET_ICONS[log.targetType] || ''} {log.targetType}
+                              <span style={iconLabelStyle}><AppIcon name={TARGET_ICONS[log.targetType]} size={13} /> {log.targetType}</span>
                             </span>
                           )}
                           {log.targetName && (
@@ -215,3 +216,4 @@ export default function AdminActivityLog() {
 }
 
 const selectStyle = { padding: '0.55rem 0.875rem', border: '1.5px solid var(--border)', borderRadius: '8px', fontSize: '0.875rem', background: '#fff', color: 'var(--text-primary)', cursor: 'pointer', outline: 'none' };
+const iconLabelStyle = { display: 'inline-flex', alignItems: 'center', gap: 4 };

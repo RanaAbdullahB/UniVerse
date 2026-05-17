@@ -15,14 +15,14 @@ const DOMAIN = process.env.UNIVERSITY_EMAIL_DOMAIN || 'cs.lgu.edu.pk';
 const seedData = async () => {
   try {
     await mongoose.connect(MONGO_URI);
-    console.log('✅ Connected to MongoDB');
+    console.log('Connected to MongoDB');
 
     // Clear existing data
     await User.deleteMany({});
     await Club.deleteMany({});
     await Event.deleteMany({});
     await StudyGroup.deleteMany({});
-    console.log('🗑️  Cleared existing data');
+    console.log('Cleared existing data');
 
     // Create users
     const hashedPassword = await bcrypt.hash('password123', 12);
@@ -47,7 +47,7 @@ const seedData = async () => {
       role: 'student',
     });
 
-    console.log('👥 Created 2 users');
+    console.log('Created 2 users');
 
     // Create clubs
     const clubs = await Club.insertMany([
@@ -108,7 +108,7 @@ const seedData = async () => {
       },
     ]);
 
-    console.log('🏛️  Created 5 clubs');
+    console.log('Created 5 clubs');
 
     // Update student's joined clubs
     await User.findByIdAndUpdate(studentUser._id, { joinedClubs: [clubs[0]._id] });
@@ -210,7 +210,7 @@ const seedData = async () => {
       },
     ]);
 
-    console.log('📅 Created 6 events');
+    console.log('Created 6 events');
 
     // Update student's registered events
     await User.findByIdAndUpdate(studentUser._id, { registeredEvents: [events[0]._id] });
@@ -291,25 +291,25 @@ const seedData = async () => {
       },
     ]);
 
-    console.log('📚 Created 4 study groups');
+    console.log('Created 4 study groups');
 
     // Update student's joined groups
     await User.findByIdAndUpdate(studentUser._id, {
       joinedStudyGroups: [studyGroups[0]._id, studyGroups[1]._id],
     });
 
-    console.log('\n✨ Seed completed successfully!\n');
+    console.log('\nSeed completed successfully!\n');
     console.log('═══════════════════════════════════════');
     console.log('  SAMPLE LOGIN CREDENTIALS');
     console.log('═══════════════════════════════════════');
-    console.log(`  👨‍💼 Admin:   admin@${DOMAIN}`);
-    console.log(`  👨‍🎓 Student: alex.johnson@${DOMAIN}`);
-    console.log('  🔑 Password: password123 (both)');
+    console.log(`  Admin:   admin@${DOMAIN}`);
+    console.log(`  Student: alex.johnson@${DOMAIN}`);
+    console.log('  Password: password123 (both)');
     console.log('═══════════════════════════════════════\n');
 
     process.exit(0);
   } catch (error) {
-    console.error('❌ Seed error:', error);
+    console.error('Seed error:', error);
     process.exit(1);
   }
 };

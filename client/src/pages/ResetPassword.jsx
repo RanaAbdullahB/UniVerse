@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import api from '../utils/api';
 import { Spinner } from '../components/LoadingSpinner';
+import AppIcon from '../components/AppIcon';
 
 export default function ResetPassword() {
   const { token } = useParams();
@@ -83,7 +84,7 @@ export default function ResetPassword() {
     return (
       <div style={{ minHeight: '100vh', background: 'var(--bg-page)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}>
         <div style={{ textAlign: 'center', maxWidth: 400 }} className="animate-fade-in">
-          <div style={{ fontSize: '3.5rem', marginBottom: 16 }}>⏰</div>
+          <AppIcon name="clock" size={56} style={{ marginBottom: 16, color: 'var(--text-muted)' }} />
           <h2 style={{ fontFamily: 'Playfair Display, serif', fontSize: '1.5rem', color: 'var(--dark-primary)', marginBottom: 10 }}>
             Link Expired or Invalid
           </h2>
@@ -106,7 +107,7 @@ export default function ResetPassword() {
     return (
       <div style={{ minHeight: '100vh', background: 'var(--bg-page)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}>
         <div style={{ textAlign: 'center', maxWidth: 400 }} className="animate-fade-in">
-          <div style={{ fontSize: '3.5rem', marginBottom: 16 }}>✅</div>
+          <AppIcon name="checkCircle" size={56} style={{ marginBottom: 16, color: 'var(--success)' }} />
           <h2 style={{ fontFamily: 'Playfair Display, serif', fontSize: '1.5rem', color: 'var(--dark-primary)', marginBottom: 10 }}>
             Password Reset!
           </h2>
@@ -149,7 +150,7 @@ export default function ResetPassword() {
               borderRadius: 8, padding: '11px 14px', marginBottom: 20,
               color: 'var(--error)', fontSize: '0.85rem',
             }}>
-              ⚠️ {errors.api}
+              <AppIcon name="warning" size={16} /> {errors.api}
             </div>
           )}
 
@@ -166,7 +167,7 @@ export default function ResetPassword() {
                 autoFocus
               />
               {errors.newPassword && (
-                <p style={{ color: 'var(--error)', fontSize: '0.75rem', marginTop: 4 }}>⚠ {errors.newPassword}</p>
+                <p style={{ color: 'var(--error)', fontSize: '0.75rem', marginTop: 4 }}>Warning: {errors.newPassword}</p>
               )}
             </div>
 
@@ -181,7 +182,7 @@ export default function ResetPassword() {
                 className={`input-field ${errors.confirmPassword ? 'error' : ''}`}
               />
               {errors.confirmPassword && (
-                <p style={{ color: 'var(--error)', fontSize: '0.75rem', marginTop: 4 }}>⚠ {errors.confirmPassword}</p>
+                <p style={{ color: 'var(--error)', fontSize: '0.75rem', marginTop: 4 }}>Warning: {errors.confirmPassword}</p>
               )}
             </div>
 
@@ -194,10 +195,10 @@ export default function ResetPassword() {
                 color: form.newPassword.length >= 8 ? 'var(--success-dark)' : 'var(--dark-accent)',
               }}>
                 {form.newPassword.length < 6
-                  ? '❌ Too short — minimum 6 characters'
+                  ? 'Too short — minimum 6 characters'
                   : form.newPassword.length < 8
-                  ? '⚠️ Acceptable — 8+ characters recommended'
-                  : '✅ Strong password'}
+                  ? 'Acceptable — 8+ characters recommended'
+                  : 'Strong password'}
               </div>
             )}
 
@@ -209,7 +210,7 @@ export default function ResetPassword() {
             >
               {loading
                 ? <><Spinner size={16} color="#fff" /> Resetting...</>
-                : '🔑 Reset Password'
+                : <><AppIcon name="key" size={16} /> Reset Password</>
               }
             </button>
           </form>

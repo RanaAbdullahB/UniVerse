@@ -6,6 +6,7 @@ import { useState, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import api from '../utils/api';
+import AppIcon from '../components/AppIcon';
 
 const DEPARTMENTS = [
   'Computer Science', 'Software Engineering', 'Electrical Engineering',
@@ -122,7 +123,7 @@ export default function Profile() {
       {/* ── Avatar Section ── */}
       <div style={{ background: '#fff', borderRadius: 14, border: '1px solid rgb(222,226,230)', padding: '24px', marginBottom: 20, boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
         <h3 style={{ fontFamily: 'Playfair Display, serif', fontSize: '1.05rem', color: 'rgb(1,8,24)', marginBottom: 20 }}>
-          📷 Profile Photo
+          <span style={headingIconStyle}><AppIcon name="image" size={18} /> Profile Photo</span>
         </h3>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 20, flexWrap: 'wrap' }}>
@@ -141,7 +142,7 @@ export default function Profile() {
             <button
               onClick={() => fileInputRef.current?.click()}
               style={{ position: 'absolute', bottom: 0, right: 0, width: 26, height: 26, borderRadius: '50%', background: 'rgb(13,110,253)', border: '2px solid #fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.7rem' }}>
-              📷
+              <AppIcon name="image" size={13} />
             </button>
           </div>
 
@@ -154,12 +155,12 @@ export default function Profile() {
             {photoFile ? (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 <p style={{ fontSize: '0.78rem', color: 'rgb(88,85,94)', margin: 0 }}>
-                  📎 <strong>{photoFile.name}</strong> — ready to upload
+                  <AppIcon name="paperclip" size={14} /> <strong>{photoFile.name}</strong> — ready to upload
                 </p>
                 <div style={{ display: 'flex', gap: 8 }}>
                   <button onClick={handlePhotoUpload} disabled={photoUploading}
                     style={{ padding: '7px 16px', borderRadius: 7, border: 'none', background: 'rgb(13,110,253)', color: '#fff', cursor: photoUploading ? 'not-allowed' : 'pointer', fontSize: '0.8rem', fontWeight: 600, opacity: photoUploading ? 0.7 : 1 }}>
-                    {photoUploading ? 'Uploading...' : '⬆️ Upload'}
+                    {photoUploading ? 'Uploading...' : <><AppIcon name="upload" size={14} /> Upload</>}
                   </button>
                   <button onClick={cancelPreview}
                     style={{ padding: '7px 14px', borderRadius: 7, border: '1.5px solid rgb(222,226,230)', background: 'transparent', cursor: 'pointer', fontSize: '0.8rem', color: 'rgb(88,85,94)' }}>
@@ -193,7 +194,7 @@ export default function Profile() {
       {/* ── Profile Info ── */}
       <div style={{ background: '#fff', borderRadius: 14, border: '1px solid rgb(222,226,230)', padding: '24px', marginBottom: 20, boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
         <h3 style={{ fontFamily: 'Playfair Display, serif', fontSize: '1.05rem', color: 'rgb(1,8,24)', marginBottom: 20 }}>
-          👤 Personal Information
+          <span style={headingIconStyle}><AppIcon name="user" size={18} /> Personal Information</span>
         </h3>
 
         {/* Read-only badges */}
@@ -201,7 +202,7 @@ export default function Profile() {
           {[
             { label: 'Email',      value: user?.universityEmail },
             { label: 'Student ID', value: user?.studentId },
-            { label: 'Role',       value: user?.role === 'admin' ? '👑 Admin' : '🎓 Student' },
+            { label: 'Role',       value: user?.role === 'admin' ? 'Admin' : 'Student' },
           ].map(({ label, value }) => (
             <div key={label} style={{ background: 'rgb(248,249,250)', borderRadius: 8, padding: '6px 12px', border: '1px solid rgb(222,226,230)' }}>
               <div style={{ fontSize: '0.65rem', fontWeight: 600, color: 'rgb(126,126,126)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{label}</div>
@@ -242,7 +243,7 @@ export default function Profile() {
       {/* ── Change Password ── */}
       <div style={{ background: '#fff', borderRadius: 14, border: '1px solid rgb(222,226,230)', padding: '24px', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
         <h3 style={{ fontFamily: 'Playfair Display, serif', fontSize: '1.05rem', color: 'rgb(1,8,24)', marginBottom: 20 }}>
-          🔒 Change Password
+          <span style={headingIconStyle}><AppIcon name="lock" size={18} /> Change Password</span>
         </h3>
 
         <form onSubmit={handlePasswordChange} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
@@ -263,7 +264,7 @@ export default function Profile() {
                 <button type="button"
                   onClick={() => setShowPasswords(p => ({ ...p, [show]: !p[show] }))}
                   style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.9rem', color: 'rgb(126,126,126)' }}>
-                  {showPasswords[show] ? '🙈' : '👁️'}
+                  <AppIcon name={showPasswords[show] ? 'eyeOff' : 'eye'} size={17} />
                 </button>
               </div>
             </Field>
@@ -297,4 +298,9 @@ const inputStyle = {
   fontSize: '0.875rem', outline: 'none',
   fontFamily: 'DM Sans, sans-serif', color: 'rgb(33,37,41)',
   background: '#fff', boxSizing: 'border-box',
+};
+const headingIconStyle = {
+  display: 'inline-flex',
+  alignItems: 'center',
+  gap: 8
 };

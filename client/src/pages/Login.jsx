@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Spinner } from '../components/LoadingSpinner';
+import AppIcon from '../components/AppIcon';
 
 export default function Login() {
   const [form, setForm] = useState({ universityEmail: '', password: '' });
@@ -143,7 +144,7 @@ export default function Login() {
                 color: '#ffb3b3', fontSize: '0.85rem',
                 display: 'flex', alignItems: 'center', gap: 8,
               }}>
-                ⚠️ {error}
+                <AppIcon name="warning" size={16} /> {error}
               </div>
             )}
 

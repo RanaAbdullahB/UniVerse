@@ -14,6 +14,7 @@ import {
   enablePushNotifications,
   disablePushNotifications
 } from '../utils/pushNotifications';
+import AppIcon from './AppIcon';
 
 export default function NotificationToggle() {
   const [supported,  setSupported]  = useState(false);
@@ -62,7 +63,7 @@ export default function NotificationToggle() {
     return (
       <div style={styles.row}>
         <div>
-          <div style={styles.label}>🔔 Push Notifications</div>
+          <div style={styles.label}><AppIcon name="bell" size={16} /> Push Notifications</div>
           <div style={styles.sub}>Not supported in this browser.</div>
         </div>
       </div>
@@ -73,9 +74,9 @@ export default function NotificationToggle() {
     return (
       <div style={styles.row}>
         <div>
-          <div style={styles.label}>🔔 Push Notifications</div>
+          <div style={styles.label}><AppIcon name="bell" size={16} /> Push Notifications</div>
           <div style={styles.sub}>
-            Blocked by browser. To enable, click the 🔒 icon in your address bar → Notifications → Allow.
+            Blocked by browser. To enable, click the lock icon in your address bar, then Notifications, then Allow.
           </div>
         </div>
       </div>
@@ -86,7 +87,7 @@ export default function NotificationToggle() {
     <div>
       <div style={styles.row}>
         <div>
-          <div style={styles.label}>🔔 Push Notifications</div>
+          <div style={styles.label}><AppIcon name="bell" size={16} /> Push Notifications</div>
           <div style={styles.sub}>
             {enabled
               ? 'You\'ll receive alerts for DMs, announcements, and new events.'
@@ -133,6 +134,9 @@ const styles = {
     borderTop:      '1px solid var(--border)'
   },
   label: {
+    display:     'flex',
+    alignItems:  'center',
+    gap:         6,
     fontWeight:  600,
     fontSize:    15,
     color:       'var(--text-primary)',
