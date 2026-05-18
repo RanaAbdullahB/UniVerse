@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { BarChart2, Users, Building2, Calendar, BookOpen, Megaphone, ClipboardList, LogOut } from 'lucide-react';
 import AdminOverview       from './AdminOverview';
 import AdminUsers          from './AdminUsers';
 import AdminClubs          from './AdminClubs';
@@ -11,13 +12,13 @@ import AdminAnnouncements  from './AdminAnnouncements';
 import AdminActivityLog    from './AdminActivityLog';
 
 const TABS = [
-  { id: 'overview',      label: 'Overview',       icon: '📊' },
-  { id: 'users',         label: 'Users',           icon: '👥' },
-  { id: 'clubs',         label: 'Clubs',           icon: '🏛️' },
-  { id: 'events',        label: 'Events',          icon: '📅' },
-  { id: 'studyGroups',   label: 'Study Groups',    icon: '📚' },
-  { id: 'announcements', label: 'Announcements',   icon: '📢' },
-  { id: 'activityLog',   label: 'Activity Log',    icon: '📋' },
+  { id: 'overview',      label: 'Overview',       Icon: BarChart2     },
+  { id: 'users',         label: 'Users',           Icon: Users         },
+  { id: 'clubs',         label: 'Clubs',           Icon: Building2     },
+  { id: 'events',        label: 'Events',          Icon: Calendar      },
+  { id: 'studyGroups',   label: 'Study Groups',    Icon: BookOpen      },
+  { id: 'announcements', label: 'Announcements',   Icon: Megaphone     },
+  { id: 'activityLog',   label: 'Activity Log',    Icon: ClipboardList },
 ];
 
 export default function AdminDashboard() {
@@ -63,7 +64,7 @@ export default function AdminDashboard() {
                 onMouseEnter={e => { if (!isActive) { e.currentTarget.style.background = 'rgba(255,255,255,0.07)'; e.currentTarget.style.color = '#fff'; } }}
                 onMouseLeave={e => { if (!isActive) { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'rgba(255,255,255,0.55)'; } }}>
                 {isActive && <div style={{ position: 'absolute', left: 0, top: '20%', bottom: '20%', width: 3, borderRadius: '0 2px 2px 0', background: 'var(--blue-primary)' }} />}
-                <span style={{ fontSize: '1rem', lineHeight: 1, flexShrink: 0 }}>{tab.icon}</span>
+                <tab.Icon size={16} strokeWidth={1.8} style={{ flexShrink: 0 }} />
                 <span>{tab.label}</span>
               </button>
             );
@@ -78,17 +79,20 @@ export default function AdminDashboard() {
             </div>
           </div>
           <button onClick={handleLogout}
-            style={{ width: '100%', padding: '0.55rem', borderRadius: '8px', border: '1px solid rgba(220,53,69,0.3)', background: 'rgba(220,53,69,0.12)', color: 'rgba(255,190,190,0.9)', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 500, transition: 'all 0.15s', fontFamily: 'DM Sans, sans-serif' }}
+            style={{ width: '100%', padding: '0.55rem', borderRadius: '8px', border: '1px solid rgba(220,53,69,0.3)', background: 'rgba(220,53,69,0.12)', color: 'rgba(255,190,190,0.9)', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 500, transition: 'all 0.15s', fontFamily: 'DM Sans, sans-serif', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}
             onMouseEnter={e => { e.currentTarget.style.background = 'rgba(220,53,69,0.3)'; e.currentTarget.style.color = '#fff'; }}
             onMouseLeave={e => { e.currentTarget.style.background = 'rgba(220,53,69,0.12)'; e.currentTarget.style.color = 'rgba(255,190,190,0.9)'; }}>
-            Sign Out
+            <LogOut size={14} /> Sign Out
           </button>
         </div>
       </aside>
       <main style={{ marginLeft: 240, flex: 1, minWidth: 0, padding: '2rem' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.75rem', flexWrap: 'wrap', gap: '0.75rem' }}>
           <div>
-            <h1 style={{ fontFamily: 'Playfair Display, serif', fontSize: '1.75rem', fontWeight: 700, color: 'var(--dark-primary)', margin: 0, lineHeight: 1.2 }}>{currentTab?.icon} {currentTab?.label}</h1>
+            <h1 style={{ fontFamily: 'Playfair Display, serif', fontSize: '1.75rem', fontWeight: 700, color: 'var(--dark-primary)', margin: 0, lineHeight: 1.2, display: 'flex', alignItems: 'center', gap: 10 }}>
+              {currentTab && <currentTab.Icon size={24} strokeWidth={1.8} style={{ color: 'var(--blue-primary)' }} />}
+              {currentTab?.label}
+            </h1>
             <p style={{ color: 'var(--text-muted)', margin: '0.3rem 0 0', fontSize: '0.82rem' }}>Lahore Garrison University — Admin Portal</p>
           </div>
           <div style={{ background: '#fff', borderRadius: '8px', padding: '0.5rem 0.875rem', border: '1px solid var(--border)', fontSize: '0.78rem', color: 'var(--text-muted)', alignSelf: 'flex-end' }}>

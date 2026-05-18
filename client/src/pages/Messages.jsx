@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { io } from 'socket.io-client';
 import api from '../utils/api';
 import { useAuth } from '../context/AuthContext';
+import { Pencil, MessageSquare, Send, Check, CheckCheck, Clock } from 'lucide-react';
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -510,7 +511,7 @@ export default function Messages() {
               title="New message"
               style={styles.newDmBtn}
             >
-              ✏️
+              <Pencil size={16} strokeWidth={2} />
             </button>
           </div>
 
@@ -556,10 +557,10 @@ export default function Messages() {
             <div style={styles.emptyState}>Loading conversations…</div>
           ) : conversations.length === 0 ? (
             <div style={styles.emptyState}>
-              <div style={{ fontSize: 36, marginBottom: 8 }}>💬</div>
+              <MessageSquare size={36} strokeWidth={1.4} style={{ color: 'var(--text-muted)', marginBottom: 8 }} />
               <div style={{ fontWeight: 600, marginBottom: 4 }}>No conversations yet</div>
               <div style={{ color: 'var(--text-muted)', fontSize: 13 }}>
-                Click ✏️ to message a student
+                Click the pencil icon to message a student
               </div>
             </div>
           ) : (
@@ -613,12 +614,12 @@ export default function Messages() {
         {/* No conversation selected */}
         {!activeConvo ? (
           <div style={styles.noChatState}>
-            <div style={{ fontSize: 56, marginBottom: 16 }}>💬</div>
+            <MessageSquare size={56} strokeWidth={1.2} style={{ color: 'var(--border)', marginBottom: 16 }} />
             <h3 style={{ fontFamily: 'Playfair Display, serif', marginBottom: 8 }}>
               Your Messages
             </h3>
             <p style={{ color: 'var(--text-muted)', maxWidth: 300, textAlign: 'center' }}>
-              Select a conversation on the left, or click ✏️ to start a new one.
+              Select a conversation on the left, or click the pencil icon to start a new one.
             </p>
           </div>
         ) : (
@@ -663,7 +664,7 @@ export default function Messages() {
               {/* Empty state */}
               {!loadingMessages && messages.length === 0 && (
                 <div style={styles.emptyChat}>
-                  <div style={{ fontSize: 32, marginBottom: 8 }}>👋</div>
+                  <MessageSquare size={32} strokeWidth={1.3} style={{ color: 'var(--border)', marginBottom: 8 }} />
                   <div>Say hello! This is the beginning of your conversation.</div>
                 </div>
               )}
@@ -719,13 +720,13 @@ export default function Messages() {
                       }}>
                         {formatTime(item.createdAt)}
                         {isMine && isOptimistic && (
-                          <span title="Sending…" style={{ marginLeft: 4 }}>⏳</span>
+                          <Clock size={10} style={{ marginLeft: 4, verticalAlign: 'middle', opacity: 0.7 }} />
                         )}
                         {isMine && !isOptimistic && item.readAt && (
-                          <span title="Seen" style={{ marginLeft: 4 }}>✓✓</span>
+                          <CheckCheck size={12} style={{ marginLeft: 4, verticalAlign: 'middle' }} />
                         )}
                         {isMine && !isOptimistic && !item.readAt && (
-                          <span title="Delivered" style={{ marginLeft: 4 }}>✓</span>
+                          <Check size={12} style={{ marginLeft: 4, verticalAlign: 'middle', opacity: 0.7 }} />
                         )}
                       </div>
                     </div>
@@ -774,7 +775,7 @@ export default function Messages() {
                   cursor:  draft.trim() && !sending ? 'pointer' : 'default'
                 }}
               >
-                {sending ? '…' : '➤'}
+                {sending ? <Clock size={16} /> : <Send size={16} />}
               </button>
             </div>
           </>

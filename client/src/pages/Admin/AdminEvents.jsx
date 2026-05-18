@@ -1,6 +1,7 @@
 // client/src/pages/admin/AdminEvents.jsx
 import React from 'react';
 import { useState, useEffect, useCallback } from 'react';
+import { Users, QrCode, Pencil, Trash2 } from 'lucide-react';
 import api from '../../utils/api';
 import { useToast } from '../../context/ToastContext';
 import { PageLoader, InlineLoader } from '../../components/LoadingSpinner';
@@ -270,30 +271,29 @@ export default function AdminEvents() {
                   <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
                     <button
                       onClick={() => openRegistrations(event)}
-                      style={{ flex: 1, padding: '0.5rem 0.5rem', borderRadius: '7px', border: '1.5px solid var(--blue-primary)', background: 'var(--blue-tint)', color: 'var(--blue-primary)', cursor: 'pointer', fontSize: '0.78rem', fontWeight: 600, whiteSpace: 'nowrap', transition: 'all 0.15s' }}
+                      style={{ flex: 1, padding: '0.5rem 0.5rem', borderRadius: '7px', border: '1.5px solid var(--blue-primary)', background: 'var(--blue-tint)', color: 'var(--blue-primary)', cursor: 'pointer', fontSize: '0.78rem', fontWeight: 600, whiteSpace: 'nowrap', transition: 'all 0.15s', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5 }}
                       onMouseEnter={e => { e.currentTarget.style.background = 'var(--blue-primary)'; e.currentTarget.style.color = '#fff'; }}
                       onMouseLeave={e => { e.currentTarget.style.background = 'var(--blue-tint)'; e.currentTarget.style.color = 'var(--blue-primary)'; }}>
-                      👥 Registrations ({regCount})
+                      <Users size={13} /> Registrations ({regCount})
                     </button>
                     <button onClick={() => openEdit(event)}
-                      style={{ padding: '0.5rem 0.75rem', borderRadius: '7px', border: '1.5px solid var(--border)', background: '#fff', color: 'var(--text-body)', cursor: 'pointer', fontSize: '0.78rem', fontWeight: 500, transition: 'all 0.15s' }}
+                      style={{ padding: '0.5rem 0.75rem', borderRadius: '7px', border: '1.5px solid var(--border)', background: '#fff', color: 'var(--text-body)', cursor: 'pointer', fontSize: '0.78rem', fontWeight: 500, transition: 'all 0.15s', display: 'flex', alignItems: 'center', gap: 5 }}
                       onMouseEnter={e => (e.currentTarget.style.borderColor = 'var(--blue-primary)')}
                       onMouseLeave={e => (e.currentTarget.style.borderColor = 'var(--border)')}>
-                      Edit
+                      <Pencil size={13} /> Edit
                     </button>
                     <button onClick={() => setDeleteId(event._id)}
-                      style={{ padding: '0.5rem 0.75rem', borderRadius: '7px', border: '1.5px solid rgba(220,53,69,0.25)', background: 'rgba(220,53,69,0.06)', color: 'var(--error)', cursor: 'pointer', fontSize: '0.78rem', fontWeight: 500, transition: 'all 0.15s' }}
+                      style={{ padding: '0.5rem 0.75rem', borderRadius: '7px', border: '1.5px solid rgba(220,53,69,0.25)', background: 'rgba(220,53,69,0.06)', color: 'var(--error)', cursor: 'pointer', fontSize: '0.78rem', fontWeight: 500, transition: 'all 0.15s', display: 'flex', alignItems: 'center', gap: 5 }}
                       onMouseEnter={e => { e.currentTarget.style.background = 'var(--error)'; e.currentTarget.style.color = '#fff'; }}
                       onMouseLeave={e => { e.currentTarget.style.background = 'rgba(220,53,69,0.06)'; e.currentTarget.style.color = 'var(--error)'; }}>
-                      Delete
+                      <Trash2 size={13} /> Delete
                     </button>
-                    {/* ── QR Button ── */}
                     <button
                       onClick={() => setQrEvent(event)}
-                      style={{ padding: '0.5rem 0.75rem', borderRadius: '7px', border: '1.5px solid var(--blue-primary)', background: 'var(--blue-tint)', color: 'var(--blue-primary)', cursor: 'pointer', fontSize: '0.78rem', fontWeight: 600, transition: 'all 0.15s' }}
+                      style={{ padding: '0.5rem 0.75rem', borderRadius: '7px', border: '1.5px solid var(--blue-primary)', background: 'var(--blue-tint)', color: 'var(--blue-primary)', cursor: 'pointer', fontSize: '0.78rem', fontWeight: 600, transition: 'all 0.15s', display: 'flex', alignItems: 'center', gap: 5 }}
                       onMouseEnter={e => { e.currentTarget.style.background = 'var(--blue-primary)'; e.currentTarget.style.color = '#fff'; }}
                       onMouseLeave={e => { e.currentTarget.style.background = 'var(--blue-tint)'; e.currentTarget.style.color = 'var(--blue-primary)'; }}>
-                      📲 QR
+                      <QrCode size={13} /> QR
                     </button>
                   </div>
                 </div>

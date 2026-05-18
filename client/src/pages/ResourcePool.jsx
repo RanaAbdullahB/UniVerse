@@ -10,6 +10,11 @@
 import { useState, useEffect, useRef } from 'react';
 import api from '../utils/api';
 import { useAuth } from '../context/AuthContext';
+import {
+  Upload, HelpCircle, BookOpen, FileText, Layout, Book,
+  ClipboardList, Folder, Paperclip, Trash2, Download,
+  Inbox, CheckCircle, Search, Plus, X
+} from 'lucide-react';
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -21,9 +26,19 @@ const DEPARTMENTS = [
   'English', 'Management Sciences'
 ];
 
-const TYPE_ICONS = {
-  PDF: '📄', Notes: '📝', Slides: '📊', Book: '📚', Assignment: '📋', Other: '📁'
+const TYPE_ICON_MAP = {
+  PDF:        FileText,
+  Notes:      FileText,
+  Slides:     Layout,
+  Book:       Book,
+  Assignment: ClipboardList,
+  Other:      Folder
 };
+
+function TypeIcon({ type, size = 14, style = {} }) {
+  const Icon = TYPE_ICON_MAP[type] || Folder;
+  return <Icon size={size} strokeWidth={1.8} style={style} />;
+}
 
 const TYPE_COLORS = {
   PDF:        { bg: 'rgba(220,53,69,0.08)',   color: '#dc3545' },
@@ -107,7 +122,7 @@ function UploadModal({ onClose, onUploaded, fulfillRequest = null }) {
         {/* Header */}
         <div style={mStyles.header}>
           <h3 style={mStyles.title}>
-            {fulfillRequest ? `✅ Fulfill: "${fulfillRequest.title}"` : '📤 Share a Resource'}
+            {fulfillRequest ? `Fulfill: "${fulfillRequest.title}"` : 'Share a Resource'}
           </h3>
           <button onClick={onClose} style={mStyles.closeBtn}>✕</button>
         </div>
@@ -174,14 +189,14 @@ function UploadModal({ onClose, onUploaded, fulfillRequest = null }) {
             >
               {file ? (
                 <>
-                  <div style={{ fontSize: 28, marginBottom: 4 }}>✅</div>
+                  <div style={{ fontSize: 28, marginBottom: 4 }}><CheckCircle size={28} strokeWidth={1.6} style={{ color: 'var(--success)' }} /></div>
                   <div style={{ fontWeight: 600, fontSize: 14, color: 'var(--success)' }}>{file.name}</div>
                   <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>{formatSize(file.size)}</div>
                   <div style={{ fontSize: 12, color: 'var(--blue-primary)', marginTop: 6 }}>Click to change</div>
                 </>
               ) : (
                 <>
-                  <div style={{ fontSize: 28, marginBottom: 4 }}>📎</div>
+                  <div style={{ marginBottom: 4 }}><Paperclip size={28} strokeWidth={1.6} style={{ color: 'var(--text-muted)' }} /></div>
                   <div style={{ fontSize: 14, color: 'var(--text-muted)' }}>Click to select file</div>
                   <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>PDF, DOCX, PPTX, XLSX, TXT, ZIP</div>
                 </>
@@ -238,7 +253,7 @@ function RequestModal({ onClose, onRequested }) {
     <div style={overlay} onClick={e => e.target === e.currentTarget && onClose()}>
       <div style={modal}>
         <div style={mStyles.header}>
-          <h3 style={mStyles.title}>🙋 Request a Resource</h3>
+          <h3 style={mStyles.title}>Request a Resource</h3>
           <button onClick={onClose} style={mStyles.closeBtn}>✕</button>
         </div>
 
@@ -409,15 +424,15 @@ export default function ResourcePool() {
       {/* ── Page header ── */}
       <div style={s.pageHeader}>
         <div>
-          <h1 style={s.pageTitle}>📚 Resource Pool</h1>
+          <h1 style={s.pageTitle}>Resource Pool</h1>
           <p style={s.pageSubtitle}>Share study materials · Ask for what you need · Help each other succeed</p>
         </div>
         <div style={s.headerActions}>
           <button onClick={() => setShowRequest(true)} style={s.secondaryBtn}>
-            🙋 Request
+            <HelpCircle size={15} strokeWidth={2} style={{ marginRight: 6 }} /> Request
           </button>
           <button onClick={() => setShowUpload(true)} style={s.primaryBtn}>
-            📤 Share Resource
+            <Upload size={15} strokeWidth={2} style={{ marginRight: 6 }} /> Share Resource
           </button>
         </div>
       </div>
@@ -425,8 +440,8 @@ export default function ResourcePool() {
       {/* ── Tabs ── */}
       <div style={s.tabs}>
         {[
-          { key: 'resources', label: `📚 Resources (${resources.length})` },
-          { key: 'requests',  label: `🙋 Requests` }
+          { key: 'resources', label: 'Resources', icon: <BookOpen size={14} strokeWidth={2} /> },
+          { key: 'requests',  label: 'Requests',  icon: <HelpCircle size={14} strokeWidth={2} /> }
         ].map(t => (
           <button
             key={t.key}
@@ -435,10 +450,11 @@ export default function ResourcePool() {
               ...s.tab,
               background:   tab === t.key ? 'var(--blue-primary)' : 'transparent',
               color:        tab === t.key ? '#fff' : 'var(--text-muted)',
-              fontWeight:   tab === t.key ? 700 : 400
+              fontWeight:   tab === t.key ? 700 : 400,
+              display: 'flex', alignItems: 'center', gap: 6
             }}
           >
-            {t.label}
+            {t.icon} {t.label}{t.key === 'resources' ? ` (${resources.length})` : ''}
           </button>
         ))}
       </div>
@@ -471,13 +487,11 @@ export default function ResourcePool() {
             <div style={s.center}><div style={s.spinner} /></div>
           ) : resources.length === 0 ? (
             <div style={s.emptyState}>
-              <div style={{ fontSize: 48, marginBottom: 12 }}>📭</div>
+              <div style={{ marginBottom: 12 }}><Inbox size={48} strokeWidth={1.3} style={{ color: 'var(--border)' }} /></div>
               <div style={{ fontWeight: 600, marginBottom: 4 }}>No resources yet</div>
-              <div style={{ fontSize: 14, color: 'var(--text-muted)' }}>
-                Be the first to share something!
-              </div>
-              <button onClick={() => setShowUpload(true)} style={{ ...s.primaryBtn, marginTop: 16 }}>
-                📤 Share Resource
+              <div style={{ fontSize: 14, color: 'var(--text-muted)' }}>Be the first to share something!</div>
+              <button onClick={() => setShowUpload(true)} style={{ ...s.primaryBtn, marginTop: 16, display: 'flex', alignItems: 'center', gap: 6 }}>
+                <Upload size={14} /> Share Resource
               </button>
             </div>
           ) : (
@@ -491,12 +505,12 @@ export default function ResourcePool() {
                     <div style={s.cardBody}>
                       {/* Type badge */}
                       <div style={s.cardTop}>
-                        <span style={{ ...s.badge, background: tc.bg, color: tc.color }}>
-                          {TYPE_ICONS[resource.resourceType]} {resource.resourceType}
+                        <span style={{ ...s.badge, background: tc.bg, color: tc.color, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                          <TypeIcon type={resource.resourceType} size={12} /> {resource.resourceType}
                         </span>
                         {resource.fulfilledRequest && (
-                          <span style={{ ...s.badge, background: 'rgba(25,135,84,0.08)', color: 'var(--success)', fontSize: 11 }}>
-                            ✅ Fulfilled
+                          <span style={{ ...s.badge, background: 'rgba(25,135,84,0.08)', color: 'var(--success)', fontSize: 11, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                            <CheckCircle size={11} /> Fulfilled
                           </span>
                         )}
                       </div>
@@ -510,9 +524,9 @@ export default function ResourcePool() {
                       {/* Meta */}
                       <div style={s.cardMeta}>
                         {resource.course && <span>📖 {resource.course}</span>}
-                        <span>🏛️ {resource.department}</span>
-                        <span>⬇️ {resource.downloads} downloads</span>
-                        {resource.fileSize > 0 && <span>💾 {formatSize(resource.fileSize)}</span>}
+                        <span>{resource.department}</span>
+                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 3 }}><Download size={11} /> {resource.downloads}</span>
+                        {resource.fileSize > 0 && <span>{formatSize(resource.fileSize)}</span>}
                       </div>
 
                       {/* Footer */}
@@ -522,19 +536,12 @@ export default function ResourcePool() {
                         </div>
                         <div style={{ display: 'flex', gap: 6 }}>
                           {(isOwner || user.role === 'admin') && (
-                            <button
-                              onClick={() => handleDeleteResource(resource._id)}
-                              style={s.deleteBtn}
-                              title="Delete"
-                            >
-                              🗑️
+                            <button onClick={() => handleDeleteResource(resource._id)} style={s.deleteBtn} title="Delete">
+                              <Trash2 size={13} />
                             </button>
                           )}
-                          <button
-                            onClick={() => handleDownload(resource)}
-                            style={s.downloadBtn}
-                          >
-                            ⬇️ Download
+                          <button onClick={() => handleDownload(resource)} style={{ ...s.downloadBtn, display: 'flex', alignItems: 'center', gap: 5 }}>
+                            <Download size={13} /> Download
                           </button>
                         </div>
                       </div>
@@ -563,8 +570,8 @@ export default function ResourcePool() {
               <option value="All">All Departments</option>
               {DEPARTMENTS.map(d => <option key={d}>{d}</option>)}
             </select>
-            <button onClick={() => setShowRequest(true)} style={{ ...s.primaryBtn, marginLeft: 'auto' }}>
-              + New Request
+            <button onClick={() => setShowRequest(true)} style={{ ...s.primaryBtn, marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 6 }}>
+              <Plus size={14} /> New Request
             </button>
           </div>
 
@@ -572,13 +579,13 @@ export default function ResourcePool() {
             <div style={s.center}><div style={s.spinner} /></div>
           ) : requests.length === 0 ? (
             <div style={s.emptyState}>
-              <div style={{ fontSize: 48, marginBottom: 12 }}>🙋</div>
+              <div style={{ marginBottom: 12 }}><HelpCircle size={48} strokeWidth={1.3} style={{ color: 'var(--border)' }} /></div>
               <div style={{ fontWeight: 600, marginBottom: 4 }}>No requests yet</div>
               <div style={{ fontSize: 14, color: 'var(--text-muted)' }}>
                 Need something? Post a request and a fellow student might help!
               </div>
-              <button onClick={() => setShowRequest(true)} style={{ ...s.primaryBtn, marginTop: 16 }}>
-                + Post Request
+              <button onClick={() => setShowRequest(true)} style={{ ...s.primaryBtn, marginTop: 16, display: 'flex', alignItems: 'center', gap: 6 }}>
+                <Plus size={14} /> Post Request
               </button>
             </div>
           ) : (
@@ -605,16 +612,16 @@ export default function ResourcePool() {
                           <div style={s.requestDesc}>{req.description}</div>
                         )}
                         <div style={s.requestMeta}>
-                          <span style={{ ...s.badge, background: tc.bg, color: tc.color, fontSize: 11 }}>
-                            {TYPE_ICONS[req.resourceType]} {req.resourceType}
+                          <span style={{ ...s.badge, background: tc.bg, color: tc.color, fontSize: 11, display: 'inline-flex', alignItems: 'center', gap: 3 }}>
+                            <TypeIcon type={req.resourceType} size={11} /> {req.resourceType}
                           </span>
                           {req.course && <span>📖 {req.course}</span>}
                           <span>🏛️ {req.department}</span>
                           <span>By <strong>{req.requesterName}</strong> · {timeAgo(req.createdAt)}</span>
                         </div>
                         {isFulfilled && (
-                          <div style={{ fontSize: 12, color: 'var(--success)', marginTop: 4, fontWeight: 600 }}>
-                            ✅ Fulfilled by {req.fulfilledByName}
+                          <div style={{ fontSize: 12, color: 'var(--success)', marginTop: 4, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 4 }}>
+                            <CheckCircle size={13} /> Fulfilled by {req.fulfilledByName}
                           </div>
                         )}
                       </div>
@@ -622,25 +629,21 @@ export default function ResourcePool() {
 
                     <div style={s.requestActions}>
                       {isOwner && !isFulfilled && (
-                        <button
-                          onClick={() => handleDeleteRequest(req._id)}
-                          style={s.deleteBtn}
-                          title="Delete request"
-                        >
-                          🗑️
+                        <button onClick={() => handleDeleteRequest(req._id)} style={s.deleteBtn} title="Delete request">
+                          <Trash2 size={13} />
                         </button>
                       )}
                       {!isFulfilled && !isOwner && (
                         <button
                           onClick={() => { setFulfillTarget(req); setShowUpload(true); }}
-                          style={s.fulfillBtn}
+                          style={{ ...s.fulfillBtn, display: 'flex', alignItems: 'center', gap: 5 }}
                         >
-                          📤 I have this!
+                          <Upload size={13} /> I have this!
                         </button>
                       )}
                       {isFulfilled && (
-                        <span style={{ fontSize: 12, color: 'var(--success)', fontWeight: 600 }}>
-                          ✅ Done
+                        <span style={{ fontSize: 12, color: 'var(--success)', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 4 }}>
+                          <CheckCircle size={13} /> Done
                         </span>
                       )}
                     </div>

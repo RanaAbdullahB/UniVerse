@@ -12,6 +12,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { QRCodeCanvas } from 'qrcode.react';
+import { Smartphone, QrCode, CheckCircle, Download, Copy, Lightbulb, Inbox } from 'lucide-react';
 import api from '../utils/api';
 
 export default function EventQRModal({ event, onClose }) {
@@ -90,7 +91,7 @@ export default function EventQRModal({ event, onClose }) {
         {/* Header */}
         <div style={styles.header}>
           <div>
-            <h2 style={styles.title}>📲 {event.title}</h2>
+            <h2 style={styles.title}><Smartphone size={18} style={{ marginRight: 8, verticalAlign: 'middle' }} />{event.title}</h2>
             <p style={styles.sub}>QR Check-in System</p>
           </div>
           <button onClick={onClose} style={styles.closeBtn}>✕</button>
@@ -109,7 +110,7 @@ export default function EventQRModal({ event, onClose }) {
                 fontWeight:  tab === t ? 700 : 400
               }}
             >
-              {t === 'qr' ? '🔲 QR Code' : `✅ Check-ins (${checkIns.length || '…'})`}
+              {t === 'qr' ? <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}><QrCode size={14} /> QR Code</span> : <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}><CheckCircle size={14} /> Check-ins ({checkIns.length || '…'})</span>}
             </button>
           ))}
         </div>
@@ -152,18 +153,18 @@ export default function EventQRModal({ event, onClose }) {
                 {/* Actions */}
                 <div style={styles.qrActions}>
                   <button onClick={downloadQR} style={styles.actionBtn}>
-                    ⬇️ Download QR
+                    <Download size={15} style={{ marginRight: 6 }} /> Download QR
                   </button>
                   <button
                     onClick={() => navigator.clipboard.writeText(tokenData.checkInUrl)}
                     style={{ ...styles.actionBtn, background: 'var(--bg-page)', color: 'var(--text-body)' }}
                   >
-                    📋 Copy Link
+                    <Copy size={15} style={{ marginRight: 6 }} /> Copy Link
                   </button>
                 </div>
 
-                <p style={{ ...styles.hint, marginTop: 16, fontSize: 12 }}>
-                  💡 Print this QR code and display it at the event entrance.
+                <p style={{ ...styles.hint, marginTop: 16, fontSize: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4 }}>
+                  <Lightbulb size={13} /> Print this QR code and display it at the event entrance.
                 </p>
               </>
             ) : (
@@ -194,7 +195,7 @@ export default function EventQRModal({ event, onClose }) {
               </div>
               {checkIns.length > 0 && (
                 <button onClick={exportCSV} style={styles.csvBtn}>
-                  ⬇️ Export CSV
+                  <Download size={13} style={{ marginRight: 4 }} /> Export CSV
                 </button>
               )}
             </div>
@@ -205,7 +206,7 @@ export default function EventQRModal({ event, onClose }) {
               </div>
             ) : checkIns.length === 0 ? (
               <div style={styles.emptyState}>
-                <div style={{ fontSize: 36, marginBottom: 8 }}>📭</div>
+                <Inbox size={36} strokeWidth={1.4} style={{ color: 'var(--text-muted)', marginBottom: 8 }} />
                 <p>No check-ins yet. Share the QR code at the event entrance.</p>
               </div>
             ) : (
@@ -348,7 +349,10 @@ const styles = {
     fontSize:       14,
     fontWeight:     600,
     cursor:         'pointer',
-    fontFamily:     'DM Sans, sans-serif'
+    fontFamily:     'DM Sans, sans-serif',
+    display:        'flex',
+    alignItems:     'center',
+    justifyContent: 'center'
   },
   checkinsHeader: {
     display:        'flex',

@@ -1,15 +1,16 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { Home, Building2, Calendar, BookOpen, MessageSquare, Library, User } from 'lucide-react';
 
 const navItems = [
-  { key: 'home',          label: 'Home',               icon: '🏠' },
-  { key: 'clubs',         label: 'Societies & Clubs',  icon: '🏛️' },
-  { key: 'events',        label: 'Upcoming Events',    icon: '📅' },
-  { key: 'studygroups',   label: 'Study Groups',       icon: '📚' },
-  { key: 'messages',      label: 'Messages',           icon: '💬' },
-  { key: 'resource-pool', label: 'Resource Pool',      icon: '📚' },
-  { key: 'profile',       label: 'My Profile',         icon: '👤' },
+  { key: 'home',          label: 'Home',               Icon: Home          },
+  { key: 'clubs',         label: 'Societies & Clubs',  Icon: Building2     },
+  { key: 'events',        label: 'Upcoming Events',    Icon: Calendar      },
+  { key: 'studygroups',   label: 'Study Groups',       Icon: BookOpen      },
+  { key: 'messages',      label: 'Messages',           Icon: MessageSquare },
+  { key: 'resource-pool', label: 'Resource Pool',      Icon: Library       },
+  { key: 'profile',       label: 'My Profile',         Icon: User          },
 ];
 
 export default function Sidebar({ activeTab, onTabChange, mobileOpen, onClose }) {
@@ -110,7 +111,7 @@ export default function Sidebar({ activeTab, onTabChange, mobileOpen, onClose })
                 onClick={() => { onTabChange(item.key); onClose && onClose(); }}
                 style={{ border: 'none', background: 'none', width: '100%', cursor: 'pointer', marginBottom: 2 }}
               >
-                <span style={{ fontSize: '1rem' }}>{item.icon}</span>
+                <item.Icon size={16} strokeWidth={1.8} />
                 <span>{item.label}</span>
               </button>
             );
