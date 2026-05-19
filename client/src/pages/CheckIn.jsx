@@ -27,7 +27,7 @@ export default function CheckIn() {
   useEffect(() => {
     (async () => {
       try {
-        const { data } = await api.get(`/api/checkin/${eventId}/verify/${token}`);
+        const { data } = await api.get(`/checkin/${eventId}/verify/${token}`);
         if (data.success) {
           setEvent(data.event);
           setStatus(user ? 'ready' : 'login');
@@ -51,7 +51,7 @@ export default function CheckIn() {
 
     setLoading(true);
     try {
-      const { data } = await api.post(`/api/checkin/${eventId}`, { token });
+      const { data } = await api.post(`/checkin/${eventId}`, { token });
       if (data.success) {
         setStatus('success');
         setMessage(data.message);
