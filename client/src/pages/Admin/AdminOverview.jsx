@@ -9,6 +9,24 @@ import { PageLoader, InlineLoader } from '../../components/LoadingSpinner';
 // ── Month helper ──────────────────────────────────────────────
 const MONTH_NAMES = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
+function getAnalyticsPayload(body) {
+  return body?.data ?? body?.analytics ?? body;
+}
+
+function normalizeStats(body) {
+  const raw = body?.data ?? body?.stats ?? body;
+  if (!raw || typeof raw !== 'object') return null;
+
+  return {
+    totalStudents: raw.totalStudents ?? raw.totalUsers ?? 0,
+    totalClubs: raw.totalClubs ?? 0,
+    totalEvents: raw.totalEvents ?? 0,
+    totalStudyGroups: raw.totalStudyGroups ?? raw.totalGroups ?? 0,
+    upcomingEvents: raw.upcomingEvents ?? 0,
+    recentUsers: body?.recentUsers ?? raw.recentUsers ?? [],
+  };
+}
+
 function buildMonthlyData(rawData) {
   const now = new Date();
   const labels = [];
@@ -45,8 +63,10 @@ Chart.defaults.color = '#7e7e7e';
 // Analytics Section (Chart.js charts)
 // ─────────────────────────────────────────────────────────────
 function AnalyticsSection() {
+  const { showToast } = useToast();
   const [analytics, setAnalytics] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState('');
 
   // canvas refs
   const deptRef    = useRef(null);
@@ -61,11 +81,34 @@ function AnalyticsSection() {
   const eventInst  = useRef(null);
 
   useEffect(() => {
+    let cancelled = false;
+
     api.get('/admin/analytics')
-      .then(res => setAnalytics(res.data.data))
-      .catch(() => {})
-      .finally(() => setLoading(false));
-  }, []);
+      .then((res) => {
+        if (cancelled) return;
+        const payload = getAnalyticsPayload(res.data);
+        if (!payload || typeof payload !== 'object') {
+          setLoadError('Analytics response was empty.');
+          return;
+        }
+        setAnalytics(payload);
+        setLoadError('');
+      })
+      .catch((err) => {
+        if (cancelled) return;
+        const msg = err.response?.data?.message
+          || (err.response?.status === 404
+            ? 'Analytics endpoint not found on the server.'
+            : 'Could not load analytics. Check that the API server is running.');
+        setLoadError(msg);
+        showToast(msg, 'error');
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+
+    return () => { cancelled = true; };
+  }, [showToast]);
 
   // ── Chart 1: Students by Department (horizontal bar) ──
   useEffect(() => {
@@ -243,7 +286,7 @@ function AnalyticsSection() {
   if (!analytics) {
     return (
       <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-muted)' }}>
-        <p>Analytics data unavailable. Make sure the /api/admin/analytics endpoint is added to the backend.</p>
+        <p>{loadError || 'Analytics data unavailable. Make sure the /api/admin/analytics endpoint is reachable and you are logged in as an admin.'}</p>
       </div>
     );
   }
@@ -340,7 +383,7 @@ export default function AdminOverview({ onTabChange }) {
   const fetchStats = useCallback(async () => {
     try {
       const res = await api.get('/admin/stats');
-      setStats(res.data.data || res.data);
+      setStats(normalizeStats(res.data));
     } catch {
       showToast('Failed to load stats', 'error');
     } finally {

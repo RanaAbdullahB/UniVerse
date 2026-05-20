@@ -7,7 +7,7 @@
  * 3. Background sync readiness
  */
 
-const CACHE_NAME = 'universe-v1';
+const CACHE_NAME = 'universe-v2';
 const STATIC_ASSETS = [
   '/',
   '/login',
@@ -50,7 +50,13 @@ self.addEventListener('fetch', (event) => {
 
   if (request.method !== 'GET') return;
 
-  // API requests: network-first, fall back to cache
+  // Admin/analytics API: always network (avoid stale empty/error payloads in PWA)
+  if (url.pathname.startsWith('/api/admin/')) {
+    event.respondWith(fetch(request));
+    return;
+  }
+
+  // Other API requests: network-first, fall back to cache
   if (url.pathname.startsWith('/api/')) {
     event.respondWith(
       fetch(request)

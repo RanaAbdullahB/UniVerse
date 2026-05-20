@@ -35,6 +35,19 @@ app.use('/api/conversations', require('./routes/conversations'));
 app.use('/api/resources', require('./routes/resources'));
 app.use('/api/chatbot',   require('./routes/chatbot'));
 app.use('/api/checkin',   require('./routes/checkin'));
+
+// Serve built React app (same origin as API for PWA / production)
+const clientDist = path.join(__dirname, '../client/dist');
+if (process.env.SERVE_CLIENT === 'true' || process.env.NODE_ENV === 'production') {
+  app.use(express.static(clientDist));
+  app.get(/^\/(?!api\/).*/, (req, res, next) => {
+    if (req.method !== 'GET') return next();
+    res.sendFile(path.join(clientDist, 'index.html'), (err) => {
+      if (err) next();
+    });
+  });
+}
+
 // ── Health check ──────────────────────────────────────────────
 app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', message: 'UniVerse API is running' });

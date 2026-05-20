@@ -32,6 +32,14 @@ router.get('/stats', async (req, res, next) => {
 
     res.json({
       success: true,
+      data: {
+        totalStudents: totalUsers,
+        totalClubs,
+        totalEvents,
+        totalStudyGroups: totalGroups,
+        upcomingEvents,
+        recentUsers,
+      },
       stats: { totalUsers, totalClubs, totalEvents, totalGroups, upcomingEvents },
       recentUsers,
     });
